@@ -117,7 +117,7 @@ func (c *AwClient) UpdateEmail(id string, r *sioModel.UpdateEmailRequest) (*sioM
 	return response, nil
 }
 
-func (c *AwClient) UpdatePassword(id string, r *sioModel.UpdateEmailRequest) (*sioModel.AwUser, error) {
+func (c *AwClient) UpdatePassword(id string, r *sioModel.UpdatePasswordRequest) (*sioModel.AwUser, error) {
 	url := fmt.Sprintf("%s/users/%s/password", c.host, id)
 	rJSON, err := json.Marshal(r)
 	if err != nil {
@@ -139,7 +139,7 @@ func (c *AwClient) UpdatePassword(id string, r *sioModel.UpdateEmailRequest) (*s
 	return response, nil
 }
 
-func (c *AwClient) UpdatePhone(id string, r *sioModel.UpdateEmailRequest) (*sioModel.AwUser, error) {
+func (c *AwClient) UpdatePhone(id string, r *sioModel.UpdatePhoneRequest) (*sioModel.AwUser, error) {
 	url := fmt.Sprintf("%s/users/%s/phone", c.host, id)
 	rJSON, err := json.Marshal(r)
 	if err != nil {
