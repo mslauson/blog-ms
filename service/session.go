@@ -16,18 +16,17 @@ type SessionService struct {
 }
 
 type IamSessionService interface {
-	CreateEmailSession(r *sioModel.AwEmailSessionRequest) *sioModel.AwSession
-	DeleteSession(sID string) sioModelGeneric.SuccessResponse
+	CreateEmailSession(r *sioModel.AwEmailSessionRequest, c *gin.Context) *sioModel.AwSession
+	DeleteSession(sID string, c *gin.Context) sioModelGeneric.SuccessResponse
 }
 
-func NewSessionService(c *gin.Context) *SessionService {
+func NewSessionService() *SessionService {
 	return &SessionService{
-		c:        c,
 		awClient: client.NewAwClient(),
 	}
 }
 
-func (s *SessionService) CreateEmailSession(r *sioModel.AwEmailSessionRequest) *sioModel.AwSession {
+func (s *SessionService) CreateEmailSession(r *sioModel.AwEmailSessionRequest, c *gin.Context) *sioModel.AwSession {
 	response, err := s.awClient.CreateEmailSession(r)
 	if err != nil {
 		log.Error(err)
@@ -37,7 +36,7 @@ func (s *SessionService) CreateEmailSession(r *sioModel.AwEmailSessionRequest) *
 	return response
 }
 
-func (s *SessionService) DeleteSession(sID string) sioModelGeneric.SuccessResponse           {
+func (s *SessionService) DeleteSession(sID string, c *gin.Context) sioModelGeneric.SuccessResponse {
 	err := s.awClient.DeleteSession(sID)
 	if err != nil {
 		log.Error(err)

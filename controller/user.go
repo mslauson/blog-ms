@@ -137,6 +137,7 @@ func (uc *UserController) UpdatePhone(c *gin.Context) {
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("decryption failed - unable to proceed"))
 	}
+
 	if !uc.v.ValidateUpdatePhoneRequest(request) {
 		return
 	}
