@@ -4,6 +4,8 @@ gitea.slauson.io/slausonio/go-libs v0.0.94 h1:oscKRWt/Oxn564dnrljZZMwRJJhv0vD8rW
 gitea.slauson.io/slausonio/go-libs v0.0.94/go.mod h1:ikUtFdrrjY6185JaUmsht1wsHZwTL3wxzthzePNLCGo=
 gitea.slauson.io/slausonio/go-utils v0.0.15 h1:JV9XKoufjdlEWORq0p92FAgi7CSOPNhNOBlqillz6Es=
 gitea.slauson.io/slausonio/go-utils v0.0.15/go.mod h1:7BdAgWQO33jAXjUxVOohPt2v3FStkeS+miR41rPvqE8=
+gitea.slauson.io/slausonio/go-utils v0.0.16 h1:5lVVqIJ+UK9p1hbEH7PMF0j96u/5ySmwfCZJgTpIWG0=
+gitea.slauson.io/slausonio/go-utils v0.0.16/go.mod h1:7BdAgWQO33jAXjUxVOohPt2v3FStkeS+miR41rPvqE8=
 github.com/afiskon/promtail-client v0.0.0-20190305142237-506f3f921e9c h1:AMDVOKGaiqse4qiRXSzRgpC9DCNTHCx6zpzdtXXrKM4=
 github.com/afiskon/promtail-client v0.0.0-20190305142237-506f3f921e9c/go.mod h1:p/7Wos+jcfrnwLqqzJMZ0s323kfVtJPW+HUvAANklVQ=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
