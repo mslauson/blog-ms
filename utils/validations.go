@@ -18,7 +18,7 @@ func NewIamValidations(c *gin.Context) *IamValidations {
 	}
 }
 
-func (v *IamValidations) ValidateCreateUserRequest(r *sioModel.AwCreateUserRequest) {
+func (v *IamValidations) ValidateCreateUserRequest(r *sioModel.AwCreateUserRequest) bool {
 	var (
 		emailValid    bool = false
 		passwordValid bool = false
@@ -27,4 +27,22 @@ func (v *IamValidations) ValidateCreateUserRequest(r *sioModel.AwCreateUserReque
 	)
 
 	emailValid = v.validator.ValidateEmail(r.Email)
+	passwordValid = v.validator.ValidatePassword(r.Password)
+	nameValid = v.validator.ValidateName(r.Name)
+	phoneValid = v.validator.ValidatePhone(r.Phone)
+
+	return emailValid && passwordValid && nameValid && phoneValid
 }
+
+func (v *IamValidations) ValidateUpdatePasswordRequest(r *sioModel.UpdatePasswordRequest) bool {
+	return v.validator.ValidatePassword(r.Password)
+}
+
+func (v *IamValidations) ValidateUpdateEmailRequest(r *sioModel.UpdateEmailRequest) bool {
+	return v.validator.ValidateEmail(r.Email)
+}
+
+func (v *IamValidations) ValidateUpdatePhoneRequest(r *sioModel.UpdatePhoneRequest) bool {
+	return v.validator.ValidatePhone(r.Number)
+}
+
