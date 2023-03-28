@@ -16,8 +16,8 @@ type SessionService struct {
 }
 
 type IamSessionService interface {
-	CreateEmailSession(r *sioModel.AwEmailSessionRequest) (*sioModel.AwSession, error)
-	DeleteSession(sID string) (sioModelGeneric.SuccessResponse, error)
+	CreateEmailSession(r *sioModel.AwEmailSessionRequest) *sioModel.AwSession
+	DeleteSession(sID string) sioModelGeneric.SuccessResponse
 }
 
 func NewSessionService(c *gin.Context) *SessionService {
@@ -27,23 +27,23 @@ func NewSessionService(c *gin.Context) *SessionService {
 	}
 }
 
-func (s *SessionService) CreateEmailSession(r *sioModel.AwEmailSessionRequest) (*sioModel.AwSession, error) {
+func (s *SessionService) CreateEmailSession(r *sioModel.AwEmailSessionRequest) *sioModel.AwSession {
 	response, err := s.awClient.CreateEmailSession(r)
 	if err != nil {
 		log.Error(err)
 		s.c.AbortWithError(http.StatusBadRequest, err)
-		return nil, err
+		return nil
 	}
-	return response, nil
+	return response
 }
 
-func (s *SessionService) DeleteSession(sID string) (sioModelGeneric.SuccessResponse, error) {
+func (s *SessionService) DeleteSession(sID string) sioModelGeneric.SuccessResponse           {
 	err := s.awClient.DeleteSession(sID)
 	if err != nil {
 		log.Error(err)
 		s.c.AbortWithError(http.StatusBadRequest, err)
-		return sioModelGeneric.SuccessResponse{Success: true}, err
+		return sioModelGeneric.SuccessResponse{Success: true}
 	}
 
-	return sioModelGeneric.SuccessResponse{Success: true}, nil
+	return sioModelGeneric.SuccessResponse{Success: true}
 }
