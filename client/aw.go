@@ -7,13 +7,12 @@ import (
 	"os"
 	"strings"
 
-	sioRest "gitea.slauson.io/slausonio/go-utils/rest"
-
 	sioModel "gitea.slauson.io/slausonio/go-libs/model"
+	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 )
 
 type AwClient struct {
-	h              sioRest.RestHelpers
+	h              sioUtils.RestHelpers
 	defaultHeaders map[string][]string
 	host           string
 	key            string
@@ -33,7 +32,7 @@ type AppwriteClient interface {
 
 func NewAwClient() *AwClient {
 	return &AwClient{
-		h: sioRest.RestHelpers{},
+		h: sioUtils.RestHelpers{},
 		defaultHeaders: map[string][]string{
 			"Content-Type":       {"application/json"},
 			"X-Appwrite-Project": {os.Getenv("IAM_PROJECT")},

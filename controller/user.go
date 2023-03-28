@@ -1,16 +1,20 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	sioModel "gitea.slauson.io/slausonio/go-libs/model"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"gitea.slauson.io/slausonio/iam-ms/service"
+	"gitea.slauson.io/slausonio/iam-ms/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type UserController struct {
-	s service.IamUserService
+	s   service.IamUserService
+	enc *sioUtils.EncryptionUtil
+	v   *utils.IamValidations
 }
 
 type IamUserController interface {
@@ -26,6 +30,7 @@ type IamUserController interface {
 func NewUserController(c *gin.Context) *UserController {
 	return &UserController{
 		s: service.NewUserService(c),
+		v: utils.NewIamValidations(c),
 	}
 }
 
@@ -38,10 +43,6 @@ func (uc *UserController) ListUsers(c *gin.Context) {
 
 func (uc *UserController) GetUserById(c *gin.Context) {
 	id := c.Param("id")
-	newId, err := sioUtils.ConvertToInt64(id, c)
-	if err != nil {
-		return
-	}
 	response := uc.s.GetUserByID(id)
 	if response != nil {
 		c.JSON(http.StatusOK, response)
@@ -49,16 +50,23 @@ func (uc *UserController) GetUserById(c *gin.Context) {
 }
 
 func (uc *UserController) CreateUser(c *gin.Context) {
-	// TODO validations
-
-	var request sioModel.AwCreateUserRequest
+	request := new(sioModel.AwCreateUserRequest)
 	err := c.BindJSON(&request)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	result := uc.s.CreateUser(&request)
+	err = uc.enc.DecryptInterface(request, false)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("decryption failed - unable to proceed"))
+	}
+
+	if !uc.v.ValidateCreateUserRequest(request) {
+		return
+	}
+
+	result := uc.s.CreateUser(request)
 	if result != nil {
 		c.JSON(http.StatusOK, result)
 		return
@@ -66,20 +74,25 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 }
 
 func (uc *UserController) UpdatePassword(c *gin.Context) {
-	// TODO validations
 	id := c.Param("id")
-	newId, err := sioUtils.ConvertToInt64(id, c)
-	if err != nil {
-		return
-	}
-	var request sioModel.UpdatePasswordRequest
-	err = c.BindJSON(&request)
+	request := new(sioModel.UpdatePasswordRequest)
+
+	err := c.BindJSON(&request)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	result := uc.s.UpdatePassword(id, &request)
+	err = uc.enc.DecryptInterface(request, false)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("decryption failed - unable to proceed"))
+	}
+
+	if !uc.v.ValidateUpdatePasswordRequest(request) {
+		return
+	}
+
+	result := uc.s.UpdatePassword(id, request)
 	if result != nil {
 		c.JSON(http.StatusOK, result)
 		return
@@ -87,20 +100,23 @@ func (uc *UserController) UpdatePassword(c *gin.Context) {
 }
 
 func (uc *UserController) UpdateEmail(c *gin.Context) {
-	// TODO validations
 	id := c.Param("id")
-	newId, err := sioUtils.ConvertToInt64(id, c)
-	if err != nil {
-		return
-	}
-	var request sioModel.UpdateEmailRequest
-	err = c.BindJSON(&request)
+	request := new(sioModel.UpdateEmailRequest)
+
+	err := c.BindJSON(&request)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	result := uc.s.UpdateEmail(id, &request)
+	err = uc.enc.DecryptInterface(request, false)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("decryption failed - unable to proceed"))
+	}
+	if !uc.v.ValidateUpdateEmailRequest(request) {
+		return
+	}
+	result := uc.s.UpdateEmail(id, request)
 	if result != nil {
 		c.JSON(http.StatusOK, result)
 		return
@@ -108,20 +124,23 @@ func (uc *UserController) UpdateEmail(c *gin.Context) {
 }
 
 func (uc *UserController) UpdatePhone(c *gin.Context) {
-	// TODO validations
 	id := c.Param("id")
-	newId, err := sioUtils.ConvertToInt64(id, c)
-	if err != nil {
-		return
-	}
-	var request sioModel.UpdatePhoneRequest
-	err = c.BindJSON(&request)
+	request := new(sioModel.UpdatePhoneRequest)
+
+	err := c.BindJSON(&request)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	result := uc.s.UpdatePhone(id, &request)
+	err = uc.enc.DecryptInterface(request, false)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("decryption failed - unable to proceed"))
+	}
+	if !uc.v.ValidateUpdatePhoneRequest(request) {
+		return
+	}
+	result := uc.s.UpdatePhone(id, request)
 	if result != nil {
 		c.JSON(http.StatusOK, result)
 		return
@@ -130,10 +149,6 @@ func (uc *UserController) UpdatePhone(c *gin.Context) {
 
 func (uc *UserController) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
-	newId, err := sioUtils.ConvertToInt64(id, c)
-	if err != nil {
-		return
-	}
 	response := uc.s.DeleteUser(id)
 	if response.Success {
 		c.JSON(http.StatusOK, response)
