@@ -31,14 +31,14 @@ type AppwriteClient interface {
 	DeleteSession(sID string) error
 }
 
-func NewAwClient(host string) *AwClient {
+func NewAwClient() *AwClient {
 	return &AwClient{
 		h: sioRest.RestHelpers{},
 		defaultHeaders: map[string][]string{
 			"Content-Type":       {"application/json"},
 			"X-Appwrite-Project": {os.Getenv("IAM_PROJECT")},
 		},
-		host: host,
+		host: os.Getenv("IAM_HOST"),
 		key:  os.Getenv("IAM_KEY"),
 	}
 }
