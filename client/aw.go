@@ -152,8 +152,7 @@ func (c *AwClient) DeleteUser(id string) error {
 	req, _ := http.NewRequest("DELETE", url, nil)
 	req.Header.Add("Content-Type", "application/json")
 
-	response := new(sioModel.AwUser)
-	err := c.h.DoHttpRequestAndParse(req, response)
+	_, err := c.h.DoHttpRequest(req)
 	if err != nil {
 		return err
 	}
@@ -162,7 +161,7 @@ func (c *AwClient) DeleteUser(id string) error {
 }
 
 func (c *AwClient) CreateSession(r *sioModel.AwEmailSessionRequest) (*sioModel.AwSession, error) {
-	url := fmt.Sprintf("%s/account/sessions", c.host)
+	url := fmt.Sprintf("%s/account/sessions/email", c.host)
 	rJSON, err := json.Marshal(r)
 	if err != nil {
 		return nil, err
@@ -180,4 +179,17 @@ func (c *AwClient) CreateSession(r *sioModel.AwEmailSessionRequest) (*sioModel.A
 	}
 
 	return response, nil
+}
+
+func (c *AwClient) DeleteSession(sID string) error {
+	url := fmt.Sprintf("%s/account/sessions/%s", c.host, sID)
+	req, _ := http.NewRequest("DELETE", url, nil)
+	req.Header.Add("Content-Type", "application/json")
+
+	_, err := c.h.DoHttpRequest(req)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
