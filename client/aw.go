@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	sioRest "gitea.slauson.io/slausonio/go-utils/rest"
@@ -12,8 +13,10 @@ import (
 )
 
 type AwClient struct {
-	h    sioRest.RestHelpers
-	host string
+	h              sioRest.RestHelpers
+	defaultHeaders map[string][]string
+	host           string
+	key            string
 }
 
 type AppwriteClient interface {
@@ -30,8 +33,13 @@ type AppwriteClient interface {
 
 func NewAwClient(host string) *AwClient {
 	return &AwClient{
-		h:    sioRest.RestHelpers{},
+		h: sioRest.RestHelpers{},
+		defaultHeaders: map[string][]string{
+			"Content-Type":       {"application/json"},
+			"X-Appwrite-Project": {os.Getenv("IAM_PROJECT")},
+		},
 		host: host,
+		key:  os.Getenv("IAM_KEY"),
 	}
 }
 
@@ -39,7 +47,8 @@ func (c *AwClient) ListUsers() (*sioModel.AwlistResponse, error) {
 	url := fmt.Sprintf("%s/users", c.host)
 	req, _ := http.NewRequest("GET", url, nil)
 
-	req.Header.Add("Content-Type", "application/json")
+	req.Header = c.defaultHeaders
+	req.Header.Add("X-Appwrite-Key", c.key)
 	response := new(sioModel.AwlistResponse)
 	err := c.h.DoHttpRequestAndParse(req, response)
 	if err != nil {
@@ -52,7 +61,8 @@ func (c *AwClient) ListUsers() (*sioModel.AwlistResponse, error) {
 func (c *AwClient) GetUserByID(id string) (*sioModel.AwUser, error) {
 	url := fmt.Sprintf("%s/users/%s", c.host, id)
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Add("Content-Type", "application/json")
+	req.Header = c.defaultHeaders
+	req.Header.Add("X-Appwrite-Key", c.key)
 
 	response := new(sioModel.AwUser)
 	err := c.h.DoHttpRequestAndParse(req, response)
@@ -73,7 +83,8 @@ func (c *AwClient) CreateUser(r *sioModel.AwCreateUserRequest) (*sioModel.AwUser
 	sr := strings.NewReader(string(rJSON))
 	req, _ := http.NewRequest("POST", url, sr)
 
-	req.Header.Add("Content-Type", "application/json")
+	req.Header = c.defaultHeaders
+	req.Header.Add("X-Appwrite-Key", c.key)
 
 	response := new(sioModel.AwUser)
 	err = c.h.DoHttpRequestAndParse(req, response)
@@ -94,7 +105,8 @@ func (c *AwClient) UpdateEmail(id string, r *sioModel.UpdateEmailRequest) (*sioM
 	sr := strings.NewReader(string(rJSON))
 	req, _ := http.NewRequest("PATCH", url, sr)
 
-	req.Header.Add("Content-Type", "application/json")
+	req.Header = c.defaultHeaders
+	req.Header.Add("X-Appwrite-Key", c.key)
 
 	response := new(sioModel.AwUser)
 	err = c.h.DoHttpRequestAndParse(req, response)
@@ -115,7 +127,8 @@ func (c *AwClient) UpdatePassword(id string, r *sioModel.UpdateEmailRequest) (*s
 	sr := strings.NewReader(string(rJSON))
 	req, _ := http.NewRequest("PATCH", url, sr)
 
-	req.Header.Add("Content-Type", "application/json")
+	req.Header = c.defaultHeaders
+	req.Header.Add("X-Appwrite-Key", c.key)
 
 	response := new(sioModel.AwUser)
 	err = c.h.DoHttpRequestAndParse(req, response)
@@ -136,7 +149,8 @@ func (c *AwClient) UpdatePhone(id string, r *sioModel.UpdateEmailRequest) (*sioM
 	sr := strings.NewReader(string(rJSON))
 	req, _ := http.NewRequest("PATCH", url, sr)
 
-	req.Header.Add("Content-Type", "application/json")
+	req.Header = c.defaultHeaders
+	req.Header.Add("X-Appwrite-Key", c.key)
 
 	response := new(sioModel.AwUser)
 	err = c.h.DoHttpRequestAndParse(req, response)
@@ -150,7 +164,8 @@ func (c *AwClient) UpdatePhone(id string, r *sioModel.UpdateEmailRequest) (*sioM
 func (c *AwClient) DeleteUser(id string) error {
 	url := fmt.Sprintf("%s/users/%s", c.host, id)
 	req, _ := http.NewRequest("DELETE", url, nil)
-	req.Header.Add("Content-Type", "application/json")
+	req.Header = c.defaultHeaders
+	req.Header.Add("X-Appwrite-Key", c.key)
 
 	_, err := c.h.DoHttpRequest(req)
 	if err != nil {
@@ -170,7 +185,7 @@ func (c *AwClient) CreateSession(r *sioModel.AwEmailSessionRequest) (*sioModel.A
 	sr := strings.NewReader(string(rJSON))
 	req, _ := http.NewRequest("POST", url, sr)
 
-	req.Header.Add("Content-Type", "application/json")
+	req.Header = c.defaultHeaders
 
 	response := new(sioModel.AwSession)
 	err = c.h.DoHttpRequestAndParse(req, response)
@@ -184,7 +199,7 @@ func (c *AwClient) CreateSession(r *sioModel.AwEmailSessionRequest) (*sioModel.A
 func (c *AwClient) DeleteSession(sID string) error {
 	url := fmt.Sprintf("%s/account/sessions/%s", c.host, sID)
 	req, _ := http.NewRequest("DELETE", url, nil)
-	req.Header.Add("Content-Type", "application/json")
+	req.Header = c.defaultHeaders
 
 	_, err := c.h.DoHttpRequest(req)
 	if err != nil {
