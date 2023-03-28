@@ -1,4 +1,4 @@
-package iamConst
+package iamError
 
 import "fmt"
 

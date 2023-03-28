@@ -6,6 +6,7 @@ import (
 	sioModel "gitea.slauson.io/slausonio/go-libs/model"
 	sioModelGeneric "gitea.slauson.io/slausonio/go-libs/model/generic"
 	"gitea.slauson.io/slausonio/iam-ms/client"
+	"gitea.slauson.io/slausonio/iam-ms/iamError"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,7 +35,7 @@ func NewUserService(c *gin.Context) *UserService {
 func (s *UserService) ListUsers() (*sioModel.AwlistResponse, error) {
 	response, err := s.awClient.ListUsers()
 	if err != nil {
-		s.c.AbortWithError(http.StatusNotFound, iamConst.NoCustomersFound)
+		s.c.AbortWithError(http.StatusNotFound, iamError.NoCustomersFound)
 	}
 
 	return response, nil
@@ -43,7 +44,7 @@ func (s *UserService) ListUsers() (*sioModel.AwlistResponse, error) {
 func (s *UserService) GetUserByID(id string) (*sioModel.AwUser, error) {
 	response, err := s.awClient.GetUserByID(id)
 	if err != nil {
-		s.c.AbortWithError(http.StatusNotFound, iamConst.NoCustomerFound)
+		s.c.AbortWithError(http.StatusNotFound, iamError.NoCustomerFound)
 	}
 
 	return response, nil
@@ -91,7 +92,7 @@ func (s *UserService) UpdatePassword(id string, r *sioModel.UpdatePasswordReques
 func (s *UserService) DeleteUser(id string) (sioModelGeneric.SuccessResponse, error) {
 	err := s.awClient.DeleteUser(id)
 	if err != nil {
-		s.c.AbortWithError(http.StatusNotFound, iamConst.NoCustomerFound)
+		s.c.AbortWithError(http.StatusNotFound, iamError.NoCustomerFound)
 	}
 
 	return sioModelGeneric.SuccessResponse{true}, nil

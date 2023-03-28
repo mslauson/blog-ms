@@ -27,7 +27,7 @@ type AppwriteClient interface {
 	UpdatePhone(id string, r *sioModel.UpdatePhoneRequest) (*sioModel.AwUser, error)
 	UpdatePassword(id string, r *sioModel.UpdatePasswordRequest) (*sioModel.AwUser, error)
 
-	CreateSession(r *sioModel.AwEmailSessionRequest) (*sioModel.AwSession, error)
+	CreateEmailSession(r *sioModel.AwEmailSessionRequest) (*sioModel.AwSession, error)
 	DeleteSession(sID string) error
 }
 
@@ -175,7 +175,7 @@ func (c *AwClient) DeleteUser(id string) error {
 	return nil
 }
 
-func (c *AwClient) CreateSession(r *sioModel.AwEmailSessionRequest) (*sioModel.AwSession, error) {
+func (c *AwClient) CreateEmailSession(r *sioModel.AwEmailSessionRequest) (*sioModel.AwSession, error) {
 	url := fmt.Sprintf("%s/account/sessions/email", c.host)
 	rJSON, err := json.Marshal(r)
 	if err != nil {
