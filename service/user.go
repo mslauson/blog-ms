@@ -93,7 +93,8 @@ func (s *UserService) DeleteUser(id string) (sioModelGeneric.SuccessResponse, er
 	err := s.awClient.DeleteUser(id)
 	if err != nil {
 		s.c.AbortWithError(http.StatusNotFound, iamError.NoCustomerFound)
+		return sioModelGeneric.SuccessResponse{Success: true}, err
 	}
 
-	return sioModelGeneric.SuccessResponse{true}, nil
+	return sioModelGeneric.SuccessResponse{Success: true}, nil
 }
