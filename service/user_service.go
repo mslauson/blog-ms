@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	sioModel "gitea.slauson.io/slausonio/go-libs/model"
+	sioModelGeneric "gitea.slauson.io/slausonio/go-libs/model/generic"
 	"gitea.slauson.io/slausonio/iam-ms/client"
 	"github.com/gin-gonic/gin"
 )
@@ -20,7 +21,7 @@ type IamUserService interface {
 	UpdateEmail(id string, r *sioModel.UpdateEmailRequest) (*sioModel.AwUser, error)
 	UpdatePhone(id string, r *sioModel.UpdatePhoneRequest) (*sioModel.AwUser, error)
 	UpdatePassword(id string, r *sioModel.UpdatePasswordRequest) (*sioModel.AwUser, error)
-	DeleteUser(id string) error
+	DeleteUser(id string) (sioModelGeneric.SuccessResponse, error)
 }
 
 func NewUserService(c *gin.Context) *UserService {
@@ -87,11 +88,11 @@ func (s *UserService) UpdatePassword(id string, r *sioModel.UpdatePasswordReques
 	return response, nil
 }
 
-func (s *UserService) DeleteUser(id string) (sioModel.GenericSuccessResposne, error) {
+func (s *UserService) DeleteUser(id string) (sioModelGeneric.SuccessResponse, error) {
 	err := s.awClient.DeleteUser(id)
 	if err != nil {
 		s.c.AbortWithError(http.StatusNotFound, iamConst.NoCustomerFound)
 	}
 
-	return sioModel.GenericSuccessResposne{true}
+	return sioModelGeneric.SuccessResponse{true}, nil
 }
