@@ -14,6 +14,7 @@ type SessionService struct {
 	awClient *client.AwClient
 }
 
+//go:generate mockery --name IamSessionService
 type IamSessionService interface {
 	CreateEmailSession(r *sioModel.AwEmailSessionRequest, c *gin.Context) *sioModel.AwSession
 	DeleteSession(sID string, c *gin.Context) sioModelGeneric.SuccessResponse

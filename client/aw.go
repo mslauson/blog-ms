@@ -18,6 +18,7 @@ type AwClient struct {
 	key            string
 }
 
+//go:generate mockery --name AppwriteClient
 type AppwriteClient interface {
 	ListUsers() (*sioModel.AwlistResponse, error)
 	GetUserByID(id string) (*sioModel.AwUser, error)

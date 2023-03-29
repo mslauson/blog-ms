@@ -12,6 +12,7 @@ type SessionController struct {
 	s service.IamSessionService
 }
 
+//go:generate mockery --name IamSessionController
 type IamSessionController interface {
 	CreateEmailSession(c *gin.Context)
 	DeleteSession(c *gin.Context)

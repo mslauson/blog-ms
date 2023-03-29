@@ -16,6 +16,7 @@ type UserController struct {
 	enc *sioUtils.EncryptionUtil
 }
 
+//go:generate mockery --name IamUserController
 type IamUserController interface {
 	ListUsers(c *gin.Context)
 	GetUserById(c *gin.Context)
