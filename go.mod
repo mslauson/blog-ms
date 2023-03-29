@@ -3,18 +3,18 @@ module gitea.slauson.io/slausonio/iam-ms
 go 1.20
 
 require (
+	gitea.slauson.io/slausonio/go-libs v0.0.96
 	gitea.slauson.io/slausonio/go-utils v0.0.16
+	github.com/gin-gonic/gin v1.9.0
 	github.com/sirupsen/logrus v1.9.0
 )
 
 require (
-	gitea.slauson.io/slausonio/go-libs v0.0.94 // indirect
 	github.com/afiskon/promtail-client v0.0.0-20190305142237-506f3f921e9c // indirect
 	github.com/bytedance/sonic v1.8.6 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/gin-gonic/gin v1.9.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.12.0 // indirect

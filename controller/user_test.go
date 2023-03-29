@@ -3,6 +3,7 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
+	sioModelGeneric "gitea.slauson.io/slausonio/go-libs/model/generic"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
@@ -128,6 +129,219 @@ func TestUserController_CreateUser(t *testing.T) {
 			uc.CreateUser(c)
 			if w.Code != tt.status {
 				t.Errorf("CreateUser() = %v, want %v", w.Code, tt.status)
+				return
+			}
+		})
+	}
+}
+
+func TestUserController_UpdatePassword(t *testing.T) {
+	tests := []struct {
+		name    string
+		request *sioModel.UpdatePasswordRequest
+		status  int
+		result  *sioModel.AwUser
+	}{
+		{name: "happy", request: &sioModel.UpdatePasswordRequest{Password: "Mm112a23!"}, status: http.StatusOK, result: mAwUserPtr},
+		{name: "service failure", request: &sioModel.UpdatePasswordRequest{Password: "Mm112a23!"}, status: http.StatusOK, result: nil},
+		{name: "No Password", request: &sioModel.UpdatePasswordRequest{Password: ""}, status: http.StatusBadRequest, result: nil},
+		{name: "Bad Password Missing Number", request: &sioModel.UpdatePasswordRequest{Password: "Mmsdfsdfafsdf!"}, status: http.StatusBadRequest, result: nil},
+		{name: "Bad Password Missing Upper", request: &sioModel.UpdatePasswordRequest{Password: "aaam112a23!"}, status: http.StatusBadRequest, result: nil},
+		{name: "Bad Password Missing Special", request: &sioModel.UpdatePasswordRequest{Password: "Mm112a2333"}, status: http.StatusBadRequest, result: nil},
+		{name: "Short Password", request: &sioModel.UpdatePasswordRequest{Password: "Mm1^"}, status: http.StatusBadRequest, result: nil},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var (
+				w    = httptest.NewRecorder()
+				c, _ = gin.CreateTestContext(w)
+			)
+			c.Request = &http.Request{
+				Header: make(http.Header),
+			}
+
+			c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
+
+			uc, ms, eu := initController(t)
+
+			err := eu.EncryptInterface(tt.request, false)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+
+			MockJson(c, tt.request, "PUT")
+			if tt.status == http.StatusOK {
+				ms.On("UpdatePassword", "a", mock.AnythingOfType("*sioModel.UpdatePasswordRequest"), c).Return(tt.result)
+			}
+			uc.UpdatePassword(c)
+			if w.Code != tt.status {
+				t.Errorf("UpdatePassword() = %v, want %v", w.Code, tt.status)
+				return
+			}
+		})
+	}
+}
+
+func TestUserController_UpdateEmail(t *testing.T) {
+	tests := []struct {
+		name    string
+		request *sioModel.UpdateEmailRequest
+		status  int
+		result  *sioModel.AwUser
+	}{
+		{name: "happy", request: &sioModel.UpdateEmailRequest{Email: "fake@fake.com"}, status: http.StatusOK, result: mAwUserPtr},
+		{name: "service failure", request: &sioModel.UpdateEmailRequest{Email: "fake@fake.com"}, status: http.StatusOK, result: nil},
+		{name: "No Email", request: &sioModel.UpdateEmailRequest{Email: ""}, status: http.StatusBadRequest, result: nil},
+		{name: "Bad Email ", request: &sioModel.UpdateEmailRequest{Email: "fakefake.com"}, status: http.StatusBadRequest, result: nil},
+		{name: "Bad Email too long", request: &sioModel.UpdateEmailRequest{Email: "\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@.com"}, status: http.StatusBadRequest, result: nil},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var (
+				w    = httptest.NewRecorder()
+				c, _ = gin.CreateTestContext(w)
+			)
+			c.Request = &http.Request{
+				Header: make(http.Header),
+			}
+
+			c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
+
+			uc, ms, eu := initController(t)
+
+			err := eu.EncryptInterface(tt.request, false)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+
+			MockJson(c, tt.request, "PUT")
+			if tt.status == http.StatusOK {
+				ms.On("UpdateEmail", "a", mock.AnythingOfType("*sioModel.UpdateEmailRequest"), c).Return(tt.result)
+			}
+			uc.UpdateEmail(c)
+			if w.Code != tt.status {
+				t.Errorf("UpdateEmail() = %v, want %v", w.Code, tt.status)
+				return
+			}
+		})
+	}
+}
+
+func TestUserController_UpdatePhone(t *testing.T) {
+	tests := []struct {
+		name    string
+		request *sioModel.UpdatePhoneRequest
+		status  int
+		result  *sioModel.AwUser
+	}{
+		{name: "happy", request: &sioModel.UpdatePhoneRequest{Number: "1239323939"}, status: http.StatusOK, result: mAwUserPtr},
+		{name: "service failure", request: &sioModel.UpdatePhoneRequest{Number: "1239323939"}, status: http.StatusOK, result: nil},
+		{name: "No Phone", request: &sioModel.UpdatePhoneRequest{Number: ""}, status: http.StatusBadRequest, result: nil},
+		{name: "Bad Phone too short ", request: &sioModel.UpdatePhoneRequest{Number: "23423"}, status: http.StatusBadRequest, result: nil},
+		{name: "Bad Phone too long", request: &sioModel.UpdatePhoneRequest{Number: "2934830298420394809238402893"}, status: http.StatusBadRequest, result: nil},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var (
+				w    = httptest.NewRecorder()
+				c, _ = gin.CreateTestContext(w)
+			)
+			c.Request = &http.Request{
+				Header: make(http.Header),
+			}
+
+			c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
+
+			uc, ms, eu := initController(t)
+
+			err := eu.EncryptInterface(tt.request, false)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+
+			MockJson(c, tt.request, "PUT")
+			if tt.status == http.StatusOK {
+				ms.On("UpdatePhone", "a", mock.AnythingOfType("*sioModel.UpdatePhoneRequest"), c).Return(tt.result)
+			}
+			uc.UpdatePhone(c)
+			if w.Code != tt.status {
+				t.Errorf("UpdatePhone() = %v, want %v", w.Code, tt.status)
+				return
+			}
+		})
+	}
+}
+
+func TestGetUserById(t *testing.T) {
+	var (
+		w    = httptest.NewRecorder()
+		c, _ = gin.CreateTestContext(w)
+	)
+
+	uc, ms, _ := initController(t)
+	tests := []struct {
+		name   string
+		want   *sioModel.AwUser
+		status int
+	}{
+		{name: "happy", want: mAwUserPtr, status: 200},
+		{name: "service error", want: nil, status: 200},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			c.Request = &http.Request{
+				Header: make(http.Header),
+			}
+
+			c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
+
+			ms.On("GetUserByID", "a", c).Return(tt.want)
+			uc.GetUserById(c)
+
+			if w.Code != tt.status {
+				t.Errorf("GetUserById()() = %v, want %v", w.Code, tt.status)
+				return
+			}
+		})
+	}
+}
+
+func TestDeleteUser(t *testing.T) {
+	var (
+		w    = httptest.NewRecorder()
+		c, _ = gin.CreateTestContext(w)
+	)
+
+	uc, ms, _ := initController(t)
+	tests := []struct {
+		name   string
+		want   sioModelGeneric.SuccessResponse
+		status int
+	}{
+		{name: "happy", want: sioModelGeneric.SuccessResponse{Success: true}, status: 200},
+		{name: "service error", want: sioModelGeneric.SuccessResponse{Success: true}, status: 200},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			c.Request = &http.Request{
+				Header: make(http.Header),
+			}
+
+			c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
+
+			ms.On("DeleteUser", "a", c).Return(tt.want)
+			uc.DeleteUser(c)
+
+			if w.Code != tt.status {
+				t.Errorf("DeleteUser( )= %v, want %v", w.Code, tt.status)
 				return
 			}
 		})
