@@ -52,7 +52,7 @@ func initControllerForSessionTests(t *testing.T) (*SessionController, *mocks.Iam
 }
 
 // func TestNewSessionController(t *testing.T) {
-// 	c, ms, eu := initControllerForSessionTests(t)
+// 	c, ms, eu := initControllerForSession
 // 	tests := []struct {
 // 		name string
 // 		want *SessionController

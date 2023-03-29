@@ -11,7 +11,7 @@ import (
 )
 
 type UserService struct {
-	awClient *client.AwClient
+	awClient client.AppwriteClient
 }
 
 //go:generate mockery --name IamUserService
@@ -35,6 +35,7 @@ func (s *UserService) ListUsers(c *gin.Context) *sioModel.AwlistResponse {
 	response, err := s.awClient.ListUsers()
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, iamError.NoCustomersFound)
+		return nil
 	}
 
 	return response
@@ -44,6 +45,7 @@ func (s *UserService) GetUserByID(id string, c *gin.Context) *sioModel.AwUser {
 	response, err := s.awClient.GetUserByID(id)
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, iamError.NoCustomerFound)
+		return nil
 	}
 
 	return response
@@ -53,6 +55,7 @@ func (s *UserService) CreateUser(r *sioModel.AwCreateUserRequest, c *gin.Context
 	response, err := s.awClient.CreateUser(r)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return nil
 	}
 
 	return response
@@ -92,7 +95,7 @@ func (s *UserService) DeleteUser(id string, c *gin.Context) sioModelGeneric.Succ
 	err := s.awClient.DeleteUser(id)
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, iamError.NoCustomerFound)
-		return sioModelGeneric.SuccessResponse{Success: true}
+		return sioModelGeneric.SuccessResponse{Success: false}
 	}
 
 	return sioModelGeneric.SuccessResponse{Success: true}

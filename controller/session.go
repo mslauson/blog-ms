@@ -28,7 +28,7 @@ func NewSessionController() *SessionController {
 
 func (sc *SessionController) CreateEmailSession(c *gin.Context) {
 	enc := sioUtils.NewEncryptionUtil()
-	var request = new(sioModel.AwEmailSessionRequest)
+	request := new(sioModel.AwEmailSessionRequest)
 
 	err := c.ShouldBindJSON(request)
 	if err != nil {

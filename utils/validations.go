@@ -43,4 +43,3 @@ func (v *IamValidations) ValidateUpdateEmailRequest(r *sioModel.UpdateEmailReque
 func (v *IamValidations) ValidateUpdatePhoneRequest(r *sioModel.UpdatePhoneRequest) bool {
 	return v.validator.ValidatePhone(r.Number)
 }
-

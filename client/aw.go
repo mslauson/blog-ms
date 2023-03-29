@@ -26,7 +26,7 @@ type AppwriteClient interface {
 	UpdateEmail(id string, r *sioModel.UpdateEmailRequest) (*sioModel.AwUser, error)
 	UpdatePhone(id string, r *sioModel.UpdatePhoneRequest) (*sioModel.AwUser, error)
 	UpdatePassword(id string, r *sioModel.UpdatePasswordRequest) (*sioModel.AwUser, error)
-
+	DeleteUser(id string) error
 	CreateEmailSession(r *sioModel.AwEmailSessionRequest) (*sioModel.AwSession, error)
 	DeleteSession(sID string) error
 }

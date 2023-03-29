@@ -78,6 +78,20 @@ func (_m *AppwriteClient) DeleteSession(sID string) error {
 	return r0
 }
 
+// DeleteUser provides a mock function with given fields: id
+func (_m *AppwriteClient) DeleteUser(id string) error {
+	ret := _m.Called(id)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // GetUserByID provides a mock function with given fields: id
 func (_m *AppwriteClient) GetUserByID(id string) (*sioModel.AwUser, error) {
 	ret := _m.Called(id)
