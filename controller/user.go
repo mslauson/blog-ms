@@ -14,7 +14,6 @@ import (
 type UserController struct {
 	s   service.IamUserService
 	enc *sioUtils.EncryptionUtil
-	v   *utils.IamValidations
 }
 
 type IamUserController interface {
@@ -27,15 +26,14 @@ type IamUserController interface {
 	DeleteUser(c *gin.Context)
 }
 
-func NewUserController(c *gin.Context) *UserController {
+func NewUserController() *UserController {
 	return &UserController{
-		s: service.NewUserService(c),
-		v: utils.NewIamValidations(c),
+		s: service.NewUserService(),
 	}
 }
 
 func (uc *UserController) ListUsers(c *gin.Context) {
-	response := uc.s.ListUsers()
+	response := uc.s.ListUsers(c)
 	if response != nil {
 		c.JSON(http.StatusOK, response)
 	}
@@ -43,13 +41,14 @@ func (uc *UserController) ListUsers(c *gin.Context) {
 
 func (uc *UserController) GetUserById(c *gin.Context) {
 	id := c.Param("id")
-	response := uc.s.GetUserByID(id)
+	response := uc.s.GetUserByID(id, c)
 	if response != nil {
 		c.JSON(http.StatusOK, response)
 	}
 }
 
 func (uc *UserController) CreateUser(c *gin.Context) {
+	validations := utils.NewIamValidations(c)
 	request := new(sioModel.AwCreateUserRequest)
 	err := c.BindJSON(&request)
 	if err != nil {
@@ -62,11 +61,11 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("decryption failed - unable to proceed"))
 	}
 
-	if !uc.v.ValidateCreateUserRequest(request) {
+	if !validations.ValidateCreateUserRequest(request) {
 		return
 	}
 
-	result := uc.s.CreateUser(request)
+	result := uc.s.CreateUser(request, c)
 	if result != nil {
 		c.JSON(http.StatusOK, result)
 		return
@@ -74,6 +73,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 }
 
 func (uc *UserController) UpdatePassword(c *gin.Context) {
+	validations := utils.NewIamValidations(c)
 	id := c.Param("id")
 	request := new(sioModel.UpdatePasswordRequest)
 
@@ -88,11 +88,11 @@ func (uc *UserController) UpdatePassword(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("decryption failed - unable to proceed"))
 	}
 
-	if !uc.v.ValidateUpdatePasswordRequest(request) {
+	if !validations.ValidateUpdatePasswordRequest(request) {
 		return
 	}
 
-	result := uc.s.UpdatePassword(id, request)
+	result := uc.s.UpdatePassword(id, request, c)
 	if result != nil {
 		c.JSON(http.StatusOK, result)
 		return
@@ -100,6 +100,7 @@ func (uc *UserController) UpdatePassword(c *gin.Context) {
 }
 
 func (uc *UserController) UpdateEmail(c *gin.Context) {
+	validations := utils.NewIamValidations(c)
 	id := c.Param("id")
 	request := new(sioModel.UpdateEmailRequest)
 
@@ -113,10 +114,10 @@ func (uc *UserController) UpdateEmail(c *gin.Context) {
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("decryption failed - unable to proceed"))
 	}
-	if !uc.v.ValidateUpdateEmailRequest(request) {
+	if !validations.ValidateUpdateEmailRequest(request) {
 		return
 	}
-	result := uc.s.UpdateEmail(id, request)
+	result := uc.s.UpdateEmail(id, request, c)
 	if result != nil {
 		c.JSON(http.StatusOK, result)
 		return
@@ -124,6 +125,7 @@ func (uc *UserController) UpdateEmail(c *gin.Context) {
 }
 
 func (uc *UserController) UpdatePhone(c *gin.Context) {
+	validations := utils.NewIamValidations(c)
 	id := c.Param("id")
 	request := new(sioModel.UpdatePhoneRequest)
 
@@ -138,10 +140,10 @@ func (uc *UserController) UpdatePhone(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("decryption failed - unable to proceed"))
 	}
 
-	if !uc.v.ValidateUpdatePhoneRequest(request) {
+	if !validations.ValidateUpdatePhoneRequest(request) {
 		return
 	}
-	result := uc.s.UpdatePhone(id, request)
+	result := uc.s.UpdatePhone(id, request, c)
 	if result != nil {
 		c.JSON(http.StatusOK, result)
 		return
@@ -150,7 +152,7 @@ func (uc *UserController) UpdatePhone(c *gin.Context) {
 
 func (uc *UserController) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
-	response := uc.s.DeleteUser(id)
+	response := uc.s.DeleteUser(id, c)
 	if response.Success {
 		c.JSON(http.StatusOK, response)
 	}

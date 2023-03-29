@@ -14,8 +14,8 @@ type IamSessionController interface {
 	DeleteEmailSession(c *gin.Context)
 }
 
-func NewSessionController(c *gin.Context) *SessionController {
+func NewSessionController() *SessionController {
 	return &SessionController{
-		s: service.NewSessionService(c),
+		s: service.NewSessionService(),
 	}
 }

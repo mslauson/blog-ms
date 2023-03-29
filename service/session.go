@@ -11,7 +11,6 @@ import (
 )
 
 type SessionService struct {
-	c        *gin.Context
 	awClient *client.AwClient
 }
 
@@ -30,7 +29,7 @@ func (s *SessionService) CreateEmailSession(r *sioModel.AwEmailSessionRequest, c
 	response, err := s.awClient.CreateEmailSession(r)
 	if err != nil {
 		log.Error(err)
-		s.c.AbortWithError(http.StatusBadRequest, err)
+		c.AbortWithError(http.StatusBadRequest, err)
 		return nil
 	}
 	return response
@@ -40,7 +39,7 @@ func (s *SessionService) DeleteSession(sID string, c *gin.Context) sioModelGener
 	err := s.awClient.DeleteSession(sID)
 	if err != nil {
 		log.Error(err)
-		s.c.AbortWithError(http.StatusBadRequest, err)
+		c.AbortWithError(http.StatusBadRequest, err)
 		return sioModelGeneric.SuccessResponse{Success: true}
 	}
 

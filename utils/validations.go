@@ -7,13 +7,11 @@ import (
 )
 
 type IamValidations struct {
-	enc       *sioUtils.EncryptionUtil
 	validator *sioUtils.SioValidator
 }
 
 func NewIamValidations(c *gin.Context) *IamValidations {
 	return &IamValidations{
-		enc:       sioUtils.NewEncryptionUtil(),
 		validator: sioUtils.NewValidator(c),
 	}
 }

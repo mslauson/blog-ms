@@ -14,7 +14,7 @@ func CreateRouter() {
 	r.Use(mw.ErrorHandler)
 
 	uc := controller.NewUserController()
-sc. := controller.NewSessionController()
+	sc := controller.NewSessionController()
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
