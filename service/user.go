@@ -14,6 +14,7 @@ type UserService struct {
 	awClient *client.AwClient
 }
 
+//go:generate mockery --name IamUserService
 type IamUserService interface {
 	ListUsers(c *gin.Context) *sioModel.AwlistResponse
 	GetUserByID(id string, c *gin.Context) *sioModel.AwUser

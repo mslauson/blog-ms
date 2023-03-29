@@ -2,18 +2,17 @@ package controller
 
 import (
 	"fmt"
+	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"net/http"
 
 	sioModel "gitea.slauson.io/slausonio/go-libs/model"
-	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"gitea.slauson.io/slausonio/iam-ms/service"
 	"gitea.slauson.io/slausonio/iam-ms/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type UserController struct {
-	s   service.IamUserService
-	enc *sioUtils.EncryptionUtil
+	s service.IamUserService
 }
 
 //go:generate mockery --name IamUserController
@@ -49,6 +48,7 @@ func (uc *UserController) GetUserById(c *gin.Context) {
 }
 
 func (uc *UserController) CreateUser(c *gin.Context) {
+	enc := sioUtils.NewEncryptionUtil()
 	validations := utils.NewIamValidations(c)
 	request := new(sioModel.AwCreateUserRequest)
 	err := c.BindJSON(&request)
@@ -57,7 +57,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	err = uc.enc.DecryptInterface(request, false)
+	err = enc.DecryptInterface(request, false)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("decryption failed - unable to proceed"))
 	}
@@ -74,6 +74,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 }
 
 func (uc *UserController) UpdatePassword(c *gin.Context) {
+	enc := sioUtils.NewEncryptionUtil()
 	validations := utils.NewIamValidations(c)
 	id := c.Param("id")
 	request := new(sioModel.UpdatePasswordRequest)
@@ -84,7 +85,7 @@ func (uc *UserController) UpdatePassword(c *gin.Context) {
 		return
 	}
 
-	err = uc.enc.DecryptInterface(request, false)
+	err = enc.DecryptInterface(request, false)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("decryption failed - unable to proceed"))
 	}
@@ -101,6 +102,7 @@ func (uc *UserController) UpdatePassword(c *gin.Context) {
 }
 
 func (uc *UserController) UpdateEmail(c *gin.Context) {
+	enc := sioUtils.NewEncryptionUtil()
 	validations := utils.NewIamValidations(c)
 	id := c.Param("id")
 	request := new(sioModel.UpdateEmailRequest)
@@ -111,7 +113,7 @@ func (uc *UserController) UpdateEmail(c *gin.Context) {
 		return
 	}
 
-	err = uc.enc.DecryptInterface(request, false)
+	err = enc.DecryptInterface(request, false)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("decryption failed - unable to proceed"))
 	}
@@ -126,6 +128,7 @@ func (uc *UserController) UpdateEmail(c *gin.Context) {
 }
 
 func (uc *UserController) UpdatePhone(c *gin.Context) {
+	enc := sioUtils.NewEncryptionUtil()
 	validations := utils.NewIamValidations(c)
 	id := c.Param("id")
 	request := new(sioModel.UpdatePhoneRequest)
@@ -136,7 +139,7 @@ func (uc *UserController) UpdatePhone(c *gin.Context) {
 		return
 	}
 
-	err = uc.enc.DecryptInterface(request, false)
+	err = enc.DecryptInterface(request, false)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("decryption failed - unable to proceed"))
 	}
