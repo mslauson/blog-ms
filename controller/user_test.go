@@ -17,11 +17,10 @@ import (
 	"gitea.slauson.io/slausonio/iam-ms/service/mocks"
 )
 
-var mAwUser = sioModel.AwUser{
-	Email: "t@t.com",
-}
-
 var (
+	mAwUser = sioModel.AwUser{
+		Email: "t@t.com",
+	}
 	mAwUserPtr = &mAwUser
 	mUserList  = &sioModel.AwlistResponse{
 		Total: 1,

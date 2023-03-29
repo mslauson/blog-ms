@@ -12,7 +12,7 @@ import (
 )
 
 type AwClient struct {
-	h              sioUtils.RestHelpers
+	h              sioUtils.SioRestHelpers
 	defaultHeaders map[string][]string
 	host           string
 	key            string
@@ -33,7 +33,7 @@ type AppwriteClient interface {
 
 func NewAwClient() *AwClient {
 	return &AwClient{
-		h: sioUtils.RestHelpers{},
+		h: sioUtils.NewRestHelpers(),
 		defaultHeaders: map[string][]string{
 			"Content-Type":       {"application/json"},
 			"X-Appwrite-Project": {os.Getenv("IAM_PROJECT")},
