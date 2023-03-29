@@ -40,7 +40,7 @@ func CreateRouter() {
 		session := v1.Group("/session")
 		{
 			session.POST("/email", sc.CreateEmailSession)
-			session.DELETE("/:sessionId", sc.DeleteEmailSession)
+			session.DELETE("/:sessionId", sc.DeleteSession)
 		}
 
 	}

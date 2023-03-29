@@ -3,7 +3,6 @@ module gitea.slauson.io/slausonio/iam-ms
 go 1.20
 
 require (
-	gitea.slauson.io/slausonio/customer-ms v0.0.0-20230327041456-6be2924aec64
 	gitea.slauson.io/slausonio/go-utils v0.0.16
 	github.com/sirupsen/logrus v1.9.0
 )

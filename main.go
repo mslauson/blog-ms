@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"gitea.slauson.io/slausonio/customer-ms/utils"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	log "github.com/sirupsen/logrus"
 )
@@ -34,6 +33,5 @@ func init() {
 }
 
 func main() {
-	db := utils.InitDB()
-	CreateRouter(db)
+	CreateRouter()
 }
