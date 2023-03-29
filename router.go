@@ -49,6 +49,5 @@ func CreateRouter() {
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		panic(err)
-		return
 	}
 }

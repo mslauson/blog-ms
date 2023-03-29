@@ -24,16 +24,15 @@ spec:
         vault.hashicorp.com/agent-inject-template-encryption: |
           {{ with secret "chore/data/encryption" -}}
             export KEY="{{ .Data.data.key }}"
-            export IV="{{ .Data.data.iv }}"
-          {{- end }}
+            export IV="{{ .Data.data.iv }}" {{- end }}
         vault.hashicorp.com/agent-inject-secret-oauth: 'chore/data/oauth'
         vault.hashicorp.com/agent-inject-template-oauth: |
           {{ with secret "chore/data/oauth" -}}
             export AUTH_HOST="{{ .Data.data.authHost }}"
           {{- end }}
-        vault.hashicorp.com/agent-inject-secret-aw: 'chore/data/aw'
-        vault.hashicorp.com/agent-inject-template-aw: |
-          {{ with secret "chore/data/aw" -}}
+        vault.hashicorp.com/agent-inject-secret-appwrite: 'chore/data/appwrite'
+        vault.hashicorp.com/agent-inject-template-appwrite: |
+          {{ with secret "chore/data/appwrite" -}}
             export IAM_HOST="{{ .Data.data.host }}"
             export IAM_KEY="{{ .Data.data.key }}"
             export IAM_PROJECT="{{ .Data.data.project }}"
