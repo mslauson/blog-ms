@@ -31,7 +31,7 @@ spec:
           {{ with secret "chore/data/oauth" -}}
             export AUTH_HOST="{{ .Data.data.authHost }}"
           {{- end }}
-    	vault.hashicorp.com/agent-inject-secret-aw: 'chore/data/aw'
+        vault.hashicorp.com/agent-inject-secret-aw: 'chore/data/aw'
         vault.hashicorp.com/agent-inject-template-aw: |
           {{ with secret "chore/data/aw" -}}
             export IAM_HOST="{{ .Data.data.host }}"
