@@ -3,14 +3,15 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
-	sioModelGeneric "gitea.slauson.io/slausonio/go-libs/model/generic"
-	"gitea.slauson.io/slausonio/go-utils/sioUtils"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/mock"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	sioModelGeneric "gitea.slauson.io/slausonio/go-libs/model/generic"
+	"gitea.slauson.io/slausonio/go-utils/sioUtils"
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/mock"
 
 	sioModel "gitea.slauson.io/slausonio/go-libs/model"
 	"gitea.slauson.io/slausonio/iam-ms/service/mocks"
@@ -20,11 +21,13 @@ var mAwUser = sioModel.AwUser{
 	Email: "t@t.com",
 }
 
-var mAwUserPtr = &mAwUser
-var mUserList = &sioModel.AwlistResponse{
-	Total: 1,
-	Users: []sioModel.AwUser{mAwUser},
-}
+var (
+	mAwUserPtr = &mAwUser
+	mUserList  = &sioModel.AwlistResponse{
+		Total: 1,
+		Users: []sioModel.AwUser{mAwUser},
+	}
+)
 
 func initController(t *testing.T) (*UserController, *mocks.IamUserService, *sioUtils.EncryptionUtil) {
 	ms := mocks.NewIamUserService(t)
@@ -68,7 +71,6 @@ func TestListUsers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			ms.On("ListUsers", c).Return(tt.want)
 			uc.ListUsers(c)
 
@@ -295,7 +297,6 @@ func TestGetUserById(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			c.Request = &http.Request{
 				Header: make(http.Header),
 			}
@@ -326,11 +327,10 @@ func TestDeleteUser(t *testing.T) {
 		status int
 	}{
 		{name: "happy", want: sioModelGeneric.SuccessResponse{Success: true}, status: 200},
-		{name: "service error", want: sioModelGeneric.SuccessResponse{Success: true}, status: 200},
+		{name: "service error", want: sioModelGeneric.SuccessResponse{Success: false}, status: 200},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			c.Request = &http.Request{
 				Header: make(http.Header),
 			}
