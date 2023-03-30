@@ -12,6 +12,8 @@ gitea.slauson.io/slausonio/go-utils v0.0.15 h1:JV9XKoufjdlEWORq0p92FAgi7CSOPNhNO
 gitea.slauson.io/slausonio/go-utils v0.0.15/go.mod h1:7BdAgWQO33jAXjUxVOohPt2v3FStkeS+miR41rPvqE8=
 gitea.slauson.io/slausonio/go-utils v0.0.16 h1:5lVVqIJ+UK9p1hbEH7PMF0j96u/5ySmwfCZJgTpIWG0=
 gitea.slauson.io/slausonio/go-utils v0.0.16/go.mod h1:7BdAgWQO33jAXjUxVOohPt2v3FStkeS+miR41rPvqE8=
+gitea.slauson.io/slausonio/go-utils v0.0.17 h1:BljQxGvYgF8lA2F31nReZSGMcE7xnwmvK72n+ldCd5k=
+gitea.slauson.io/slausonio/go-utils v0.0.17/go.mod h1:7BdAgWQO33jAXjUxVOohPt2v3FStkeS+miR41rPvqE8=
 github.com/afiskon/promtail-client v0.0.0-20190305142237-506f3f921e9c h1:AMDVOKGaiqse4qiRXSzRgpC9DCNTHCx6zpzdtXXrKM4=
 github.com/afiskon/promtail-client v0.0.0-20190305142237-506f3f921e9c/go.mod h1:p/7Wos+jcfrnwLqqzJMZ0s323kfVtJPW+HUvAANklVQ=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
@@ -45,6 +47,8 @@ github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.6 h1:BKbKCqvP6I+rmFHt06ZmyQtvB8xAkWdhFyr0ZUNZcxQ=
 github.com/google/go-cmp v0.5.6/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
+github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
+github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
 github.com/json-iterator/go v1.1.12 h1:PV8peI4a0ysnczrg+LtxykD8LfKY9ML6u2jnxaEnrnM=

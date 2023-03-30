@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	gitea.slauson.io/slausonio/go-libs v0.0.96
-	gitea.slauson.io/slausonio/go-utils v0.0.16
+	gitea.slauson.io/slausonio/go-utils v0.0.17
 	github.com/gin-gonic/gin v1.9.0
 	github.com/sirupsen/logrus v1.9.0
 )
@@ -12,6 +12,7 @@ require (
 require (
 	gitea.slauson.io/slausonio/go-testing v0.0.1 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 )
 
