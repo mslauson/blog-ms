@@ -50,7 +50,7 @@ spec:
             [
               "sh",
               "-c",
-              ". /vault/secrets/encryption &&. /vault/secrets/oauth && . /vault/secrets/appwrit && ./iam-ms",
+              ". /vault/secrets/encryption &&. /vault/secrets/oauth && . /vault/secrets/appwrite && ./iam-ms",
             ]
           readinessProbe:
             failureThreshold: 10

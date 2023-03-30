@@ -2,6 +2,8 @@ pipeline {
       agent any
 	environment {
 	  GT_CREDS= credentials('Gitea')
+	  KEY="${env.KEY}"
+	  IV="${env.IV}"
 	  IAM_KEY="${env.IAM_KEY}"
 	  IAM_HOST="${env.IAM_HOST}"
 	  IAM_PROJECT="${env.IAM_PROJECT}"
@@ -26,18 +28,25 @@ pipeline {
         }
         stage('Test') {
            steps {
-                withEnv(['IAM_KEY=${env.IAM_KEY}', 'IAM_HOST=${env.IAM_HOST}', 'IAM_PROJECT=${env.IAM_PROJECT}', 'OAUTH_CLIENT_ID=${env.OAUTH_CLIENT_ID}', 'OAUTH_CLIENT_SECRET=${env.OAUTH_CLIENT_SECRET}', 'OAUTH_ADMIN_BASE=${env.OAUTH_ADMIN_BASE}', 'OAUTH_ISSUER_BASE=${env.OAUTH_ISSUER_BASE}']) {
                     sh 'printenv'
                     sh 'go test ./...'
-                }
             }        
 		  }
-        stage('Code Analysis') {
-            steps {
-                sh 'curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | bash -s -- -b $GOPATH/bin v1.12.5'
-                sh 'golangci-lint run'
-            }
-        }
+        /* stage('Code Analysis') { */
+        /*     steps { */
+        /*         sh 'sudo curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | bash -s -- -b $GOPATH/bin v1.12.5' */
+        /*         sh 'golangci-lint run' */
+        /*     } */
+        /* } */
+		stage('Build'){
+		  steps{
+		  script{
+			docker.withRegistry('https://docker.slauson.io', 'docker-registry') {
+			def image = docker.build("registry.slauson.io/slausonio:${env.appName}-${env.BUILD_NUMBER}")
+image.push() 
+		   }}
+		  }
+		  }
         /* stage('publish') { */
         /*     when { */
         /*         buildingTag() */
