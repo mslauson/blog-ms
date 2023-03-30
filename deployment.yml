@@ -17,20 +17,23 @@ spec:
         deploy: iam-ms
         app: iam-ms
       annotations:
-        vault.hashicorp.com/agent-inject: 'true'
-        vault.hashicorp.com/role: 'chore'
-        vault.hashicorp.com/agent-pre-populate-only: 'true'
-        vault.hashicorp.com/agent-inject-secret-encryption: 'chore/data/encryption'
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "chore"
+        vault.hashicorp.com/agent-pre-populate-only: "true"
+        vault.hashicorp.com/agent-inject-secret-encryption: "chore/data/encryption"
         vault.hashicorp.com/agent-inject-template-encryption: |
           {{ with secret "chore/data/encryption" -}}
             export KEY="{{ .Data.data.key }}"
             export IV="{{ .Data.data.iv }}" {{- end }}
-        vault.hashicorp.com/agent-inject-secret-oauth: 'chore/data/oauth'
+        vault.hashicorp.com/agent-inject-secret-oauth: "chore/data/oauth"
         vault.hashicorp.com/agent-inject-template-oauth: |
           {{ with secret "chore/data/oauth" -}}
-            export AUTH_HOST="{{ .Data.data.authHost }}"
+            export OAUTH_ADMIN_BASE="{{ .Data.data.authHost }}"
+            export OAUTH_ISSUER_BASE="{{ .Data.data.oauthIssuerBase }}"
+            export OAUTH_CLIENT_ID="{{ .Data.data.oauthClientId }}"
+            export OAUTH_CLIENT_SECRET="{{ .Data.data.oauthClientSecret }}"
           {{- end }}
-        vault.hashicorp.com/agent-inject-secret-appwrite: 'chore/data/appwrite'
+        vault.hashicorp.com/agent-inject-secret-appwrite: "chore/data/appwrite"
         vault.hashicorp.com/agent-inject-template-appwrite: |
           {{ with secret "chore/data/appwrite" -}}
             export IAM_HOST="{{ .Data.data.host }}"
@@ -44,7 +47,11 @@ spec:
         - name: iam-ms
           image: registry.slauson.io/slausonio/iam-ms:dev-9c97e21441f8510ab5588cc8c2864ca6006ced9d
           args:
-            ['sh', '-c', '. /vault/secrets/encryption &&. /vault/secrets/oauth && . /vault/secrets/appwrite && ./iam-ms']
+            [
+              "sh",
+              "-c",
+              ". /vault/secrets/encryption &&. /vault/secrets/oauth && . /vault/secrets/appwrit && ./iam-ms",
+            ]
           readinessProbe:
             failureThreshold: 10
             httpGet:
@@ -68,4 +75,3 @@ spec:
               memory: 100Mi
       imagePullSecrets:
         - name: regcred
-
