@@ -10,7 +10,7 @@ pipeline {
                 CODECOV_TOKEN = credentials('codecov_token')
             }
             steps {
-                sh 'go test ./...
+                sh 'go test ./...'
                 /* sh "curl -s https://codecov.io/bash | bash -s -" */
             }
         }
