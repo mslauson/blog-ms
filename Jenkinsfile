@@ -2,6 +2,13 @@ pipeline {
       agent any
 	environment {
 	  GT_CREDS= credentials('Gitea')
+	  IAM_KEY=${IAM_KEY}
+	  IAM_HOST=${IAM_HOST}
+	  IAM_PROJECT=${IAM_PROJECT}
+	  OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID}
+	  OAUTH_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
+	  OAUTH_ADMIN_BASE=${OAUTH_ADMIN_BASE}
+	  OAUTH_ISSUER_BASE=${OAUTH_ISSUER_BASE}
 	}
     tools {
         go 'main'
