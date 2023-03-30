@@ -41,7 +41,7 @@ pipeline {
 		stage('Build'){
 		  steps{
 		  script{
-			docker.withRegistry('https://docker.slauson.io', 'docker-registry') {
+			docker.withRegistry('https://registry.slauson.io', 'docker-registry') {
 			def image = docker.build("registry.slauson.io/slausonio:${env.appName}-${env.BUILD_NUMBER}")
 image.push() 
 		   }}
