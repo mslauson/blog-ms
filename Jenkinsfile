@@ -1,4 +1,8 @@
 pipeline {
+      agent any
+    tools {
+        go 'go1.20.2'
+    }
     stages {
         stage('Compile') {
             steps {
