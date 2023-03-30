@@ -2,13 +2,13 @@ pipeline {
       agent any
 	environment {
 	  GT_CREDS= credentials('Gitea')
-	  IAM_KEY="${AM_KEY}"
-	  IAM_HOST="${AM_HOST}"
-	  IAM_PROJECT="${AM_PROJECT}"
-	  OAUTH_CLIENT_ID="${AUTH_CLIENT_ID}"
-	  OAUTH_CLIENT_SECRET="${AUTH_CLIENT_SECRET}"
-	  OAUTH_ADMIN_BASE="${AUTH_ADMIN_BASE}"
-	  OAUTH_ISSUER_BASE="${AUTH_ISSUER_BASE}"
+	  IAM_KEY="${env.IAM_KEY}"
+	  IAM_HOST="${env.IAM_HOST}"
+	  IAM_PROJECT="${env.IAM_PROJECT}"
+	  OAUTH_CLIENT_ID="${env.OAUTH_CLIENT_ID}"
+	  OAUTH_CLIENT_SECRET="${env.OAUTH_CLIENT_SECRET}"
+	  OAUTH_ADMIN_BASE="${env.OAUTH_ADMIN_BASE}"
+	  OAUTH_ISSUER_BASE="${env.OAUTH_ISSUER_BASE}"
 	}
     tools {
         go 'main'
@@ -25,10 +25,13 @@ pipeline {
             }
         }
         stage('Test') {
-            steps {
-                sh 'go test ./...'
-            }
-        }
+           steps {
+                withEnv(['IAM_KEY=${env.IAM_KEY}', 'IAM_HOST=${env.IAM_HOST}', 'IAM_PROJECT=${env.IAM_PROJECT}', 'OAUTH_CLIENT_ID=${env.OAUTH_CLIENT_ID}', 'OAUTH_CLIENT_SECRET=${env.OAUTH_CLIENT_SECRET}', 'OAUTH_ADMIN_BASE=${env.OAUTH_ADMIN_BASE}', 'OAUTH_ISSUER_BASE=${env.OAUTH_ISSUER_BASE}']) {
+                    sh 'printenv'
+                    sh 'go test ./...'
+                }
+            }        
+		  }
         stage('Code Analysis') {
             steps {
                 sh 'curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | bash -s -- -b $GOPATH/bin v1.12.5'
