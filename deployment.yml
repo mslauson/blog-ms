@@ -1,0 +1,77 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: iam-ms
+  namespace: chore
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      deploy: iam-ms
+      app: iam-ms
+
+  template:
+    metadata:
+      labels:
+        deploy: iam-ms
+        app: iam-ms
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "chore"
+        vault.hashicorp.com/agent-pre-populate-only: "true"
+        vault.hashicorp.com/agent-inject-secret-encryption: "chore/data/encryption"
+        vault.hashicorp.com/agent-inject-template-encryption: |
+          {{ with secret "chore/data/encryption" -}}
+            export KEY="{{ .Data.data.key }}"
+            export IV="{{ .Data.data.iv }}" {{- end }}
+        vault.hashicorp.com/agent-inject-secret-oauth: "chore/data/oauth"
+        vault.hashicorp.com/agent-inject-template-oauth: |
+          {{ with secret "chore/data/oauth" -}}
+            export OAUTH_ADMIN_BASE="{{ .Data.data.authHost }}"
+            export OAUTH_ISSUER_BASE="{{ .Data.data.oauthIssuerBase }}"
+            export OAUTH_CLIENT_ID="{{ .Data.data.oauthClientId }}"
+            export OAUTH_CLIENT_SECRET="{{ .Data.data.oauthClientSecret }}"
+          {{- end }}
+        vault.hashicorp.com/agent-inject-secret-appwrite: "chore/data/appwrite"
+        vault.hashicorp.com/agent-inject-template-appwrite: |
+          {{ with secret "chore/data/appwrite" -}}
+            export IAM_HOST="{{ .Data.data.host }}"
+            export IAM_KEY="{{ .Data.data.key }}"
+            export IAM_PROJECT="{{ .Data.data.project }}"
+          {{- end }}
+
+    spec:
+      serviceAccountName: chore-sa
+      containers:
+        - name: iam-ms
+          image: registry.slauson.io/slausonio/iam-ms:dev-9c97e21441f8510ab5588cc8c2864ca6006ced9d
+          args:
+            [
+              "sh",
+              "-c",
+              ". /vault/secrets/encryption &&. /vault/secrets/oauth && . /vault/secrets/appwrite && ./iam-ms",
+            ]
+          readinessProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+          livenessProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: 500m
+              memory: 200Mi
+            requests:
+              cpu: 50m
+              memory: 100Mi
+      imagePullSecrets:
+        - name: regcred
