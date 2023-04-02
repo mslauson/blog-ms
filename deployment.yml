@@ -20,29 +20,29 @@ spec:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/role: "chore"
         vault.hashicorp.com/agent-pre-populate-only: "true"
-        vault.hashicorp.com/agent-inject-secret-encryption: "chore/data/encryption"
+        vault.hashicorp.com/agent-inject-secret-encryption: "ndt/data/encryption"
         vault.hashicorp.com/agent-inject-template-encryption: |
-          {{ with secret "chore/data/encryption" -}}
+          {{ with secret "ndt/data/encryption" -}}
             export KEY="{{ .Data.data.key }}"
             export IV="{{ .Data.data.iv }}" {{- end }}
-        vault.hashicorp.com/agent-inject-secret-oauth: "chore/data/oauth"
+        vault.hashicorp.com/agent-inject-secret-oauth: "ndt/data/oauth"
         vault.hashicorp.com/agent-inject-template-oauth: |
-          {{ with secret "chore/data/oauth" -}}
+          {{ with secret "ndt/data/oauth" -}}
             export OAUTH_ADMIN_BASE="{{ .Data.data.authHost }}"
             export OAUTH_ISSUER_BASE="{{ .Data.data.oauthIssuerBase }}"
             export OAUTH_CLIENT_ID="{{ .Data.data.oauthClientId }}"
             export OAUTH_CLIENT_SECRET="{{ .Data.data.oauthClientSecret }}"
           {{- end }}
-        vault.hashicorp.com/agent-inject-secret-appwrite: "chore/data/appwrite"
+        vault.hashicorp.com/agent-inject-secret-appwrite: "ndt/data/appwrite"
         vault.hashicorp.com/agent-inject-template-appwrite: |
-          {{ with secret "chore/data/appwrite" -}}
+          {{ with secret "ndt/data/appwrite" -}}
             export IAM_HOST="{{ .Data.data.host }}"
             export IAM_KEY="{{ .Data.data.key }}"
             export IAM_PROJECT="{{ .Data.data.project }}"
           {{- end }}
 
     spec:
-      serviceAccountName: chore-sa
+      serviceAccountName: vault-auth 
       containers:
         - name: iam-ms
           image: registry.slauson.io/slausonio/iam-ms:dev-9c97e21441f8510ab5588cc8c2864ca6006ced9d
