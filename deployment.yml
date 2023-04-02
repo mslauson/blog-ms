@@ -2,7 +2,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: iam-ms
-  namespace: nd_tasks
+  namespace: nd-tasks
 spec:
   replicas: 2
   revisionHistoryLimit: 3
