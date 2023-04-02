@@ -2,7 +2,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: iam-ms
-  namespace: chore
+  namespace: nd_tasks
 spec:
   replicas: 2
   revisionHistoryLimit: 3
