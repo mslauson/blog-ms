@@ -23,9 +23,11 @@ type AwClient struct {
 type AppwriteClient interface {
 	ListUsers() (*siogeneric.AwlistResponse, error)
 	GetUserByID(id string) (*siogeneric.AwUser, error)
+	CreateUser(r *siogeneric.AwCreateUserRequest) (*siogeneric.AwUser, error)
 	UpdateEmail(id string, r *siogeneric.UpdateEmailRequest) (*siogeneric.AwUser, error)
 	UpdatePhone(id string, r *siogeneric.UpdatePhoneRequest) (*siogeneric.AwUser, error)
 	UpdatePassword(id string, r *siogeneric.UpdatePasswordRequest) (*siogeneric.AwUser, error)
+	DeleteUser(id string) error
 	CreateEmailSession(r *siogeneric.AwEmailSessionRequest) (*siogeneric.AwSession, error)
 	DeleteSession(sID string) error
 }

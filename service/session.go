@@ -1,14 +1,11 @@
 package service
 
 import (
-	"gitea.slauson.io/slausonio/iam-ms/iamError"
-	"net/http"
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
+	"gitea.slauson.io/slausonio/go-utils/sioerror"
 
-	sioModel "gitea.slauson.io/slausonio/go-libs/model"
-	sioModelGeneric "gitea.slauson.io/slausonio/go-libs/model/generic"
 	"gitea.slauson.io/slausonio/iam-ms/client"
-	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
+	"gitea.slauson.io/slausonio/iam-ms/constants"
 )
 
 type SessionService struct {
@@ -17,8 +14,10 @@ type SessionService struct {
 
 //go:generate mockery --name IamSessionService
 type IamSessionService interface {
-	CreateEmailSession(r *sioModel.AwEmailSessionRequest, c *gin.Context) *sioModel.AwSession
-	DeleteSession(sID string, c *gin.Context) sioModelGeneric.SuccessResponse
+	CreateEmailSession(
+		r *siogeneric.AwEmailSessionRequest,
+	) (*siogeneric.AwSession, error)
+	DeleteSession(sID string) (siogeneric.SuccessResponse, error)
 }
 
 func NewSessionService() *SessionService {
@@ -27,23 +26,27 @@ func NewSessionService() *SessionService {
 	}
 }
 
-func (s *SessionService) CreateEmailSession(r *sioModel.AwEmailSessionRequest, c *gin.Context) *sioModel.AwSession {
+func (s *SessionService) CreateEmailSession(
+	r *siogeneric.AwEmailSessionRequest,
+) (*siogeneric.AwSession, error) {
 	response, err := s.awClient.CreateEmailSession(r)
 	if err != nil {
-		log.Error(err)
-		c.AbortWithError(http.StatusBadRequest, err)
-		return nil
+		return nil, sioerror.NewSioBadRequestError(err.Error())
 	}
-	return response
+	return response, nil
 }
 
-func (s *SessionService) DeleteSession(sID string, c *gin.Context) sioModelGeneric.SuccessResponse {
+func (s *SessionService) DeleteSession(
+	sID string,
+) (siogeneric.SuccessResponse, error) {
 	err := s.awClient.DeleteSession(sID)
 	if err != nil {
-		log.Error(err)
-		c.AbortWithError(http.StatusNotFound, iamError.NoCustomerFound)
-		return sioModelGeneric.SuccessResponse{Success: false}
+		return siogeneric.SuccessResponse{
+				Success: false,
+			}, sioerror.NewSioNotFoundError(
+				constants.NoCustomerFound,
+			)
 	}
 
-	return sioModelGeneric.SuccessResponse{Success: true}
+	return siogeneric.SuccessResponse{Success: true}, nil
 }

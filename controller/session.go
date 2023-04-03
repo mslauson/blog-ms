@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
-	sioModel "gitea.slauson.io/slausonio/go-libs/model"
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
-	"gitea.slauson.io/slausonio/iam-ms/service"
 	"github.com/gin-gonic/gin"
+
+	"gitea.slauson.io/slausonio/iam-ms/service"
 )
 
 type SessionController struct {
@@ -28,7 +29,7 @@ func NewSessionController() *SessionController {
 
 func (sc *SessionController) CreateEmailSession(c *gin.Context) {
 	enc := sioUtils.NewEncryptionUtil()
-	request := new(sioModel.AwEmailSessionRequest)
+	request := new(siogeneric.AwEmailSessionRequest)
 
 	err := c.ShouldBindJSON(request)
 	if err != nil {
@@ -37,7 +38,10 @@ func (sc *SessionController) CreateEmailSession(c *gin.Context) {
 	}
 	err = enc.DecryptInterface(request, false)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("decryption failed - unable to proceed"))
+		c.AbortWithError(
+			http.StatusInternalServerError,
+			fmt.Errorf("decryption failed - unable to proceed"),
+		)
 		return
 	}
 	response := sc.s.CreateEmailSession(request, c)

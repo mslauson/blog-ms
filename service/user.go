@@ -1,13 +1,11 @@
 package service
 
 import (
-	"net/http"
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
+	"gitea.slauson.io/slausonio/go-utils/sioerror"
 
-	sioModel "gitea.slauson.io/slausonio/go-libs/model"
-	sioModelGeneric "gitea.slauson.io/slausonio/go-libs/model/generic"
 	"gitea.slauson.io/slausonio/iam-ms/client"
-	"gitea.slauson.io/slausonio/iam-ms/iamError"
-	"github.com/gin-gonic/gin"
+	"gitea.slauson.io/slausonio/iam-ms/constants"
 )
 
 type UserService struct {
@@ -16,13 +14,16 @@ type UserService struct {
 
 //go:generate mockery --name IamUserService
 type IamUserService interface {
-	ListUsers(c *gin.Context) *sioModel.AwlistResponse
-	GetUserByID(id string, c *gin.Context) *sioModel.AwUser
-	CreateUser(r *sioModel.AwCreateUserRequest, c *gin.Context) *sioModel.AwUser
-	UpdateEmail(id string, r *sioModel.UpdateEmailRequest, c *gin.Context) *sioModel.AwUser
-	UpdatePhone(id string, r *sioModel.UpdatePhoneRequest, c *gin.Context) *sioModel.AwUser
-	UpdatePassword(id string, r *sioModel.UpdatePasswordRequest, c *gin.Context) *sioModel.AwUser
-	DeleteUser(id string, c *gin.Context) sioModelGeneric.SuccessResponse
+	ListUsers() (*siogeneric.AwlistResponse, error)
+	GetUserByID(id string) (*siogeneric.AwUser, error)
+	CreateUser(r *siogeneric.AwCreateUserRequest) (*siogeneric.AwUser, error)
+	UpdateEmail(id string, r *siogeneric.UpdateEmailRequest) (*siogeneric.AwUser, error)
+	UpdatePhone(id string, r *siogeneric.UpdatePhoneRequest) (*siogeneric.AwUser, error)
+	UpdatePassword(
+		id string,
+		r *siogeneric.UpdatePasswordRequest,
+	) (*siogeneric.AwUser, error)
+	DeleteUser(id string) (siogeneric.SuccessResponse, error)
 }
 
 func NewUserService() *UserService {
@@ -31,72 +32,73 @@ func NewUserService() *UserService {
 	}
 }
 
-func (s *UserService) ListUsers(c *gin.Context) *sioModel.AwlistResponse {
+func (s *UserService) ListUsers() (*siogeneric.AwlistResponse, error) {
 	response, err := s.awClient.ListUsers()
 	if err != nil {
-		c.AbortWithError(http.StatusNotFound, iamError.NoCustomersFound)
-		return nil
+		return nil, sioerror.NewSioNotFoundError(constants.NoCustomersFound)
 	}
 
-	return response
+	return response, nil
 }
 
-func (s *UserService) GetUserByID(id string, c *gin.Context) *sioModel.AwUser {
+func (s *UserService) GetUserByID(id string) (*siogeneric.AwUser, error) {
 	response, err := s.awClient.GetUserByID(id)
 	if err != nil {
-		c.AbortWithError(http.StatusNotFound, iamError.NoCustomerFound)
-		return nil
+		return nil, sioerror.NewSioNotFoundError(constants.NoCustomerFound)
 	}
 
-	return response
+	return response, nil
 }
 
-func (s *UserService) CreateUser(r *sioModel.AwCreateUserRequest, c *gin.Context) *sioModel.AwUser {
+func (s *UserService) CreateUser(
+	r *siogeneric.AwCreateUserRequest,
+) (*siogeneric.AwUser, error) {
 	response, err := s.awClient.CreateUser(r)
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return nil
+		return nil, sioerror.NewSioBadRequestError(err.Error())
 	}
 
-	return response
+	return response, nil
 }
 
-func (s *UserService) UpdateEmail(id string, r *sioModel.UpdateEmailRequest, c *gin.Context) *sioModel.AwUser {
+func (s *UserService) UpdateEmail(
+	id string,
+	r *siogeneric.UpdateEmailRequest,
+) (*siogeneric.AwUser, error) {
 	response, err := s.awClient.UpdateEmail(id, r)
 	if err != nil {
-		// TODO: check for 404 and return 404
-		c.AbortWithError(http.StatusBadRequest, err)
-		return nil
+		return nil, sioerror.NewSioBadRequestError(err.Error())
 	}
-	return response
+	return response, nil
 }
 
-func (s *UserService) UpdatePhone(id string, r *sioModel.UpdatePhoneRequest, c *gin.Context) *sioModel.AwUser {
+func (s *UserService) UpdatePhone(
+	id string,
+	r *siogeneric.UpdatePhoneRequest,
+) (*siogeneric.AwUser, error) {
 	response, err := s.awClient.UpdatePhone(id, r)
 	if err != nil {
-		// TODO: check for 404 and return 404
-		c.AbortWithError(http.StatusBadRequest, err)
-		return nil
+		return nil, sioerror.NewSioBadRequestError(err.Error())
 	}
-	return response
+	return response, nil
 }
 
-func (s *UserService) UpdatePassword(id string, r *sioModel.UpdatePasswordRequest, c *gin.Context) *sioModel.AwUser {
+func (s *UserService) UpdatePassword(
+	id string,
+	r *siogeneric.UpdatePasswordRequest,
+) (*siogeneric.AwUser, error) {
 	response, err := s.awClient.UpdatePassword(id, r)
 	if err != nil {
-		// TODO: check for 404 and return 404
-		c.AbortWithError(http.StatusBadRequest, err)
-		return nil
+		return nil, sioerror.NewSioBadRequestError(err.Error())
 	}
-	return response
+	return response, nil
 }
 
-func (s *UserService) DeleteUser(id string, c *gin.Context) sioModelGeneric.SuccessResponse {
+func (s *UserService) DeleteUser(id string) (siogeneric.SuccessResponse, error) {
 	err := s.awClient.DeleteUser(id)
 	if err != nil {
-		c.AbortWithError(http.StatusNotFound, iamError.NoCustomerFound)
-		return sioModelGeneric.SuccessResponse{Success: false}
+		return siogeneric.SuccessResponse{Success: false}, sioerror.NewSioNotFoundError(err.Error())
 	}
 
-	return sioModelGeneric.SuccessResponse{Success: true}
+	return siogeneric.SuccessResponse{Success: true}, nil
 }
