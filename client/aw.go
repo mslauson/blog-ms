@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	sioModel "gitea.slauson.io/slausonio/go-libs/model"
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"github.com/google/uuid"
 )
@@ -21,14 +21,12 @@ type AwClient struct {
 
 //go:generate mockery --name AppwriteClient
 type AppwriteClient interface {
-	ListUsers() (*sioModel.AwlistResponse, error)
-	GetUserByID(id string) (*sioModel.AwUser, error)
-	CreateUser(r *sioModel.AwCreateUserRequest) (*sioModel.AwUser, error)
-	UpdateEmail(id string, r *sioModel.UpdateEmailRequest) (*sioModel.AwUser, error)
-	UpdatePhone(id string, r *sioModel.UpdatePhoneRequest) (*sioModel.AwUser, error)
-	UpdatePassword(id string, r *sioModel.UpdatePasswordRequest) (*sioModel.AwUser, error)
-	DeleteUser(id string) error
-	CreateEmailSession(r *sioModel.AwEmailSessionRequest) (*sioModel.AwSession, error)
+	ListUsers() (*siogeneric.AwlistResponse, error)
+	GetUserByID(id string) (*siogeneric.AwUser, error)
+	UpdateEmail(id string, r *siogeneric.UpdateEmailRequest) (*siogeneric.AwUser, error)
+	UpdatePhone(id string, r *siogeneric.UpdatePhoneRequest) (*siogeneric.AwUser, error)
+	UpdatePassword(id string, r *siogeneric.UpdatePasswordRequest) (*siogeneric.AwUser, error)
+	CreateEmailSession(r *siogeneric.AwEmailSessionRequest) (*siogeneric.AwSession, error)
 	DeleteSession(sID string) error
 }
 
@@ -44,13 +42,13 @@ func NewAwClient() *AwClient {
 	}
 }
 
-func (c *AwClient) ListUsers() (*sioModel.AwlistResponse, error) {
+func (c *AwClient) ListUsers() (*siogeneric.AwlistResponse, error) {
 	url := fmt.Sprintf("%s/users", c.host)
 	req, _ := http.NewRequest("GET", url, nil)
 
 	req.Header = c.defaultHeaders
 	req.Header.Add("X-Appwrite-Key", c.key)
-	response := new(sioModel.AwlistResponse)
+	response := new(siogeneric.AwlistResponse)
 	err := c.h.DoHttpRequestAndParse(req, response)
 	if err != nil {
 		return nil, err
@@ -59,13 +57,13 @@ func (c *AwClient) ListUsers() (*sioModel.AwlistResponse, error) {
 	return response, nil
 }
 
-func (c *AwClient) GetUserByID(id string) (*sioModel.AwUser, error) {
+func (c *AwClient) GetUserByID(id string) (*siogeneric.AwUser, error) {
 	url := fmt.Sprintf("%s/users/%s", c.host, id)
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header = c.defaultHeaders
 	req.Header.Add("X-Appwrite-Key", c.key)
 
-	response := new(sioModel.AwUser)
+	response := new(siogeneric.AwUser)
 	err := c.h.DoHttpRequestAndParse(req, response)
 	if err != nil {
 		return nil, err
@@ -74,7 +72,7 @@ func (c *AwClient) GetUserByID(id string) (*sioModel.AwUser, error) {
 	return response, nil
 }
 
-func (c *AwClient) CreateUser(r *sioModel.AwCreateUserRequest) (*sioModel.AwUser, error) {
+func (c *AwClient) CreateUser(r *siogeneric.AwCreateUserRequest) (*siogeneric.AwUser, error) {
 	url := fmt.Sprintf("%s/users", c.host)
 	r.UserId = uuid.New().String()
 	r.Phone = fmt.Sprintf("+1%s", r.Phone)
@@ -90,7 +88,7 @@ func (c *AwClient) CreateUser(r *sioModel.AwCreateUserRequest) (*sioModel.AwUser
 	req.Header = c.defaultHeaders
 	req.Header.Add("X-Appwrite-Key", c.key)
 
-	response := new(sioModel.AwUser)
+	response := new(siogeneric.AwUser)
 	err = c.h.DoHttpRequestAndParse(req, response)
 	if err != nil {
 		return nil, err
@@ -99,7 +97,10 @@ func (c *AwClient) CreateUser(r *sioModel.AwCreateUserRequest) (*sioModel.AwUser
 	return response, nil
 }
 
-func (c *AwClient) UpdateEmail(id string, r *sioModel.UpdateEmailRequest) (*sioModel.AwUser, error) {
+func (c *AwClient) UpdateEmail(
+	id string,
+	r *siogeneric.UpdateEmailRequest,
+) (*siogeneric.AwUser, error) {
 	url := fmt.Sprintf("%s/users/%s/email", c.host, id)
 	rJSON, err := json.Marshal(r)
 	if err != nil {
@@ -112,7 +113,7 @@ func (c *AwClient) UpdateEmail(id string, r *sioModel.UpdateEmailRequest) (*sioM
 	req.Header = c.defaultHeaders
 	req.Header.Add("X-Appwrite-Key", c.key)
 
-	response := new(sioModel.AwUser)
+	response := new(siogeneric.AwUser)
 	err = c.h.DoHttpRequestAndParse(req, response)
 	if err != nil {
 		return nil, err
@@ -121,7 +122,10 @@ func (c *AwClient) UpdateEmail(id string, r *sioModel.UpdateEmailRequest) (*sioM
 	return response, nil
 }
 
-func (c *AwClient) UpdatePassword(id string, r *sioModel.UpdatePasswordRequest) (*sioModel.AwUser, error) {
+func (c *AwClient) UpdatePassword(
+	id string,
+	r *siogeneric.UpdatePasswordRequest,
+) (*siogeneric.AwUser, error) {
 	url := fmt.Sprintf("%s/users/%s/password", c.host, id)
 	rJSON, err := json.Marshal(r)
 	if err != nil {
@@ -134,7 +138,7 @@ func (c *AwClient) UpdatePassword(id string, r *sioModel.UpdatePasswordRequest) 
 	req.Header = c.defaultHeaders
 	req.Header.Add("X-Appwrite-Key", c.key)
 
-	response := new(sioModel.AwUser)
+	response := new(siogeneric.AwUser)
 	err = c.h.DoHttpRequestAndParse(req, response)
 	if err != nil {
 		return nil, err
@@ -143,7 +147,10 @@ func (c *AwClient) UpdatePassword(id string, r *sioModel.UpdatePasswordRequest) 
 	return response, nil
 }
 
-func (c *AwClient) UpdatePhone(id string, r *sioModel.UpdatePhoneRequest) (*sioModel.AwUser, error) {
+func (c *AwClient) UpdatePhone(
+	id string,
+	r *siogeneric.UpdatePhoneRequest,
+) (*siogeneric.AwUser, error) {
 	url := fmt.Sprintf("%s/users/%s/phone", c.host, id)
 	rJSON, err := json.Marshal(r)
 	if err != nil {
@@ -156,7 +163,7 @@ func (c *AwClient) UpdatePhone(id string, r *sioModel.UpdatePhoneRequest) (*sioM
 	req.Header = c.defaultHeaders
 	req.Header.Add("X-Appwrite-Key", c.key)
 
-	response := new(sioModel.AwUser)
+	response := new(siogeneric.AwUser)
 	err = c.h.DoHttpRequestAndParse(req, response)
 	if err != nil {
 		return nil, err
@@ -179,7 +186,9 @@ func (c *AwClient) DeleteUser(id string) error {
 	return nil
 }
 
-func (c *AwClient) CreateEmailSession(r *sioModel.AwEmailSessionRequest) (*sioModel.AwSession, error) {
+func (c *AwClient) CreateEmailSession(
+	r *siogeneric.AwEmailSessionRequest,
+) (*siogeneric.AwSession, error) {
 	url := fmt.Sprintf("%s/account/sessions/email", c.host)
 	rJSON, err := json.Marshal(r)
 	if err != nil {
@@ -191,7 +200,7 @@ func (c *AwClient) CreateEmailSession(r *sioModel.AwEmailSessionRequest) (*sioMo
 
 	req.Header = c.defaultHeaders
 
-	response := new(sioModel.AwSession)
+	response := new(siogeneric.AwSession)
 	err = c.h.DoHttpRequestAndParse(req, response)
 	if err != nil {
 		return nil, err
