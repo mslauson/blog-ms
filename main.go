@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	siologger "gitea.slauson.io/slausonio/go-utils/sio-logger"
 	"os"
 
-	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -19,12 +19,12 @@ func init() {
 	// Only log the warning severity or above.
 	log.SetLevel(log.InfoLevel)
 
-	lc := new(sioUtils.LokiConfig)
+	lc := new(siologger.LokiConfig)
 
 	lc.UseDefaults("customer-ms")
 	fmt.Println(lc)
 
-	lh, err := sioUtils.NewLokiHook(lc)
+	lh, err := siologger.NewLokiHook(lc)
 	if err != nil {
 		log.Errorf("Error creating Loki hook: %s", err)
 		return

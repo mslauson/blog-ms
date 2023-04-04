@@ -20,6 +20,8 @@ gitea.slauson.io/slausonio/go-utils v0.0.30 h1:zbMGdF8Mtz9otpXIVpngymqhh5QXr2ao6
 gitea.slauson.io/slausonio/go-utils v0.0.30/go.mod h1:Dyhvx/9UF1QdCW6mNr1s9ClZJVgm7N4qq8bjAyS8GX4=
 gitea.slauson.io/slausonio/go-utils v0.0.31 h1:4TJnDnE3jNG6IbD6Y9qNGybJZrY9NNk+E7SIR+7m9mg=
 gitea.slauson.io/slausonio/go-utils v0.0.31/go.mod h1:Dyhvx/9UF1QdCW6mNr1s9ClZJVgm7N4qq8bjAyS8GX4=
+gitea.slauson.io/slausonio/go-utils v0.0.32 h1:DFgVgtRWTLtofGJ16fr9oujSVyKCVh9rNX2nYrpajVA=
+gitea.slauson.io/slausonio/go-utils v0.0.32/go.mod h1:Dyhvx/9UF1QdCW6mNr1s9ClZJVgm7N4qq8bjAyS8GX4=
 github.com/afiskon/promtail-client v0.0.0-20190305142237-506f3f921e9c h1:AMDVOKGaiqse4qiRXSzRgpC9DCNTHCx6zpzdtXXrKM4=
 github.com/afiskon/promtail-client v0.0.0-20190305142237-506f3f921e9c/go.mod h1:p/7Wos+jcfrnwLqqzJMZ0s323kfVtJPW+HUvAANklVQ=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
