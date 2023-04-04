@@ -84,7 +84,7 @@ func TestSessionService_CreateUser_Error(t *testing.T) {
 	awClient.On("CreateEmailSession", mock.AnythingOfType("*siogeneric.AwEmailSessionRequest")).Return(nil, siotest.TError)
 	actual, err := ss.CreateEmailSession(sessionReq)
 	assert.Nilf(t, actual, "expected nil, actual: %v", actual)
-	assert.Equalf(t, err, siotest.TBadRequestError, "error: %v", err)
+	assert.Equalf(t, err, siotest.TUnauthorizedError, "error: %v", err)
 }
 
 func TestSessionService_DeleteSession(t *testing.T) {

@@ -31,7 +31,7 @@ func (s *SessionService) CreateEmailSession(
 ) (*siogeneric.AwSession, error) {
 	response, err := s.awClient.CreateEmailSession(r)
 	if err != nil {
-		return nil, sioerror.NewSioBadRequestError(err.Error())
+		return nil, sioerror.NewSioUnauthorizedError(err.Error())
 	}
 	return response, nil
 }
