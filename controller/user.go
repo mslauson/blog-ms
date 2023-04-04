@@ -57,18 +57,11 @@ func (uc *UserController) GetUserById(c *gin.Context) {
 }
 
 func (uc *UserController) CreateUser(c *gin.Context) {
-	enc := sioUtils.NewEncryptionUtil()
 	validations := utils.NewIamValidations()
 	request := new(siogeneric.AwCreateUserRequest)
-	err := c.BindJSON(&request)
+	err := sioUtils.DecryptAndHandle(request, c)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	err = enc.DecryptInterface(request, false)
-	if err != nil {
-		_ = c.Error(sioerror.NewSioInternalServerError(sioUtils.DecryptionFailed))
+		_ = c.Error(err)
 		return
 	}
 
@@ -89,20 +82,13 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 }
 
 func (uc *UserController) UpdatePassword(c *gin.Context) {
-	enc := sioUtils.NewEncryptionUtil()
 	validations := utils.NewIamValidations()
 	id := c.Param("id")
 	request := new(siogeneric.UpdatePasswordRequest)
 
-	err := c.BindJSON(&request)
+	err := sioUtils.DecryptAndHandle(request, c)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	err = enc.DecryptInterface(request, false)
-	if err != nil {
-		_ = c.Error(sioerror.NewSioInternalServerError(sioUtils.DecryptionFailed))
+		_ = c.Error(err)
 		return
 	}
 
@@ -124,20 +110,13 @@ func (uc *UserController) UpdatePassword(c *gin.Context) {
 }
 
 func (uc *UserController) UpdateEmail(c *gin.Context) {
-	enc := sioUtils.NewEncryptionUtil()
 	validations := utils.NewIamValidations()
 	id := c.Param("id")
 	request := new(siogeneric.UpdateEmailRequest)
-
-	err := c.BindJSON(&request)
+	err := sioUtils.DecryptAndHandle(request, c)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
+		_ = c.Error(err)
 		return
-	}
-
-	err = enc.DecryptInterface(request, false)
-	if err != nil {
-		_ = c.Error(sioerror.NewSioInternalServerError(sioUtils.DecryptionFailed))
 	}
 
 	err = validations.ValidateUpdateEmailRequest(request)
@@ -157,25 +136,19 @@ func (uc *UserController) UpdateEmail(c *gin.Context) {
 }
 
 func (uc *UserController) UpdatePhone(c *gin.Context) {
-	enc := sioUtils.NewEncryptionUtil()
+
 	validations := utils.NewIamValidations()
 	id := c.Param("id")
 	request := new(siogeneric.UpdatePhoneRequest)
-
-	err := c.BindJSON(&request)
+	err := sioUtils.DecryptAndHandle(request, c)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
+		_ = c.Error(err)
 		return
-	}
-
-	err = enc.DecryptInterface(request, false)
-	if err != nil {
-		_ = c.Error(sioerror.NewSioInternalServerError(sioUtils.DecryptionFailed))
 	}
 
 	err = validations.ValidateUpdatePhoneRequest(request)
 	if err != nil {
-		_ = c.Error(sioerror.NewSioBadRequestError(err.Error()))
+		_ = c.Error(err)
 		return
 	}
 
