@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	sioModel "gitea.slauson.io/slausonio/go-libs/model"
+	siogeneric "gitea.slauson.io/slausonio/go-types/siogeneric"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,23 +13,23 @@ type AppwriteClient struct {
 }
 
 // CreateEmailSession provides a mock function with given fields: r
-func (_m *AppwriteClient) CreateEmailSession(r *sioModel.AwEmailSessionRequest) (*sioModel.AwSession, error) {
+func (_m *AppwriteClient) CreateEmailSession(r *siogeneric.AwEmailSessionRequest) (*siogeneric.AwSession, error) {
 	ret := _m.Called(r)
 
-	var r0 *sioModel.AwSession
+	var r0 *siogeneric.AwSession
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*sioModel.AwEmailSessionRequest) (*sioModel.AwSession, error)); ok {
+	if rf, ok := ret.Get(0).(func(*siogeneric.AwEmailSessionRequest) (*siogeneric.AwSession, error)); ok {
 		return rf(r)
 	}
-	if rf, ok := ret.Get(0).(func(*sioModel.AwEmailSessionRequest) *sioModel.AwSession); ok {
+	if rf, ok := ret.Get(0).(func(*siogeneric.AwEmailSessionRequest) *siogeneric.AwSession); ok {
 		r0 = rf(r)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*sioModel.AwSession)
+			r0 = ret.Get(0).(*siogeneric.AwSession)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(*sioModel.AwEmailSessionRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(*siogeneric.AwEmailSessionRequest) error); ok {
 		r1 = rf(r)
 	} else {
 		r1 = ret.Error(1)
@@ -39,23 +39,23 @@ func (_m *AppwriteClient) CreateEmailSession(r *sioModel.AwEmailSessionRequest) 
 }
 
 // CreateUser provides a mock function with given fields: r
-func (_m *AppwriteClient) CreateUser(r *sioModel.AwCreateUserRequest) (*sioModel.AwUser, error) {
+func (_m *AppwriteClient) CreateUser(r *siogeneric.AwCreateUserRequest) (*siogeneric.AwUser, error) {
 	ret := _m.Called(r)
 
-	var r0 *sioModel.AwUser
+	var r0 *siogeneric.AwUser
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*sioModel.AwCreateUserRequest) (*sioModel.AwUser, error)); ok {
+	if rf, ok := ret.Get(0).(func(*siogeneric.AwCreateUserRequest) (*siogeneric.AwUser, error)); ok {
 		return rf(r)
 	}
-	if rf, ok := ret.Get(0).(func(*sioModel.AwCreateUserRequest) *sioModel.AwUser); ok {
+	if rf, ok := ret.Get(0).(func(*siogeneric.AwCreateUserRequest) *siogeneric.AwUser); ok {
 		r0 = rf(r)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*sioModel.AwUser)
+			r0 = ret.Get(0).(*siogeneric.AwUser)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(*sioModel.AwCreateUserRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(*siogeneric.AwCreateUserRequest) error); ok {
 		r1 = rf(r)
 	} else {
 		r1 = ret.Error(1)
@@ -93,19 +93,19 @@ func (_m *AppwriteClient) DeleteUser(id string) error {
 }
 
 // GetUserByID provides a mock function with given fields: id
-func (_m *AppwriteClient) GetUserByID(id string) (*sioModel.AwUser, error) {
+func (_m *AppwriteClient) GetUserByID(id string) (*siogeneric.AwUser, error) {
 	ret := _m.Called(id)
 
-	var r0 *sioModel.AwUser
+	var r0 *siogeneric.AwUser
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (*sioModel.AwUser, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) (*siogeneric.AwUser, error)); ok {
 		return rf(id)
 	}
-	if rf, ok := ret.Get(0).(func(string) *sioModel.AwUser); ok {
+	if rf, ok := ret.Get(0).(func(string) *siogeneric.AwUser); ok {
 		r0 = rf(id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*sioModel.AwUser)
+			r0 = ret.Get(0).(*siogeneric.AwUser)
 		}
 	}
 
@@ -119,19 +119,19 @@ func (_m *AppwriteClient) GetUserByID(id string) (*sioModel.AwUser, error) {
 }
 
 // ListUsers provides a mock function with given fields:
-func (_m *AppwriteClient) ListUsers() (*sioModel.AwlistResponse, error) {
+func (_m *AppwriteClient) ListUsers() (*siogeneric.AwlistResponse, error) {
 	ret := _m.Called()
 
-	var r0 *sioModel.AwlistResponse
+	var r0 *siogeneric.AwlistResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (*sioModel.AwlistResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func() (*siogeneric.AwlistResponse, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() *sioModel.AwlistResponse); ok {
+	if rf, ok := ret.Get(0).(func() *siogeneric.AwlistResponse); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*sioModel.AwlistResponse)
+			r0 = ret.Get(0).(*siogeneric.AwlistResponse)
 		}
 	}
 
@@ -145,23 +145,23 @@ func (_m *AppwriteClient) ListUsers() (*sioModel.AwlistResponse, error) {
 }
 
 // UpdateEmail provides a mock function with given fields: id, r
-func (_m *AppwriteClient) UpdateEmail(id string, r *sioModel.UpdateEmailRequest) (*sioModel.AwUser, error) {
+func (_m *AppwriteClient) UpdateEmail(id string, r *siogeneric.UpdateEmailRequest) (*siogeneric.AwUser, error) {
 	ret := _m.Called(id, r)
 
-	var r0 *sioModel.AwUser
+	var r0 *siogeneric.AwUser
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string, *sioModel.UpdateEmailRequest) (*sioModel.AwUser, error)); ok {
+	if rf, ok := ret.Get(0).(func(string, *siogeneric.UpdateEmailRequest) (*siogeneric.AwUser, error)); ok {
 		return rf(id, r)
 	}
-	if rf, ok := ret.Get(0).(func(string, *sioModel.UpdateEmailRequest) *sioModel.AwUser); ok {
+	if rf, ok := ret.Get(0).(func(string, *siogeneric.UpdateEmailRequest) *siogeneric.AwUser); ok {
 		r0 = rf(id, r)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*sioModel.AwUser)
+			r0 = ret.Get(0).(*siogeneric.AwUser)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(string, *sioModel.UpdateEmailRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(string, *siogeneric.UpdateEmailRequest) error); ok {
 		r1 = rf(id, r)
 	} else {
 		r1 = ret.Error(1)
@@ -171,23 +171,23 @@ func (_m *AppwriteClient) UpdateEmail(id string, r *sioModel.UpdateEmailRequest)
 }
 
 // UpdatePassword provides a mock function with given fields: id, r
-func (_m *AppwriteClient) UpdatePassword(id string, r *sioModel.UpdatePasswordRequest) (*sioModel.AwUser, error) {
+func (_m *AppwriteClient) UpdatePassword(id string, r *siogeneric.UpdatePasswordRequest) (*siogeneric.AwUser, error) {
 	ret := _m.Called(id, r)
 
-	var r0 *sioModel.AwUser
+	var r0 *siogeneric.AwUser
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string, *sioModel.UpdatePasswordRequest) (*sioModel.AwUser, error)); ok {
+	if rf, ok := ret.Get(0).(func(string, *siogeneric.UpdatePasswordRequest) (*siogeneric.AwUser, error)); ok {
 		return rf(id, r)
 	}
-	if rf, ok := ret.Get(0).(func(string, *sioModel.UpdatePasswordRequest) *sioModel.AwUser); ok {
+	if rf, ok := ret.Get(0).(func(string, *siogeneric.UpdatePasswordRequest) *siogeneric.AwUser); ok {
 		r0 = rf(id, r)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*sioModel.AwUser)
+			r0 = ret.Get(0).(*siogeneric.AwUser)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(string, *sioModel.UpdatePasswordRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(string, *siogeneric.UpdatePasswordRequest) error); ok {
 		r1 = rf(id, r)
 	} else {
 		r1 = ret.Error(1)
@@ -197,23 +197,23 @@ func (_m *AppwriteClient) UpdatePassword(id string, r *sioModel.UpdatePasswordRe
 }
 
 // UpdatePhone provides a mock function with given fields: id, r
-func (_m *AppwriteClient) UpdatePhone(id string, r *sioModel.UpdatePhoneRequest) (*sioModel.AwUser, error) {
+func (_m *AppwriteClient) UpdatePhone(id string, r *siogeneric.UpdatePhoneRequest) (*siogeneric.AwUser, error) {
 	ret := _m.Called(id, r)
 
-	var r0 *sioModel.AwUser
+	var r0 *siogeneric.AwUser
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string, *sioModel.UpdatePhoneRequest) (*sioModel.AwUser, error)); ok {
+	if rf, ok := ret.Get(0).(func(string, *siogeneric.UpdatePhoneRequest) (*siogeneric.AwUser, error)); ok {
 		return rf(id, r)
 	}
-	if rf, ok := ret.Get(0).(func(string, *sioModel.UpdatePhoneRequest) *sioModel.AwUser); ok {
+	if rf, ok := ret.Get(0).(func(string, *siogeneric.UpdatePhoneRequest) *siogeneric.AwUser); ok {
 		r0 = rf(id, r)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*sioModel.AwUser)
+			r0 = ret.Get(0).(*siogeneric.AwUser)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(string, *sioModel.UpdatePhoneRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(string, *siogeneric.UpdatePhoneRequest) error); ok {
 		r1 = rf(id, r)
 	} else {
 		r1 = ret.Error(1)

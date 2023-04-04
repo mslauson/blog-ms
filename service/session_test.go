@@ -1,14 +1,14 @@
 package service
 
 import (
+	siotest "gitea.slauson.io/slausonio/go-testing/sio_test"
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
+	"gitea.slauson.io/slausonio/go-utils/sioerror"
 	"gitea.slauson.io/slausonio/iam-ms/client/mocks"
-	"gitea.slauson.io/slausonio/iam-ms/iamError"
+	"gitea.slauson.io/slausonio/iam-ms/constants"
 	"github.com/stretchr/testify/mock"
-	"net/http"
 	"testing"
 
-	sioModel "gitea.slauson.io/slausonio/go-libs/model"
-	siotest "gitea.slauson.io/slausonio/go-testing/sio_test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,12 +27,12 @@ import (
 // }
 
 var (
-	sessionReq = &sioModel.AwEmailSessionRequest{
+	sessionReq = &siogeneric.AwEmailSessionRequest{
 		Email:    "test",
 		Password: "test",
 	}
 
-	mUserSession = &sioModel.AwSession{
+	mUserSession = &siogeneric.AwSession{
 		ID:                        "blah",
 		CreatedAt:                 "blah",
 		AwClientCode:              "blah",
@@ -71,42 +71,36 @@ func initSessionServiceTest(t *testing.T) (*SessionService, *mocks.AppwriteClien
 
 func TestSessionService_CreateUser(t *testing.T) {
 	ss, awClient := initSessionServiceTest(t)
-	gc, _ := siotest.InitGinTestContext()
 
-	awClient.On("CreateEmailSession", mock.AnythingOfType("*sioModel.AwEmailSessionRequest")).Return(mUserSession, nil)
-	actual := ss.CreateEmailSession(sessionReq, gc)
+	awClient.On("CreateEmailSession", mock.AnythingOfType("*siogeneric.AwEmailSessionRequest")).Return(mUserSession, nil)
+	actual, err := ss.CreateEmailSession(sessionReq)
 	assert.Equalf(t, mUserSession, actual, "actual: %v", actual)
-	assert.Emptyf(t, gc.Errors, "gc.Errors: %v", gc.Errors)
+	assert.Emptyf(t, err, "err: %v", err)
 }
 
 func TestSessionService_CreateUser_Error(t *testing.T) {
 	ss, awClient := initSessionServiceTest(t)
-	gc, w := siotest.InitGinTestContext()
 
-	awClient.On("CreateEmailSession", mock.AnythingOfType("*sioModel.AwEmailSessionRequest")).Return(nil, tError)
-	actual := ss.CreateEmailSession(sessionReq, gc)
+	awClient.On("CreateEmailSession", mock.AnythingOfType("*siogeneric.AwEmailSessionRequest")).Return(nil, siotest.TError)
+	actual, err := ss.CreateEmailSession(sessionReq)
 	assert.Nilf(t, actual, "expected nil, actual: %v", actual)
-	assert.Equalf(t, gc.Errors[0].Err, tError, "error: %v", gc.Errors[0].Err)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equalf(t, err, siotest.TUnauthorizedError, "error: %v", err)
 }
 
 func TestSessionService_DeleteSession(t *testing.T) {
 	ss, awClient := initSessionServiceTest(t)
-	gc, _ := siotest.InitGinTestContext()
 
 	awClient.On("DeleteSession", "a").Return(nil)
-	actual := ss.DeleteSession("a", gc)
+	actual, err := ss.DeleteSession("a")
 	assert.Truef(t, actual.Success, "actual.Success: %v", actual.Success)
-	assert.Emptyf(t, gc.Errors, "gc.Errors: %v", gc.Errors)
+	assert.Emptyf(t, err, "err: %v", err)
 }
 
 func TestSessionService_DeleteSession_Error(t *testing.T) {
 	ss, awClient := initSessionServiceTest(t)
-	gc, w := siotest.InitGinTestContext()
 
-	awClient.On("DeleteSession", "a").Return(tError)
-	actual := ss.DeleteSession("a", gc)
+	awClient.On("DeleteSession", "a").Return(siotest.TError)
+	actual, err := ss.DeleteSession("a")
 	assert.False(t, actual.Success)
-	assert.Equalf(t, gc.Errors[0].Err, iamError.NoCustomerFound, "error: %v", gc.Errors[0].Err)
-	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Equalf(t, err, sioerror.NewSioNotFoundError(constants.NoCustomerFound), "error: %v", err)
 }

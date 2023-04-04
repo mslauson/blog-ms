@@ -1,12 +1,12 @@
 package main
 
 import (
-	"log"
 	"net/http"
 
 	"gitea.slauson.io/slausonio/go-libs/mw"
 	"gitea.slauson.io/slausonio/iam-ms/controller"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 func CreateRouter() {
@@ -48,6 +48,5 @@ func CreateRouter() {
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
 		log.Fatalf("error: %v", err)
-		panic(err)
 	}
 }

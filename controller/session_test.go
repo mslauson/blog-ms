@@ -1,19 +1,20 @@
 package controller
 
 import (
-	sioModelGeneric "gitea.slauson.io/slausonio/go-libs/model/generic"
+	"errors"
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	sioModel "gitea.slauson.io/slausonio/go-libs/model"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"gitea.slauson.io/slausonio/iam-ms/service/mocks"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 )
 
-var mUserSession = &sioModel.AwSession{
+var mUserSession = &siogeneric.AwSession{
 	ID:                        "blah",
 	CreatedAt:                 "blah",
 	AwClientCode:              "blah",
@@ -69,18 +70,16 @@ func initControllerForSessionTests(t *testing.T) (*SessionController, *mocks.Iam
 // }
 
 func TestSessionController_CreateEmailSession(t *testing.T) {
-	sc, ss, eu := initControllerForSessionTests(t)
 
 	tests := []struct {
 		name    string
-		request *sioModel.AwEmailSessionRequest
-		want    *sioModel.AwSession
+		request *siogeneric.AwEmailSessionRequest
+		want    *siogeneric.AwSession
 		status  int
 	}{
-		{name: "valid", request: &sioModel.AwEmailSessionRequest{Email: "test@test.com", Password: "asdf"}, want: mUserSession, status: http.StatusOK},
-		{name: "service error", request: &sioModel.AwEmailSessionRequest{Email: "test@test.com", Password: "asdf"}, want: nil, status: http.StatusOK},
-		{name: "Missing Email", request: &sioModel.AwEmailSessionRequest{Email: "", Password: "asdf"}, want: nil, status: http.StatusBadRequest},
-		{name: "Missing Pass", request: &sioModel.AwEmailSessionRequest{Email: "test@test.com", Password: ""}, want: nil, status: http.StatusBadRequest},
+		{name: "valid", request: &siogeneric.AwEmailSessionRequest{Email: "test@test.com", Password: "asdf"}, want: mUserSession, status: http.StatusOK},
+		{name: "Missing Email", request: &siogeneric.AwEmailSessionRequest{Email: "", Password: "asdf"}, want: nil, status: http.StatusBadRequest},
+		{name: "Missing Pass", request: &siogeneric.AwEmailSessionRequest{Email: "test@test.com", Password: ""}, want: nil, status: http.StatusBadRequest},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -88,10 +87,11 @@ func TestSessionController_CreateEmailSession(t *testing.T) {
 				w    = httptest.NewRecorder()
 				c, _ = gin.CreateTestContext(w)
 			)
-
 			c.Request = &http.Request{
 				Header: make(http.Header),
 			}
+
+			sc, ss, eu := initControllerForSessionTests(t)
 
 			err := eu.EncryptInterface(tt.request, false)
 			if err != nil {
@@ -100,42 +100,78 @@ func TestSessionController_CreateEmailSession(t *testing.T) {
 			}
 
 			MockJson(c, tt.request, "POST")
-			if tt.status == http.StatusOK {
-				ss.On("CreateEmailSession", mock.AnythingOfType("*sioModel.AwEmailSessionRequest"), c).Return(tt.want, nil)
+			if tt.want != nil {
+				ss.On("CreateEmailSession", mock.AnythingOfType("*siogeneric.AwEmailSessionRequest")).Return(tt.want, nil)
 			}
 			sc.CreateEmailSession(c)
-			if w.Code != tt.status {
-				t.Errorf("CreateEmailSession() status = %v, want %v", w.Code, tt.status)
-				return
+			if tt.want != nil {
+				assert.Truef(t, c.Errors == nil, "c.Errors should be nil")
+			} else {
+				assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil")
 			}
 		})
 	}
 }
 
-func TestSessionController_DeleteSession(t *testing.T) {
-	sc, ss, _ := initControllerForSessionTests(t)
-	tests := []struct {
-		name   string
-		want   sioModelGeneric.SuccessResponse
-		status int
-	}{
-		{name: "happy", want: sioModelGeneric.SuccessResponse{Success: true}, status: 200},
-		{name: "service error", want: sioModelGeneric.SuccessResponse{Success: false}, status: 200},
+func TestUserController_CreateEmailSessionServiceFailure(t *testing.T) {
+	request := &siogeneric.AwEmailSessionRequest{Email: "test@test.com", Password: "asdf"}
+	var (
+		w    = httptest.NewRecorder()
+		c, _ = gin.CreateTestContext(w)
+	)
+	c.Request = &http.Request{
+		Header: make(http.Header),
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var (
-				w    = httptest.NewRecorder()
-				c, _ = gin.CreateTestContext(w)
-			)
 
-			c.Request = &http.Request{
-				Header: make(http.Header),
-			}
+	sc, ss, eu := initControllerForSessionTests(t)
 
-			c.Params = gin.Params{gin.Param{Key: "sessionId", Value: "a"}}
-			ss.On("DeleteSession", "a", c).Return(tt.want)
-			sc.DeleteSession(c)
-		})
+	err := eu.EncryptInterface(request, false)
+	if err != nil {
+		t.Error(err)
+		return
 	}
+
+	MockJson(c, request, "POST")
+	ss.On("CreateEmailSession", mock.AnythingOfType("*siogeneric.AwEmailSessionRequest")).Return(nil, errors.New("error"))
+	sc.CreateEmailSession(c)
+
+	assert.Truef(t, c.Errors != nil, "c.Errors shouldn't be nil")
+
+}
+func TestDeleteSession(t *testing.T) {
+
+	uc, ms, _ := initControllerForSessionTests(t)
+
+	var (
+		w    = httptest.NewRecorder()
+		c, _ = gin.CreateTestContext(w)
+	)
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+
+	c.Params = gin.Params{gin.Param{Key: "sessionId", Value: "a"}}
+	ms.On("DeleteSession", "a").Return(siogeneric.SuccessResponse{Success: true}, nil)
+	uc.DeleteSession(c)
+
+	assert.Truef(t, c.Errors == nil, "c.Errors should be nil")
+}
+
+func TestDeleteSessionError(t *testing.T) {
+
+	uc, ms, _ := initControllerForSessionTests(t)
+
+	var (
+		w    = httptest.NewRecorder()
+		c, _ = gin.CreateTestContext(w)
+	)
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+
+	c.Params = gin.Params{gin.Param{Key: "sessionId", Value: "a"}}
+	ms.On("DeleteSession", "a").Return(siogeneric.SuccessResponse{Success: false}, errors.New("asdf"))
+	uc.DeleteSession(c)
+
+	assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil")
 }
