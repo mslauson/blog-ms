@@ -2,6 +2,12 @@ gitea.slauson.io/slausonio/go-libs v0.0.96 h1:mpzGhdaXioIB5QbPBFlH34Wv+hxUac4Xcn
 gitea.slauson.io/slausonio/go-libs v0.0.96/go.mod h1:ikUtFdrrjY6185JaUmsht1wsHZwTL3wxzthzePNLCGo=
 gitea.slauson.io/slausonio/go-testing v0.0.1 h1:3g21v1difIX9fL1U/SDHWIQMJRaZPrQIVCDTJ7TKYdE=
 gitea.slauson.io/slausonio/go-testing v0.0.1/go.mod h1:DYK3t7zh/b75hhrJm0Xq4AO/3zjzuyoMIL0Bcy+sdOI=
+gitea.slauson.io/slausonio/go-testing v0.0.2 h1:WBIfmA1kdaQjlF97awD2vGsmYOFP1o2ynscu3Vqec5M=
+gitea.slauson.io/slausonio/go-testing v0.0.2/go.mod h1:tJ5YevHS333zKTuw4+XKaoW2nC/T112FtKvsqvH1OoI=
+gitea.slauson.io/slausonio/go-testing v0.0.3 h1:LIfUL2bHEN40eNxO4uANXKYSI+aGc9MRYtvaBweIfhQ=
+gitea.slauson.io/slausonio/go-testing v0.0.3/go.mod h1:tJ5YevHS333zKTuw4+XKaoW2nC/T112FtKvsqvH1OoI=
+gitea.slauson.io/slausonio/go-testing v0.0.4 h1:OKwwuHduS+pmfeV3c0OJlerVTrLtPPZuwDaoHWC3oZE=
+gitea.slauson.io/slausonio/go-testing v0.0.4/go.mod h1:tJ5YevHS333zKTuw4+XKaoW2nC/T112FtKvsqvH1OoI=
 gitea.slauson.io/slausonio/go-types v0.0.98 h1:tdkAkfp8sC2zGkfYsXo8jm4rtmOqVPfHm2Le1cAkQxA=
 gitea.slauson.io/slausonio/go-types v0.0.98/go.mod h1:Hy3pD3/NMxIWPxgwTCeETBhVKKcKEAlzQQAQUHbafcY=
 gitea.slauson.io/slausonio/go-types v0.0.103 h1:SuFrzJiKF8GINaNhCy0jHQgdw9nKU4DQdfDB6yViCek=
