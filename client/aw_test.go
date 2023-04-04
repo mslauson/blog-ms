@@ -3,11 +3,11 @@ package client
 import (
 	"bytes"
 	"fmt"
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"io/ioutil"
 	"net/http"
 	"testing"
 
-	sioModel "gitea.slauson.io/slausonio/go-libs/model"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"github.com/stretchr/testify/mock"
 )
@@ -27,19 +27,19 @@ func initForTests(t *testing.T) (*AwClient, *sioUtils.MockSioRestHelpers) {
 }
 
 var (
-	sessionReq = &sioModel.AwEmailSessionRequest{
+	sessionReq = &siogeneric.AwEmailSessionRequest{
 		Email:    "test",
 		Password: "test",
 	}
-	mCr = &sioModel.AwCreateUserRequest{
+	mCr = &siogeneric.AwCreateUserRequest{
 		Email:    "t@t.com",
 		Password: "test_password",
 		Name:     "test_name",
 		Phone:    "test_phone",
 	}
-	uEmailR    = &sioModel.UpdateEmailRequest{Email: "test"}
-	uPhoneR    = &sioModel.UpdatePhoneRequest{Number: "1235"}
-	uPasswordR = &sioModel.UpdatePasswordRequest{Password: "1235"}
+	uEmailR    = &siogeneric.UpdateEmailRequest{Email: "test"}
+	uPhoneR    = &siogeneric.UpdatePhoneRequest{Number: "1235"}
+	uPasswordR = &siogeneric.UpdatePasswordRequest{Password: "1235"}
 )
 
 func TestAwClient_ListUsers(t *testing.T) {
@@ -55,7 +55,7 @@ func TestAwClient_ListUsers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			au := new(sioModel.AwlistResponse)
+			au := new(siogeneric.AwlistResponse)
 			h.On("DoHttpRequestAndParse", mock.AnythingOfType("*http.Request"), au).
 				Return(tt.r)
 
@@ -89,7 +89,7 @@ func TestAwClient_GetUserByID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			au := new(sioModel.AwUser)
+			au := new(siogeneric.AwUser)
 			h.On("DoHttpRequestAndParse", mock.AnythingOfType("*http.Request"), au).
 				Return(tt.r)
 
@@ -123,7 +123,7 @@ func TestAwClient_CreateUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			au := new(sioModel.AwUser)
+			au := new(siogeneric.AwUser)
 			h.On("DoHttpRequestAndParse", mock.AnythingOfType("*http.Request"), au).
 				Return(tt.r)
 
@@ -157,7 +157,7 @@ func TestAwClient_UpdatePassword(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			au := new(sioModel.AwUser)
+			au := new(siogeneric.AwUser)
 			h.On("DoHttpRequestAndParse", mock.AnythingOfType("*http.Request"), au).
 				Return(tt.r)
 
@@ -191,7 +191,7 @@ func TestAwClient_UpdatePhone(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			au := new(sioModel.AwUser)
+			au := new(siogeneric.AwUser)
 			h.On("DoHttpRequestAndParse", mock.AnythingOfType("*http.Request"), au).
 				Return(tt.r)
 
@@ -225,7 +225,7 @@ func TestAwClient_UpdateEmail(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			au := new(sioModel.AwUser)
+			au := new(siogeneric.AwUser)
 			h.On("DoHttpRequestAndParse", mock.AnythingOfType("*http.Request"), au).
 				Return(tt.r)
 
@@ -287,7 +287,7 @@ func TestAwClient_CreateEmailSession(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			aw := new(sioModel.AwSession)
+			aw := new(siogeneric.AwSession)
 			h.On("DoHttpRequestAndParse", mock.AnythingOfType("*http.Request"), aw).
 				Return(tt.r)
 
