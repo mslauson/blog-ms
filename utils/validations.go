@@ -1,7 +1,7 @@
 package utils
 
 import (
-	sioModel "gitea.slauson.io/slausonio/go-libs/model"
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 )
 
@@ -15,7 +15,7 @@ func NewIamValidations() *IamValidations {
 	}
 }
 
-func (v *IamValidations) ValidateCreateUserRequest(r *sioModel.AwCreateUserRequest) error {
+func (v *IamValidations) ValidateCreateUserRequest(r *siogeneric.AwCreateUserRequest) error {
 	err := v.validator.ValidateEmail(r.Email)
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func (v *IamValidations) ValidateCreateUserRequest(r *sioModel.AwCreateUserReque
 	return nil
 }
 
-func (v *IamValidations) ValidateUpdatePasswordRequest(r *sioModel.UpdatePasswordRequest) error {
+func (v *IamValidations) ValidateUpdatePasswordRequest(r *siogeneric.UpdatePasswordRequest) error {
 	err := v.validator.ValidatePassword(r.Password)
 	if err != nil {
 		return err
@@ -44,7 +44,7 @@ func (v *IamValidations) ValidateUpdatePasswordRequest(r *sioModel.UpdatePasswor
 	return nil
 }
 
-func (v *IamValidations) ValidateUpdateEmailRequest(r *sioModel.UpdateEmailRequest) error {
+func (v *IamValidations) ValidateUpdateEmailRequest(r *siogeneric.UpdateEmailRequest) error {
 	err := v.validator.ValidateEmail(r.Email)
 	if err != nil {
 		return err
@@ -52,7 +52,7 @@ func (v *IamValidations) ValidateUpdateEmailRequest(r *sioModel.UpdateEmailReque
 	return nil
 }
 
-func (v *IamValidations) ValidateUpdatePhoneRequest(r *sioModel.UpdatePhoneRequest) error {
+func (v *IamValidations) ValidateUpdatePhoneRequest(r *siogeneric.UpdatePhoneRequest) error {
 	err := v.validator.ValidatePhone(r.Number)
 	if err != nil {
 		return err
