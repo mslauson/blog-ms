@@ -3,43 +3,59 @@ package utils
 import (
 	sioModel "gitea.slauson.io/slausonio/go-libs/model"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
-	"github.com/gin-gonic/gin"
 )
 
 type IamValidations struct {
 	validator *sioUtils.SioValidator
 }
 
-func NewIamValidations(c *gin.Context) *IamValidations {
+func NewIamValidations() *IamValidations {
 	return &IamValidations{
-		validator: sioUtils.NewValidator(c),
+		validator: sioUtils.NewValidator(),
 	}
 }
 
-func (v *IamValidations) ValidateCreateUserRequest(r *sioModel.AwCreateUserRequest) bool {
-	var (
-		emailValid    bool = false
-		passwordValid bool = false
-		nameValid     bool = false
-		phoneValid    bool = false
-	)
+func (v *IamValidations) ValidateCreateUserRequest(r *sioModel.AwCreateUserRequest) error {
+	err := v.validator.ValidateEmail(r.Email)
+	if err != nil {
+		return err
+	}
+	err = v.validator.ValidatePassword(r.Password)
+	if err != nil {
+		return err
+	}
+	err = v.validator.ValidateName(r.Name)
+	if err != nil {
+		return err
+	}
+	err = v.validator.ValidatePhone(r.Phone)
 
-	emailValid = v.validator.ValidateEmail(r.Email)
-	passwordValid = v.validator.ValidatePassword(r.Password)
-	nameValid = v.validator.ValidateName(r.Name)
-	phoneValid = v.validator.ValidatePhone(r.Phone)
-
-	return emailValid && passwordValid && nameValid && phoneValid
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (v *IamValidations) ValidateUpdatePasswordRequest(r *sioModel.UpdatePasswordRequest) bool {
-	return v.validator.ValidatePassword(r.Password)
+func (v *IamValidations) ValidateUpdatePasswordRequest(r *sioModel.UpdatePasswordRequest) error {
+	err := v.validator.ValidatePassword(r.Password)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (v *IamValidations) ValidateUpdateEmailRequest(r *sioModel.UpdateEmailRequest) bool {
-	return v.validator.ValidateEmail(r.Email)
+func (v *IamValidations) ValidateUpdateEmailRequest(r *sioModel.UpdateEmailRequest) error {
+	err := v.validator.ValidateEmail(r.Email)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (v *IamValidations) ValidateUpdatePhoneRequest(r *sioModel.UpdatePhoneRequest) bool {
-	return v.validator.ValidatePhone(r.Number)
+func (v *IamValidations) ValidateUpdatePhoneRequest(r *sioModel.UpdatePhoneRequest) error {
+	err := v.validator.ValidatePhone(r.Number)
+	if err != nil {
+		return err
+	}
+	return nil
 }
