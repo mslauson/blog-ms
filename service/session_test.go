@@ -2,7 +2,6 @@ package service
 
 import (
 	"gitea.slauson.io/slausonio/iam-ms/client/mocks"
-	"gitea.slauson.io/slausonio/iam-ms/iamError"
 	"github.com/stretchr/testify/mock"
 	"net/http"
 	"testing"

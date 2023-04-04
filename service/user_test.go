@@ -2,50 +2,34 @@ package service
 
 import (
 	"fmt"
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/iam-ms/client/mocks"
-	"gitea.slauson.io/slausonio/iam-ms/iamError"
+	"gitea.slauson.io/slausonio/iam-ms/constants"
 	"github.com/stretchr/testify/mock"
-	"net/http"
 	"testing"
 
-	sioModel "gitea.slauson.io/slausonio/go-libs/model"
-	siotest "gitea.slauson.io/slausonio/go-testing/sio_test"
 	"github.com/stretchr/testify/assert"
 )
 
-// func TestNewUserService(t *testing.T) {
-// 	tests := []struct {
-// 		name string
-// 		want *UserService
-// 	}{
-// 		// TODO: Add test cases.
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			assert.Equal(t, tt.want, NewUserService())
-// 		})
-// 	}
-// }
-
 var (
-	mAwUser = sioModel.AwUser{
+	mAwUser = siogeneric.AwUser{
 		Email: "t@t.com",
 	}
 	mAwUserPtr = &mAwUser
-	mUserList  = &sioModel.AwlistResponse{
+	mUserList  = &siogeneric.AwlistResponse{
 		Total: 1,
-		Users: []sioModel.AwUser{mAwUser},
+		Users: []siogeneric.AwUser{mAwUser},
 	}
-	mCreateReq = &sioModel.AwCreateUserRequest{
+	mCreateReq = &siogeneric.AwCreateUserRequest{
 		Email:    "t@t.com",
 		Password: "test_password",
 		Name:     "test_name",
 		Phone:    "test_phone",
 	}
 	tError       = fmt.Errorf("test error")
-	uEmailReq    = &sioModel.UpdateEmailRequest{Email: "test"}
-	uPhoneReq    = &sioModel.UpdatePhoneRequest{Number: "1235"}
-	uPasswordReq = &sioModel.UpdatePasswordRequest{Password: "1235"}
+	uEmailReq    = &siogeneric.UpdateEmailRequest{Email: "test"}
+	uPhoneReq    = &siogeneric.UpdatePhoneRequest{Number: "1235"}
+	uPasswordReq = &siogeneric.UpdatePasswordRequest{Password: "1235"}
 )
 
 func initUserServiceTest(t *testing.T) (*UserService, *mocks.AppwriteClient) {
@@ -58,147 +42,126 @@ func initUserServiceTest(t *testing.T) (*UserService, *mocks.AppwriteClient) {
 
 func TestUserService_ListUsers(t *testing.T) {
 	us, awClient := initUserServiceTest(t)
-	gc, _ := siotest.InitGinTestContext()
 
 	awClient.On("ListUsers").Return(mUserList, nil)
-	actual := us.ListUsers(gc)
+	actual, err := us.ListUsers()
 	assert.Equalf(t, mUserList, actual, "actual: %v", actual)
-	assert.Emptyf(t, gc.Errors, "gc.Errors: %v", gc.Errors)
+	assert.Emptyf(t, err, "error should have been nil. err: %v", err)
 }
 
 func TestUserService_ListUsers_Error(t *testing.T) {
 	us, awClient := initUserServiceTest(t)
-	gc, w := siotest.InitGinTestContext()
 
 	awClient.On("ListUsers").Return(nil, tError)
-	actual := us.ListUsers(gc)
+	actual, err := us.ListUsers()
 	assert.Nilf(t, actual, "expected nil, actual: %v", actual)
-	assert.Equalf(t, gc.Errors[0].Err, iamError.NoCustomersFound, "gc.Errors: %v", gc.Errors)
-	assert.Equalf(t, http.StatusNotFound, w.Code, "w.Code: %v", w.Code)
+	assert.Equalf(t, err, constants.NoCustomersFound, "actual error: %v", err)
 }
 
 func TestUserService_GetUserByID(t *testing.T) {
 	us, awClient := initUserServiceTest(t)
-	gc, _ := siotest.InitGinTestContext()
 
 	awClient.On("GetUserByID", "a").Return(mAwUserPtr, nil)
-	actual := us.GetUserByID("a", gc)
+	actual, err := us.GetUserByID("a")
 	assert.Equalf(t, mAwUserPtr, actual, "actual: %v", actual)
-	assert.Emptyf(t, gc.Errors, "gc.Errors: %v", gc.Errors)
+	assert.Emptyf(t, err, "error should have been nil. err: %v", err)
 }
 
 func TestUserService_GetUserByID_Error(t *testing.T) {
 	us, awClient := initUserServiceTest(t)
-	gc, w := siotest.InitGinTestContext()
 
 	awClient.On("GetUserByID", "a").Return(nil, tError)
-	actual := us.GetUserByID("a", gc)
+	actual, err := us.GetUserByID("a")
 	assert.Nilf(t, actual, "expected nil, actual: %v", actual)
-	assert.Equal(t, gc.Errors[0].Err, iamError.NoCustomerFound)
-	assert.Equalf(t, http.StatusNotFound, w.Code, "w.Code: %v", w.Code)
+	assert.Equal(t, err, constants.NoCustomerFound)
 }
 
 func TestUserService_CreateUser(t *testing.T) {
 	us, awClient := initUserServiceTest(t)
-	gc, _ := siotest.InitGinTestContext()
 
-	awClient.On("CreateUser", mock.AnythingOfType("*sioModel.AwCreateUserRequest")).Return(mAwUserPtr, nil)
-	actual := us.CreateUser(mCreateReq, gc)
+	awClient.On("CreateUser", mock.AnythingOfType("*siogeneric.AwCreateUserRequest")).Return(mAwUserPtr, nil)
+	actual, err := us.CreateUser(mCreateReq)
 	assert.Equalf(t, mAwUserPtr, actual, "actual: %v", actual)
-	assert.Emptyf(t, gc.Errors, "gc.Errors: %v", gc.Errors)
+	assert.Emptyf(t, err, "error should have been nil. err: %v", err)
 }
 
 func TestUserService_CreateUser_Error(t *testing.T) {
 	us, awClient := initUserServiceTest(t)
-	gc, w := siotest.InitGinTestContext()
 
-	awClient.On("CreateUser", mock.AnythingOfType("*sioModel.AwCreateUserRequest")).Return(nil, tError)
-	actual := us.CreateUser(mCreateReq, gc)
+	awClient.On("CreateUser", mock.AnythingOfType("*siogeneric.AwCreateUserRequest")).Return(nil, tError)
+	actual, err := us.CreateUser(mCreateReq)
 	assert.Nilf(t, actual, "expected nil, actual: %v", actual)
-	assert.Equalf(t, gc.Errors[0].Err, tError, "error: %v", gc.Errors[0].Err)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equalf(t, err, tError, "error: %v wanted: %v", err, tError)
 }
 
 func TestUserService_UpdateEmail(t *testing.T) {
 	us, awClient := initUserServiceTest(t)
-	gc, _ := siotest.InitGinTestContext()
 
-	awClient.On("UpdateEmail", "a", mock.AnythingOfType("*sioModel.UpdateEmailRequest")).Return(mAwUserPtr, nil)
-	actual := us.UpdateEmail("a", uEmailReq, gc)
+	awClient.On("UpdateEmail", "a", mock.AnythingOfType("*siogeneric.UpdateEmailRequest")).Return(mAwUserPtr, nil)
+	actual, err := us.UpdateEmail("a", uEmailReq)
 	assert.Equalf(t, mAwUserPtr, actual, "actual: %v", actual)
-	assert.Emptyf(t, gc.Errors, "gc.Errors: %v", gc.Errors)
+	assert.Emptyf(t, err, "error should have been nil. err: %v", err)
 }
 
 func TestUserService_UpdateEmail_Error(t *testing.T) {
 	us, awClient := initUserServiceTest(t)
-	gc, w := siotest.InitGinTestContext()
 
-	awClient.On("UpdateEmail", "a", mock.AnythingOfType("*sioModel.UpdateEmailRequest")).Return(nil, tError)
-	actual := us.UpdateEmail("a", uEmailReq, gc)
+	awClient.On("UpdateEmail", "a", mock.AnythingOfType("*siogeneric.UpdateEmailRequest")).Return(nil, tError)
+	actual, err := us.UpdateEmail("a", uEmailReq)
 	assert.Nilf(t, actual, "expected nil, actual: %v", actual)
-	assert.Equalf(t, gc.Errors[0].Err, tError, "error: %v", gc.Errors[0].Err)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equalf(t, err, tError, "error: %v wanted: %v", err, tError)
 }
 
 func TestUserService_UpdatePhone(t *testing.T) {
 	us, awClient := initUserServiceTest(t)
-	gc, _ := siotest.InitGinTestContext()
 
-	awClient.On("UpdatePhone", "a", mock.AnythingOfType("*sioModel.UpdatePhoneRequest")).Return(mAwUserPtr, nil)
-	actual := us.UpdatePhone("a", uPhoneReq, gc)
+	awClient.On("UpdatePhone", "a", mock.AnythingOfType("*siogeneric.UpdatePhoneRequest")).Return(mAwUserPtr, nil)
+	actual, err := us.UpdatePhone("a", uPhoneReq)
 	assert.Equalf(t, mAwUserPtr, actual, "actual: %v", actual)
-	assert.Emptyf(t, gc.Errors, "gc.Errors: %v", gc.Errors)
+	assert.Emptyf(t, err, "error should have been nil. err: %v", err)
 }
 
 func TestUserService_UpdatePhone_Error(t *testing.T) {
 	us, awClient := initUserServiceTest(t)
-	gc, w := siotest.InitGinTestContext()
 
-	awClient.On("UpdatePhone", "a", mock.AnythingOfType("*sioModel.UpdatePhoneRequest")).Return(nil, tError)
-	actual := us.UpdatePhone("a", uPhoneReq, gc)
+	awClient.On("UpdatePhone", "a", mock.AnythingOfType("*siogeneric.UpdatePhoneRequest")).Return(nil, tError)
+	actual, err := us.UpdatePhone("a", uPhoneReq)
 	assert.Nilf(t, actual, "expected nil, actual: %v", actual)
-	assert.Equalf(t, gc.Errors[0].Err, tError, "error: %v", gc.Errors[0].Err)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equalf(t, err, tError, "error: %v wanted: %v", err, tError)
 }
 
 func TestUserService_UpdatePassword(t *testing.T) {
 	us, awClient := initUserServiceTest(t)
-	gc, _ := siotest.InitGinTestContext()
 
-	awClient.On("UpdatePassword", "a", mock.AnythingOfType("*sioModel.UpdatePasswordRequest")).Return(mAwUserPtr, nil)
-	actual := us.UpdatePassword("a", uPasswordReq, gc)
+	awClient.On("UpdatePassword", "a", mock.AnythingOfType("*siogeneric.UpdatePasswordRequest")).Return(mAwUserPtr, nil)
+	actual, err := us.UpdatePassword("a", uPasswordReq)
 	assert.Equalf(t, mAwUserPtr, actual, "actual: %v", actual)
-	assert.Emptyf(t, gc.Errors, "gc.Errors: %v", gc.Errors)
+	assert.Emptyf(t, err, "error should have been nil. err: %v", err)
 }
 
 func TestUserService_UpdatePassword_Error(t *testing.T) {
 	us, awClient := initUserServiceTest(t)
-	gc, w := siotest.InitGinTestContext()
 
-	awClient.On("UpdatePassword", "a", mock.AnythingOfType("*sioModel.UpdatePasswordRequest")).Return(nil, tError)
-	actual := us.UpdatePassword("a", uPasswordReq, gc)
+	awClient.On("UpdatePassword", "a", mock.AnythingOfType("*siogeneric.UpdatePasswordRequest")).Return(nil, tError)
+	actual, err := us.UpdatePassword("a", uPasswordReq)
 	assert.Nilf(t, actual, "expected nil, actual: %v", actual)
-	assert.Equalf(t, gc.Errors[0].Err, tError, "error: %v", gc.Errors[0].Err)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equalf(t, err, tError, "error: %v wanted: %v", err, tError)
 }
 
 func TestUserService_DeleteUser(t *testing.T) {
 	us, awClient := initUserServiceTest(t)
-	gc, _ := siotest.InitGinTestContext()
 
 	awClient.On("DeleteUser", "a").Return(nil)
-	actual := us.DeleteUser("a", gc)
+	actual, err := us.DeleteUser("a")
 	assert.Truef(t, actual.Success, "actual.Success: %v", actual.Success)
-	assert.Emptyf(t, gc.Errors, "gc.Errors: %v", gc.Errors)
+	assert.Emptyf(t, err, "error should have been nil. err: %v", err)
 }
 
 func TestUserService_DeleteUser_Error(t *testing.T) {
 	us, awClient := initUserServiceTest(t)
-	gc, w := siotest.InitGinTestContext()
 
 	awClient.On("DeleteUser", "a").Return(tError)
-	actual := us.DeleteUser("a", gc)
+	actual, err := us.DeleteUser("a")
 	assert.False(t, actual.Success)
-	assert.Equalf(t, gc.Errors[0].Err, iamError.NoCustomerFound, "error: %v", gc.Errors[0].Err)
-	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Equalf(t, err, tError, "error: %v wanted: %v", err, tError)
 }
