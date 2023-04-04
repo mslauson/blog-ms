@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
@@ -28,33 +27,29 @@ func NewSessionController() *SessionController {
 }
 
 func (sc *SessionController) CreateEmailSession(c *gin.Context) {
-	enc := sioUtils.NewEncryptionUtil()
 	request := new(siogeneric.AwEmailSessionRequest)
-
-	err := c.ShouldBindJSON(request)
+	err := sioUtils.DecryptAndHandle(request, c)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
+		_ = c.Error(err)
 		return
 	}
-	err = enc.DecryptInterface(request, false)
+	response, err := sc.s.CreateEmailSession(request)
 	if err != nil {
-		c.AbortWithError(
-			http.StatusInternalServerError,
-			fmt.Errorf("decryption failed - unable to proceed"),
-		)
+		_ = c.Error(err)
 		return
 	}
-	response := sc.s.CreateEmailSession(request, c)
-	if response != nil {
-		c.JSON(http.StatusOK, response)
-	}
+	c.JSON(http.StatusOK, response)
+	return
 }
 
 func (sc *SessionController) DeleteSession(c *gin.Context) {
 	sessionId := c.Param("sessionId")
-	response := sc.s.DeleteSession(sessionId, c)
-
-	if response.Success {
-		c.JSON(http.StatusOK, response)
+	response, err := sc.s.DeleteSession(sessionId)
+	if err != nil {
+		_ = c.Error(err)
+		return
 	}
+
+	c.JSON(http.StatusOK, response)
+	return
 }
