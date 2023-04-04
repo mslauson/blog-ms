@@ -408,7 +408,12 @@ func TestGetUserById(t *testing.T) {
 		w    = httptest.NewRecorder()
 		c, _ = gin.CreateTestContext(w)
 	)
-	ms.On("GetUserById", "a").Return(mAwUserPtr, nil)
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+
+	c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
+	ms.On("GetUserByID", "a").Return(mAwUserPtr, nil)
 	uc.GetUserById(c)
 
 	assert.Truef(t, c.Errors == nil, "c.Errors should be nil")
@@ -422,42 +427,51 @@ func TestGetUserByIdError(t *testing.T) {
 		w    = httptest.NewRecorder()
 		c, _ = gin.CreateTestContext(w)
 	)
-	ms.On("GetUserById", "a").Return(nil, errors.New("asdf"))
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+
+	c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
+	ms.On("GetUserByID", "a").Return(nil, errors.New("asdf"))
 	uc.GetUserById(c)
 
 	assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil")
 }
 
 func TestDeleteUser(t *testing.T) {
+
+	uc, ms, _ := initController(t)
+
 	var (
 		w    = httptest.NewRecorder()
 		c, _ = gin.CreateTestContext(w)
 	)
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+
+	c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
+	ms.On("DeleteUser", "a").Return(siogeneric.SuccessResponse{Success: true}, nil)
+	uc.DeleteUser(c)
+
+	assert.Truef(t, c.Errors == nil, "c.Errors should be nil")
+}
+
+func TestDeleteUserError(t *testing.T) {
 
 	uc, ms, _ := initController(t)
-	tests := []struct {
-		name   string
-		want   siogeneric.SuccessResponse
-		status int
-	}{
-		{name: "happy", want: siogeneric.SuccessResponse{Success: true}},
-		{name: "service error", want: siogeneric.SuccessResponse{Success: false}},
+
+	var (
+		w    = httptest.NewRecorder()
+		c, _ = gin.CreateTestContext(w)
+	)
+	c.Request = &http.Request{
+		Header: make(http.Header),
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c.Request = &http.Request{
-				Header: make(http.Header),
-			}
 
-			c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
+	c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
+	ms.On("DeleteUser", "a").Return(siogeneric.SuccessResponse{Success: false}, errors.New("asdf"))
+	uc.DeleteUser(c)
 
-			ms.On("DeleteUser", "a").Return(tt.want)
-			uc.DeleteUser(c)
-
-			if w.Code != tt.status {
-				t.Errorf("DeleteUser( )= %v, want %v", w.Code, tt.status)
-				return
-			}
-		})
-	}
+	assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil")
 }
