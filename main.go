@@ -39,7 +39,7 @@ func (b *logBatch) Flush() error {
 			var buf bytes.Buffer
 			for {
 				frame, more := frames.Next()
-				fmt.Fprintf(&buf, "%s:%d\n", frame.File, frame.Line)
+				fmt.Printf("%s:%d\n", frame.File, frame.Line)
 				if !more {
 					break
 				}
@@ -69,12 +69,12 @@ func (b *logBatch) Flush() error {
 	return nil
 }
 
-type lokiHook struct {
+type LokiHook struct {
 	batch *logBatch
 }
 
-func NewLokiHook(maxEntries int, timeLimit int, labels map[string]string) *lokiHook {
-	return &lokiHook{
+func NewLokiHook(maxEntries int, timeLimit int, labels map[string]string) *LokiHook {
+	return &LokiHook{
 		batch: &logBatch{
 			maxEntries:   maxEntries,
 			maxTimeLimit: timeLimit,
@@ -85,11 +85,11 @@ func NewLokiHook(maxEntries int, timeLimit int, labels map[string]string) *lokiH
 	}
 }
 
-func (h *lokiHook) Levels() []logrus.Level {
+func (h *LokiHook) Levels() []logrus.Level {
 	return logrus.AllLevels
 }
 
-func (h *lokiHook) Fire(entry *logrus.Entry) error {
+func (h *LokiHook) Fire(entry *logrus.Entry) error {
 	// If the batch is nil, create a new batch and set the creation time.
 	if h.batch == nil {
 		h.batch = &logBatch{
@@ -104,7 +104,9 @@ func (h *lokiHook) Fire(entry *logrus.Entry) error {
 				// Batch has been sent manually.
 			case <-time.After(5 * time.Second):
 				// Time limit has been reached.
-				_ = h.batch.Flush()
+				if err := h.batch.Flush(); err != nil {
+					log.Fatalln(err)
+				}
 			}
 			h.batch = nil
 		}()
@@ -125,19 +127,19 @@ func (h *lokiHook) Fire(entry *logrus.Entry) error {
 	return nil
 }
 
-type lokiClient struct {
+type LokiClient struct {
 	rh *sioUtils.RestHelpers
 }
 
-type LokiClient interface{}
+//type LokiClient interface{}
 
-func NewLokiClient() *lokiClient {
-	return &lokiClient{
+func NewLokiClient() *LokiClient {
+	return &LokiClient{
 		rh: sioUtils.NewRestHelpers(),
 	}
 }
 
-func (lc *lokiClient) SendLog(request *LokiRequest) error {
+func (lc *LokiClient) SendLog(request *LokiRequest) error {
 	rh := sioUtils.NewRestHelpers()
 
 	url := fmt.Sprintf("%s/loki/api/v1/push", os.Getenv("LOKI_URL"))
