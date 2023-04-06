@@ -17,21 +17,70 @@ import (
 type logBatch struct {
 	entries      []*logrus.Entry
 	maxEntries   int
+	maxTimeLimit int
 	createdAt    time.Time
 	sendSchedule chan bool
+}
+
+func (b *logBatch) flush() error {
+	// Send the batched log entries to their destination here.
+	// ...
+	// Clear the batched entries after they've been sent.
+	b.entries = nil
+	return nil
 }
 
 type lokiHook struct {
 	batch *logBatch
 }
 
-func NewLokiHook() *lokiHook {
+func NewLokiHook(maxEntries int, timeLimit int) *lokiHook {
 	return &lokiHook{
 		batch: &logBatch{
-			maxEntries: 100, // Or whatever maximum number of entries you want to batch
+			maxEntries:   maxEntries,
+			maxTimeLimit: timeLimit,
+			sendSchedule: make(chan bool),
+			createdAt:    time.Now(),
 		},
 		// Other fields for the hook
 	}
+}
+
+func (h *lokiHook) Fire(entry *logrus.Entry) error {
+	// If the batch is nil, create a new batch and set the creation time.
+	if h.batch == nil {
+		h.batch = &logBatch{
+			maxEntries:   h.batch.maxEntries,
+			maxTimeLimit: h.batch.maxTimeLimit,
+			createdAt:    time.Now(),
+			sendSchedule: make(chan bool),
+		}
+		go func() {
+			// Wait for the sendSchedule signal or the time limit to be reached.
+			select {
+			case <-h.batch.sendSchedule:
+				// Batch has been sent manually.
+			case <-time.After(5 * time.Second):
+				// Time limit has been reached.
+				_ = h.batch.flush()
+			}
+			h.batch = nil
+		}()
+	}
+
+	// Add the log entry to the batch.
+	h.batch.entries = append(h.batch.entries, entry)
+
+	// If the batch is full, flush it and create a new batch.
+	if len(h.batch.entries) >= h.batch.maxEntries {
+		err := h.batch.flush()
+		if err != nil {
+			return err
+		}
+		h.batch = nil
+	}
+
+	return nil
 }
 
 type lokiClient struct {
