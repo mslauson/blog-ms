@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"gitea.slauson.io/slausonio/go-libs/mw"
+	"gitea.slauson.io/slausonio/go-utils/siomw"
 	"gitea.slauson.io/slausonio/iam-ms/controller"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -11,7 +11,7 @@ import (
 
 func CreateRouter() {
 	r := gin.Default()
-	r.Use(mw.ErrorHandler)
+	r.Use(siomw.ErrorHandler)
 
 	uc := controller.NewUserController()
 	sc := controller.NewSessionController()
@@ -24,7 +24,7 @@ func CreateRouter() {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 	// App
-	v1 := r.Group("/api/iam/v1", mw.AuthMiddleware)
+	v1 := r.Group("/api/iam/v1", siomw.AuthMiddleware)
 	{
 		user := v1.Group("/user")
 		{
