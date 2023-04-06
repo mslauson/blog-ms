@@ -1,11 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
+	"runtime"
 	"strings"
 	"time"
 
@@ -18,14 +19,52 @@ type logBatch struct {
 	entries      []*logrus.Entry
 	maxEntries   int
 	maxTimeLimit int
-	createdAt    time.Time
 	sendSchedule chan bool
+	labels       map[string]string
 }
 
-func (b *logBatch) flush() error {
-	// Send the batched log entries to their destination here.
-	// ...
-	// Clear the batched entries after they've been sent.
+func (b *logBatch) Flush() error {
+	request := &LokiRequest{
+		Streams: []LokiStream{},
+	}
+	for _, entry := range b.entries {
+		labels := b.labels
+		labels["level"] = entry.Level.String()
+
+		// Add a stack trace label if the entry has a stack trace.
+		if entry.HasCaller() {
+			pc := make([]uintptr, 15)
+			n := runtime.Callers(6, pc)
+			frames := runtime.CallersFrames(pc[:n])
+			var buf bytes.Buffer
+			for {
+				frame, more := frames.Next()
+				fmt.Fprintf(&buf, "%s:%d\n", frame.File, frame.Line)
+				if !more {
+					break
+				}
+			}
+			labels["stack_trace"] = buf.String()
+		}
+
+		values := [][]interface{}{
+			{
+				entry.Time.UnixNano(),
+				entry.Message,
+			},
+		}
+		stream := LokiStream{
+			Stream: labels,
+			Values: values,
+		}
+		request.Streams = append(request.Streams, stream)
+	}
+
+	// Send the batched log entries to Loki.
+	client := NewLokiClient()
+	if err := client.SendLog(request); err != nil {
+		return err
+	}
 	b.entries = nil
 	return nil
 }
@@ -34,16 +73,20 @@ type lokiHook struct {
 	batch *logBatch
 }
 
-func NewLokiHook(maxEntries int, timeLimit int) *lokiHook {
+func NewLokiHook(maxEntries int, timeLimit int, labels map[string]string) *lokiHook {
 	return &lokiHook{
 		batch: &logBatch{
 			maxEntries:   maxEntries,
 			maxTimeLimit: timeLimit,
 			sendSchedule: make(chan bool),
-			createdAt:    time.Now(),
+			labels:       labels,
 		},
 		// Other fields for the hook
 	}
+}
+
+func (h *lokiHook) Levels() []logrus.Level {
+	return logrus.AllLevels
 }
 
 func (h *lokiHook) Fire(entry *logrus.Entry) error {
@@ -52,7 +95,6 @@ func (h *lokiHook) Fire(entry *logrus.Entry) error {
 		h.batch = &logBatch{
 			maxEntries:   h.batch.maxEntries,
 			maxTimeLimit: h.batch.maxTimeLimit,
-			createdAt:    time.Now(),
 			sendSchedule: make(chan bool),
 		}
 		go func() {
@@ -62,7 +104,7 @@ func (h *lokiHook) Fire(entry *logrus.Entry) error {
 				// Batch has been sent manually.
 			case <-time.After(5 * time.Second):
 				// Time limit has been reached.
-				_ = h.batch.flush()
+				_ = h.batch.Flush()
 			}
 			h.batch = nil
 		}()
@@ -73,7 +115,7 @@ func (h *lokiHook) Fire(entry *logrus.Entry) error {
 
 	// If the batch is full, flush it and create a new batch.
 	if len(h.batch.entries) >= h.batch.maxEntries {
-		err := h.batch.flush()
+		err := h.batch.Flush()
 		if err != nil {
 			return err
 		}
@@ -89,7 +131,7 @@ type lokiClient struct {
 
 type LokiClient interface{}
 
-func newLokiClient() *lokiClient {
+func NewLokiClient() *lokiClient {
 	return &lokiClient{
 		rh: sioUtils.NewRestHelpers(),
 	}
@@ -108,17 +150,19 @@ func (lc *lokiClient) SendLog(request *LokiRequest) error {
 	req, _ := http.NewRequest("POST", url, sr)
 	req.Header.Add("Content-Type", "application/json")
 
-	_, err = rh.DoHttpRequest(req)
+	res, err := rh.DoHttpRequest(req)
 	if err != nil {
 		return err
 	}
+
+	log.Debugln("Response: %s", res)
 
 	return nil
 }
 
 type LokiStream struct {
 	Stream map[string]string `json:"stream"`
-	Values [][]string        `json:"values"`
+	Values [][]interface{}   `json:"values"`
 }
 
 type LokiRequest struct {
@@ -126,24 +170,7 @@ type LokiRequest struct {
 }
 
 func init() {
-	temp := LokiRequest{
-		Streams: []LokiStream{
-			{
-				Stream: map[string]string{"t": "a"},
-				Values: [][]string{
-					{strconv.FormatInt(time.Now().UnixNano(), 10), "test"},
-				},
-			},
-		},
-	}
-
-	lc := newLokiClient()
-	err := lc.SendLog(&temp)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// return response, nil
-
+	lh := NewLokiHook(10, 5, map[string]string{"app": "customer-ms", "environment": os.Getenv("ENV")})
 	log.SetFormatter(&log.JSONFormatter{})
 
 	// Output to stdout instead of the default stderr
@@ -163,7 +190,7 @@ func init() {
 	// 	log.Errorf("Error creating Loki hook: %s", err)
 	// 	return
 	// }
-	// log.AddHook(lh)
+	log.AddHook(lh)
 }
 
 func main() {
