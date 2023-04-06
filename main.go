@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -47,9 +48,9 @@ func (b *logBatch) Flush() error {
 			labels["stack_trace"] = buf.String()
 		}
 
-		values := [][]interface{}{
+		values := [][]string{
 			{
-				entry.Time.UnixNano(),
+				strconv.FormatInt(entry.Time.UnixNano(), 10),
 				entry.Message,
 			},
 		}
@@ -69,20 +70,32 @@ func (b *logBatch) Flush() error {
 	return nil
 }
 
+func (b *logBatch) startPeriodicFlush(interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	go func() {
+		for range ticker.C {
+			if err := b.Flush(); err != nil {
+				log.Error(err)
+			}
+		}
+	}()
+}
+
 type LokiHook struct {
 	batch *logBatch
 }
 
-func NewLokiHook(maxEntries int, timeLimit int, labels map[string]string) *LokiHook {
-	return &LokiHook{
+func NewLokiHook(maxEntries int, interval int, labels map[string]string) *LokiHook {
+	h := &LokiHook{
 		batch: &logBatch{
-			maxEntries:   maxEntries,
-			maxTimeLimit: timeLimit,
-			sendSchedule: make(chan bool),
-			labels:       labels,
+			maxEntries: maxEntries,
+			labels:     labels,
 		},
 		// Other fields for the hook
 	}
+	h.batch.startPeriodicFlush(time.Duration(interval) * time.Second)
+
+	return h
 }
 
 func (h *LokiHook) Levels() []logrus.Level {
@@ -97,19 +110,6 @@ func (h *LokiHook) Fire(entry *logrus.Entry) error {
 			maxTimeLimit: h.batch.maxTimeLimit,
 			sendSchedule: make(chan bool),
 		}
-		go func() {
-			// Wait for the sendSchedule signal or the time limit to be reached.
-			select {
-			case <-h.batch.sendSchedule:
-				// Batch has been sent manually.
-			case <-time.After(5 * time.Second):
-				// Time limit has been reached.
-				if err := h.batch.Flush(); err != nil {
-					log.Fatalln(err)
-				}
-			}
-			h.batch = nil
-		}()
 	}
 
 	// Add the log entry to the batch.
@@ -131,8 +131,7 @@ type LokiClient struct {
 	rh *sioUtils.RestHelpers
 }
 
-//type LokiClient interface{}
-
+// type LokiClient interface{}
 func NewLokiClient() *LokiClient {
 	return &LokiClient{
 		rh: sioUtils.NewRestHelpers(),
@@ -164,7 +163,7 @@ func (lc *LokiClient) SendLog(request *LokiRequest) error {
 
 type LokiStream struct {
 	Stream map[string]string `json:"stream"`
-	Values [][]interface{}   `json:"values"`
+	Values [][]string        `json:"values"`
 }
 
 type LokiRequest struct {
