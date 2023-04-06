@@ -10,8 +10,29 @@ import (
 	"time"
 
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
+
+type logBatch struct {
+	entries      []*logrus.Entry
+	maxEntries   int
+	createdAt    time.Time
+	sendSchedule chan bool
+}
+
+type lokiHook struct {
+	batch *logBatch
+}
+
+func NewLokiHook() *lokiHook {
+	return &lokiHook{
+		batch: &logBatch{
+			maxEntries: 100, // Or whatever maximum number of entries you want to batch
+		},
+		// Other fields for the hook
+	}
+}
 
 type lokiClient struct {
 	rh *sioUtils.RestHelpers
@@ -67,29 +88,11 @@ func init() {
 		},
 	}
 
-	rh := sioUtils.NewRestHelpers()
-	url := fmt.Sprintf("%s/loki/api/v1/push", os.Getenv("LOKI_URL"))
-
-	rJSON, err := json.Marshal(temp)
+	lc := newLokiClient()
+	err := lc.SendLog(&temp)
 	if err != nil {
-		log.Error(err)
-		// return nil, err
+		log.Fatal(err)
 	}
-	log.Println(temp)
-
-	sr := strings.NewReader(string(rJSON))
-	println(sr)
-	req, _ := http.NewRequest("POST", url, sr)
-	req.Header.Add("Content-Type", "application/json")
-
-	res, err := rh.DoHttpRequest(req)
-	if err != nil {
-		// return nil, err
-		log.Error(err)
-	}
-
-	log.Println(res.StatusCode)
-
 	// return response, nil
 
 	log.SetFormatter(&log.JSONFormatter{})
