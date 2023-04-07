@@ -50,7 +50,12 @@ spec:
       containers:
         - name: iam-ms
           image: registry.slauson.io/slausonio/iam-ms:dev-9c97e21441f8510ab5588cc8c2864ca6006ced9d
-          args: ["sh", "-c", ". /vault/secrets/encryption &&. /vault/secrets/oauth && . /vault/secrets/appwrite && . /vault/secrets/host && ./iam-ms"]
+          args:
+            [
+              "sh",
+              "-c",
+              ". /vault/secrets/encryption &&. /vault/secrets/oauth && . /vault/secrets/appwrite && ./iam-ms",
+            ]
           readinessProbe:
             failureThreshold: 10
             httpGet:
