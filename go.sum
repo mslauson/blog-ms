@@ -2,8 +2,6 @@ gitea.slauson.io/slausonio/go-testing v0.0.4 h1:OKwwuHduS+pmfeV3c0OJlerVTrLtPPZu
 gitea.slauson.io/slausonio/go-testing v0.0.4/go.mod h1:tJ5YevHS333zKTuw4+XKaoW2nC/T112FtKvsqvH1OoI=
 gitea.slauson.io/slausonio/go-types v0.0.103 h1:SuFrzJiKF8GINaNhCy0jHQgdw9nKU4DQdfDB6yViCek=
 gitea.slauson.io/slausonio/go-types v0.0.103/go.mod h1:Hy3pD3/NMxIWPxgwTCeETBhVKKcKEAlzQQAQUHbafcY=
-gitea.slauson.io/slausonio/go-utils v0.0.32 h1:DFgVgtRWTLtofGJ16fr9oujSVyKCVh9rNX2nYrpajVA=
-gitea.slauson.io/slausonio/go-utils v0.0.32/go.mod h1:Dyhvx/9UF1QdCW6mNr1s9ClZJVgm7N4qq8bjAyS8GX4=
 gitea.slauson.io/slausonio/go-utils v0.0.35 h1:E+EDHLi71gwnYIzCW6G1cx/DWZ69KxDXgcHVt9rxb5s=
 gitea.slauson.io/slausonio/go-utils v0.0.35/go.mod h1:LFOvoRRAdJCIkSF1PTC/duqCEZ2d3HHVcANtzxC14RE=
 gitea.slauson.io/slausonio/sio-loki v0.0.2 h1:QdTJlaBh1ceSUcXXIo44p5JT9Fq05T9FZ8ezpY/UFD4=
