@@ -6,15 +6,16 @@ FROM registry.slauson.io/runner/go:latest
 # create a working directory inside the image
 WORKDIR /app
 
-# copy Go modules and dependencies to image
-COPY . ./
-
-# download Go modules and dependencies
+# Download Go modules
+COPY go.mod go.sum ./
 RUN go mod download
-RUN go get -t
 
-# compile application
-RUN go build -o iam-ms -buildvcs=false
+# Copy the source code. Note the slash at the end, as explained in
+# https://docs.docker.com/engine/reference/builder/#copy
+COPY *.go ./
+
+# Build
+RUN CGO_ENABLED=0 GOOS=linux go build -o iam-ms -buildvcs=false
 
 # tells Docker that the container listens on specified network ports at runtime
 EXPOSE 8080
