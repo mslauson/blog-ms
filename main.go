@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"gitea.slauson.io/slausonio/sio-loki/hooks"
@@ -41,6 +40,5 @@ func init() {
 }
 
 func main() {
-	fmt.Println(os.Environ())
 	CreateRouter()
 }
