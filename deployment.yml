@@ -77,5 +77,8 @@ spec:
             requests:
               cpu: 50m
               memory: 100Mi
+          envFrom:
+          - configMapRef:
+               name: general-config
       imagePullSecrets:
         - name: regcred
