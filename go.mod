@@ -5,7 +5,7 @@ go 1.20
 require (
 	gitea.slauson.io/slausonio/go-testing v0.0.4
 	gitea.slauson.io/slausonio/go-types v0.0.103
-	gitea.slauson.io/slausonio/go-utils v0.0.35
+	gitea.slauson.io/slausonio/go-utils v0.0.52
 	github.com/gin-gonic/gin v1.9.0
 	github.com/google/uuid v1.3.0
 	github.com/sirupsen/logrus v1.9.0
