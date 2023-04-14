@@ -4,8 +4,8 @@ go 1.20
 
 require (
 	gitea.slauson.io/slausonio/go-testing v0.0.4
-	gitea.slauson.io/slausonio/go-types v0.0.103
-	gitea.slauson.io/slausonio/go-utils v0.0.52
+	gitea.slauson.io/slausonio/go-types v0.0.108
+	gitea.slauson.io/slausonio/go-utils v0.0.56
 	github.com/gin-gonic/gin v1.9.0
 	github.com/google/uuid v1.3.0
 	github.com/sirupsen/logrus v1.9.0
@@ -17,7 +17,7 @@ require (
 )
 
 require (
-	gitea.slauson.io/slausonio/sio-loki v0.0.2
+	gitea.slauson.io/slausonio/sio-loki v0.0.4
 	github.com/bytedance/sonic v1.8.7 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
