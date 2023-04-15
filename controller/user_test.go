@@ -117,7 +117,7 @@ func TestUserController_CreateUser(t *testing.T) {
 
 			uc, ms, eu := initController(t)
 
-			err := eu.EncryptInterface(tt.request, false)
+			err := eu.EncryptInterface(tt.request)
 			if err != nil {
 				t.Error(err)
 				return
@@ -149,7 +149,7 @@ func TestUserController_CreateUserServiceFailure(t *testing.T) {
 
 	uc, ms, eu := initController(t)
 
-	err := eu.EncryptInterface(request, false)
+	err := eu.EncryptInterface(request)
 	if err != nil {
 		t.Error(err)
 		return
@@ -192,7 +192,7 @@ func TestUserController_UpdatePassword(t *testing.T) {
 
 			uc, ms, eu := initController(t)
 
-			err := eu.EncryptInterface(tt.request, false)
+			err := eu.EncryptInterface(tt.request)
 			if err != nil {
 				t.Error(err)
 				return
@@ -229,7 +229,7 @@ func TestUserController_UpdatePasswordServiceFailure(t *testing.T) {
 
 	uc, ms, eu := initController(t)
 
-	err := eu.EncryptInterface(request, false)
+	err := eu.EncryptInterface(request)
 	if err != nil {
 		t.Error(err)
 		return
@@ -268,7 +268,7 @@ func TestUserController_UpdateEmail(t *testing.T) {
 
 			uc, ms, eu := initController(t)
 
-			err := eu.EncryptInterface(tt.request, false)
+			err := eu.EncryptInterface(tt.request)
 			if err != nil {
 				t.Error(err)
 				return
@@ -307,7 +307,7 @@ func TestUserController_UpdateEmailServiceFailure(t *testing.T) {
 
 	uc, ms, eu := initController(t)
 
-	err := eu.EncryptInterface(request, false)
+	err := eu.EncryptInterface(request)
 	if err != nil {
 		t.Error(err)
 		return
@@ -347,7 +347,7 @@ func TestUserController_UpdatePhone(t *testing.T) {
 
 			uc, ms, eu := initController(t)
 
-			err := eu.EncryptInterface(tt.request, false)
+			err := eu.EncryptInterface(tt.request)
 			if err != nil {
 				t.Error(err)
 				return
@@ -387,7 +387,7 @@ func TestUserController_UpdatePhoneServiceFailure(t *testing.T) {
 
 	uc, ms, eu := initController(t)
 
-	err := eu.EncryptInterface(request, false)
+	err := eu.EncryptInterface(request)
 	if err != nil {
 		t.Error(err)
 		return

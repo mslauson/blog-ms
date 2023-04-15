@@ -93,7 +93,7 @@ func TestSessionController_CreateEmailSession(t *testing.T) {
 
 			sc, ss, eu := initControllerForSessionTests(t)
 
-			err := eu.EncryptInterface(tt.request, false)
+			err := eu.EncryptInterface(tt.request)
 			if err != nil {
 				t.Error(err)
 				return
@@ -125,7 +125,7 @@ func TestUserController_CreateEmailSessionServiceFailure(t *testing.T) {
 
 	sc, ss, eu := initControllerForSessionTests(t)
 
-	err := eu.EncryptInterface(request, false)
+	err := eu.EncryptInterface(request)
 	if err != nil {
 		t.Error(err)
 		return

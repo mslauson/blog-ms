@@ -10,7 +10,6 @@ spec:
     matchLabels:
       deploy: iam-ms
       app: iam-ms
-
   template:
     metadata:
       labels:
@@ -40,6 +39,11 @@ spec:
             export IAM_KEY="{{ .Data.data.key }}"
             export IAM_PROJECT="{{ .Data.data.project }}"
           {{- end }}
+        vault.hashicorp.com/agent-inject-secret-host: "ndt/data/host"
+        vault.hashicorp.com/agent-inject-template-host: |
+          {{ with secret "ndt/data/host" -}}
+            export LOKI_URL="{{ .Data.data.loki }}"
+          {{- end }}
 
     spec:
       serviceAccountName: vault-auth 
@@ -50,7 +54,7 @@ spec:
             [
               "sh",
               "-c",
-              ". /vault/secrets/encryption &&. /vault/secrets/oauth && . /vault/secrets/appwrite && ./iam-ms",
+              ". /vault/secrets/encryption &&. /vault/secrets/oauth && . /vault/secrets/appwrite && . /vault/secrets/host && ./iam-ms",
             ]
           readinessProbe:
             failureThreshold: 10
@@ -73,5 +77,8 @@ spec:
             requests:
               cpu: 50m
               memory: 100Mi
+          envFrom:
+          - configMapRef:
+               name: general-config
       imagePullSecrets:
         - name: regcred

@@ -84,7 +84,7 @@ func TestSessionService_CreateUser_Error(t *testing.T) {
 	awClient.On("CreateEmailSession", mock.AnythingOfType("*siogeneric.AwEmailSessionRequest")).Return(nil, siotest.TError)
 	actual, err := ss.CreateEmailSession(sessionReq)
 	assert.Nilf(t, actual, "expected nil, actual: %v", actual)
-	assert.Equalf(t, err, siotest.TUnauthorizedError, "error: %v", err)
+	assert.Equalf(t, err.Error(), siotest.TUnauthorizedError.Error(), "error: %v", err.Error())
 }
 
 func TestSessionService_DeleteSession(t *testing.T) {
@@ -102,5 +102,5 @@ func TestSessionService_DeleteSession_Error(t *testing.T) {
 	awClient.On("DeleteSession", "a").Return(siotest.TError)
 	actual, err := ss.DeleteSession("a")
 	assert.False(t, actual.Success)
-	assert.Equalf(t, err, sioerror.NewSioNotFoundError(constants.NoCustomerFound), "error: %v", err)
+	assert.Equalf(t, err.Error(), sioerror.NewSioNotFoundError(constants.NoCustomerFound).Error(), "error: %v", err.Error())
 }

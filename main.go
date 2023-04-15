@@ -1,34 +1,28 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
-	"gitea.slauson.io/slausonio/go-utils/sioUtils"
+	"gitea.slauson.io/slausonio/sio-loki/hooks"
 	log "github.com/sirupsen/logrus"
 )
 
+type logBatch struct {
+	entries      []*log.Entry
+	maxEntries   int
+	maxTimeLimit int
+	sendSchedule chan bool
+	labels       map[string]string
+}
+
 func init() {
-	// Log as JSON instead of the default ASCII formatter.
+	lh := hooks.NewLokiHook(10, 5, map[string]string{"app": "iam-ms", "environment": os.Getenv("ENV")})
 	log.SetFormatter(&log.JSONFormatter{})
 
-	// Output to stdout instead of the default stderr
-	// Can be any io.Writer, see below for File example
 	log.SetOutput(os.Stdout)
 
-	// Only log the warning severity or above.
 	log.SetLevel(log.InfoLevel)
 
-	lc := new(sioUtils.LokiConfig)
-
-	lc.UseDefaults("customer-ms")
-	fmt.Println(lc)
-
-	lh, err := sioUtils.NewLokiHook(lc)
-	if err != nil {
-		log.Errorf("Error creating Loki hook: %s", err)
-		return
-	}
 	log.AddHook(lh)
 }
 

@@ -11,7 +11,6 @@ COPY . ./
 
 # download Go modules and dependencies
 RUN go mod download
-RUN go get -t
 
 # compile application
 RUN go build -o iam-ms -buildvcs=false
