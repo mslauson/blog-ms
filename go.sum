@@ -10,6 +10,8 @@ gitea.slauson.io/slausonio/go-utils v0.0.58 h1:7kRg39I+k44BcmlhnJRwV6ujjf607o+5b
 gitea.slauson.io/slausonio/go-utils v0.0.58/go.mod h1:IKK1A3RnBaM0IrqFlHHFrK6ThZNvQmOFfquyvZgzjO0=
 gitea.slauson.io/slausonio/go-utils v0.0.60 h1:SialDoLN1IrRsVCgNPvdg+VRSvHmUW3F6bkWJvL+GXM=
 gitea.slauson.io/slausonio/go-utils v0.0.60/go.mod h1:IKK1A3RnBaM0IrqFlHHFrK6ThZNvQmOFfquyvZgzjO0=
+gitea.slauson.io/slausonio/go-utils v0.0.61 h1:+ny1ypd5h0REvKA1VPEzt3pweO3RJNZrHtOt/JA+VbQ=
+gitea.slauson.io/slausonio/go-utils v0.0.61/go.mod h1:IKK1A3RnBaM0IrqFlHHFrK6ThZNvQmOFfquyvZgzjO0=
 gitea.slauson.io/slausonio/sio-loki v0.0.4 h1:JoxLWCU4fBKnGQGnDJhJRDNhYtuJeKLczOkmQ1mFldw=
 gitea.slauson.io/slausonio/sio-loki v0.0.4/go.mod h1:P5sPqmajSpV6wHO6mKLulbds2HGI6z+vhbK9Ln0D1uU=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
