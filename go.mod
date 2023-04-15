@@ -2,11 +2,10 @@ module gitea.slauson.io/slausonio/iam-ms
 
 go 1.20
 
-
 require (
 	gitea.slauson.io/slausonio/go-testing v0.0.4
 	gitea.slauson.io/slausonio/go-types v0.0.108
-	gitea.slauson.io/slausonio/go-utils v0.0.56
+	gitea.slauson.io/slausonio/go-utils v0.0.57
 	gitea.slauson.io/slausonio/sio-loki v0.0.4
 	github.com/gin-gonic/gin v1.9.0
 	github.com/google/uuid v1.3.0
