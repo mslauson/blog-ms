@@ -9,7 +9,6 @@ import (
 
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
-	"github.com/google/uuid"
 )
 
 type AwClient struct {
@@ -76,7 +75,6 @@ func (c *AwClient) GetUserByID(id string) (*siogeneric.AwUser, error) {
 
 func (c *AwClient) CreateUser(r *siogeneric.AwCreateUserRequest) (*siogeneric.AwUser, error) {
 	url := fmt.Sprintf("%s/users", c.host)
-	r.UserId = uuid.New().String()
 	r.Phone = fmt.Sprintf("+1%s", r.Phone)
 	rJSON, err := json.Marshal(r)
 	if err != nil {
