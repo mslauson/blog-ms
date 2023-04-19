@@ -34,7 +34,7 @@ func CreateRouter() {
 			user.PUT("/:userId/password", uc.UpdatePassword)
 			user.PUT("/:userId/email", uc.UpdateEmail)
 			user.PUT("/:userId/phone", uc.UpdatePhone)
-			user.DELETE("/:userId", uc.DeleteUser)
+			user.DELETE("/:id", uc.DeleteUser)
 		}
 
 		session := v1.Group("/session")

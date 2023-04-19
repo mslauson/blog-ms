@@ -211,7 +211,9 @@ func (c *AwClient) CreateEmailSession(
 func (c *AwClient) DeleteSession(sID string) error {
 	url := fmt.Sprintf("%s/account/sessions/%s", c.host, sID)
 	req, _ := http.NewRequest("DELETE", url, nil)
+
 	req.Header = c.defaultHeaders
+	req.Header.Add("X-Appwrite-Key", c.key)
 
 	_, err := c.h.DoHttpRequest(req)
 	if err != nil {
