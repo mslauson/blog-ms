@@ -84,7 +84,6 @@ func (c *AwClient) CreateUser(r *siogeneric.AwCreateUserRequest) (*siogeneric.Aw
 	}
 
 	sr := strings.NewReader(string(rJSON))
-	println(sr)
 	req, _ := http.NewRequest("POST", url, sr)
 
 	req.Header = c.defaultHeaders

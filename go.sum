@@ -2,6 +2,8 @@ gitea.slauson.io/slausonio/go-testing v0.0.4 h1:OKwwuHduS+pmfeV3c0OJlerVTrLtPPZu
 gitea.slauson.io/slausonio/go-testing v0.0.4/go.mod h1:tJ5YevHS333zKTuw4+XKaoW2nC/T112FtKvsqvH1OoI=
 gitea.slauson.io/slausonio/go-types v0.0.108 h1:2hCPgEfIeKugXYciqzhBuXYjHigXBYAUhNJIBMWTkxM=
 gitea.slauson.io/slausonio/go-types v0.0.108/go.mod h1:Hy3pD3/NMxIWPxgwTCeETBhVKKcKEAlzQQAQUHbafcY=
+gitea.slauson.io/slausonio/go-types v0.0.115 h1:AgktYF4Ba7NIXwPv+tfZttM5GhfPdhnrEZoILYligGE=
+gitea.slauson.io/slausonio/go-types v0.0.115/go.mod h1:Hy3pD3/NMxIWPxgwTCeETBhVKKcKEAlzQQAQUHbafcY=
 gitea.slauson.io/slausonio/go-utils v0.0.56 h1:Dbtdx59ipI2at/+eYAVF+6VxHwC58TqeuFilA1VgCHY=
 gitea.slauson.io/slausonio/go-utils v0.0.56/go.mod h1:E9hOzoLkb+7izCjHWF4OMX/mC1GCUivYACkPujv2Xo0=
 gitea.slauson.io/slausonio/go-utils v0.0.57 h1:1R4lI+aqYFbTnLvr8WzBSP3MHwl5sgs7mUAxovtjnwI=
@@ -14,6 +16,8 @@ gitea.slauson.io/slausonio/go-utils v0.0.61 h1:+ny1ypd5h0REvKA1VPEzt3pweO3RJNZrH
 gitea.slauson.io/slausonio/go-utils v0.0.61/go.mod h1:IKK1A3RnBaM0IrqFlHHFrK6ThZNvQmOFfquyvZgzjO0=
 gitea.slauson.io/slausonio/go-utils v0.0.62 h1:2XUWmGlxfutB92tGRR1QsM/qcDRgrn2TBOqMX1x1YKY=
 gitea.slauson.io/slausonio/go-utils v0.0.62/go.mod h1:IKK1A3RnBaM0IrqFlHHFrK6ThZNvQmOFfquyvZgzjO0=
+gitea.slauson.io/slausonio/go-utils v0.0.65 h1:7skpuwjDp8p55EMCjFVnnatZYz69+PPK/AtwYnpR4cM=
+gitea.slauson.io/slausonio/go-utils v0.0.65/go.mod h1:gaubDbhQQaezANKFPmTkJ3Ap/hU2CxNksH6igJ64/3Y=
 gitea.slauson.io/slausonio/sio-loki v0.0.4 h1:JoxLWCU4fBKnGQGnDJhJRDNhYtuJeKLczOkmQ1mFldw=
 gitea.slauson.io/slausonio/sio-loki v0.0.4/go.mod h1:P5sPqmajSpV6wHO6mKLulbds2HGI6z+vhbK9Ln0D1uU=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
