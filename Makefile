@@ -4,6 +4,9 @@ build:
 update:
 	go get -u ./...
 
+generate:
+	go generate ./...
+
 run:
 	go run .
 
