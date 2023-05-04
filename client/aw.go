@@ -9,6 +9,7 @@ import (
 
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
+	"gitea.slauson.io/slausonio/go-utils/sioerror"
 )
 
 type AwClient struct {
@@ -50,11 +51,9 @@ func (c *AwClient) ListUsers() (*siogeneric.AwlistResponse, error) {
 	req.Header = c.defaultHeaders
 	req.Header.Add("X-Appwrite-Key", c.key)
 	response := new(siogeneric.AwlistResponse)
-	err := c.h.DoHttpRequestAndParse(req, response)
-	if err != nil {
+	if err := c.executeAndParseResponse(req, response); err != nil {
 		return nil, err
 	}
-
 	return response, nil
 }
 
@@ -65,11 +64,9 @@ func (c *AwClient) GetUserByID(id string) (*siogeneric.AwUser, error) {
 	req.Header.Add("X-Appwrite-Key", c.key)
 
 	response := new(siogeneric.AwUser)
-	err := c.h.DoHttpRequestAndParse(req, response)
-	if err != nil {
+	if err := c.executeAndParseResponse(req, response); err != nil {
 		return nil, err
 	}
-
 	return response, nil
 }
 
@@ -88,11 +85,9 @@ func (c *AwClient) CreateUser(r *siogeneric.AwCreateUserRequest) (*siogeneric.Aw
 	req.Header.Add("X-Appwrite-Key", c.key)
 
 	response := new(siogeneric.AwUser)
-	err = c.h.DoHttpRequestAndParse(req, response)
-	if err != nil {
+	if err := c.executeAndParseResponse(req, response); err != nil {
 		return nil, err
 	}
-
 	return response, nil
 }
 
@@ -113,11 +108,9 @@ func (c *AwClient) UpdateEmail(
 	req.Header.Add("X-Appwrite-Key", c.key)
 
 	response := new(siogeneric.AwUser)
-	err = c.h.DoHttpRequestAndParse(req, response)
-	if err != nil {
+	if err := c.executeAndParseResponse(req, response); err != nil {
 		return nil, err
 	}
-
 	return response, nil
 }
 
@@ -138,11 +131,9 @@ func (c *AwClient) UpdatePassword(
 	req.Header.Add("X-Appwrite-Key", c.key)
 
 	response := new(siogeneric.AwUser)
-	err = c.h.DoHttpRequestAndParse(req, response)
-	if err != nil {
+	if err := c.executeAndParseResponse(req, response); err != nil {
 		return nil, err
 	}
-
 	return response, nil
 }
 
@@ -163,11 +154,9 @@ func (c *AwClient) UpdatePhone(
 	req.Header.Add("X-Appwrite-Key", c.key)
 
 	response := new(siogeneric.AwUser)
-	err = c.h.DoHttpRequestAndParse(req, response)
-	if err != nil {
+	if err := c.executeAndParseResponse(req, response); err != nil {
 		return nil, err
 	}
-
 	return response, nil
 }
 
@@ -200,11 +189,9 @@ func (c *AwClient) CreateEmailSession(
 	req.Header = c.defaultHeaders
 
 	response := new(siogeneric.AwSession)
-	err = c.h.DoHttpRequestAndParse(req, response)
-	if err != nil {
+	if err := c.executeAndParseResponse(req, response); err != nil {
 		return nil, err
 	}
-
 	return response, nil
 }
 
@@ -218,6 +205,30 @@ func (c *AwClient) DeleteSession(sID string) error {
 	_, err := c.h.DoHttpRequest(req)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (c *AwClient) executeAndParseResponse(
+	req *http.Request,
+	response interface{},
+) error {
+	res, err := c.h.DoHttpRequest(req)
+	if err != nil {
+		return err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		errRes := new(siogeneric.AppwriteError)
+		if err := sioUtils.ParseResponse(res, errRes); err != nil {
+			return err
+		}
+		return sioerror.NewSioIamError(errRes)
+	} else {
+		if err := c.h.DoHttpRequestAndParse(req, response); err != nil {
+			return err
+		}
 	}
 
 	return nil
