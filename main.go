@@ -1,22 +1,19 @@
 package main
 
 import (
+	"net/http"
 	"os"
 
 	"gitea.slauson.io/slausonio/sio-loki/hooks"
 	log "github.com/sirupsen/logrus"
 )
 
-type logBatch struct {
-	entries      []*log.Entry
-	maxEntries   int
-	maxTimeLimit int
-	sendSchedule chan bool
-	labels       map[string]string
-}
-
 func init() {
-	lh := hooks.NewLokiHook(10, 5, map[string]string{"app": "iam-ms", "environment": os.Getenv("ENV")})
+	lh := hooks.NewLokiHook(
+		10,
+		5,
+		map[string]string{"app": "iam-ms", "environment": os.Getenv("ENV")},
+	)
 	log.SetFormatter(&log.JSONFormatter{})
 
 	log.SetOutput(os.Stdout)
@@ -27,5 +24,10 @@ func init() {
 }
 
 func main() {
-	CreateRouter()
+	r := CreateRouter()
+
+	err := http.ListenAndServe(":8080", r)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
 }

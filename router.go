@@ -6,10 +6,9 @@ import (
 	"gitea.slauson.io/slausonio/go-utils/siomw"
 	"gitea.slauson.io/slausonio/iam-ms/controller"
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 )
 
-func CreateRouter() {
+func CreateRouter() *gin.Engine {
 	r := gin.Default()
 	r.Use(siomw.ErrorHandler)
 
@@ -42,11 +41,7 @@ func CreateRouter() {
 			session.POST("/email", sc.CreateEmailSession)
 			session.DELETE("/:sessionId", sc.DeleteSession)
 		}
-
 	}
 
-	err := http.ListenAndServe(":8080", r)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
+	return r
 }
