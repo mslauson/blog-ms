@@ -1,9 +1,10 @@
 package controller
 
 import (
+	"net/http"
+
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
-	"net/http"
 
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"github.com/gin-gonic/gin"
@@ -41,7 +42,6 @@ func (uc *UserController) ListUsers(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, result)
-	return
 }
 
 func (uc *UserController) GetUserById(c *gin.Context) {
@@ -53,7 +53,6 @@ func (uc *UserController) GetUserById(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, response)
-	return
 }
 
 func (uc *UserController) CreateUser(c *gin.Context) {
@@ -78,7 +77,6 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, result)
-	return
 }
 
 func (uc *UserController) UpdatePassword(c *gin.Context) {
@@ -106,7 +104,6 @@ func (uc *UserController) UpdatePassword(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, result)
-	return
 }
 
 func (uc *UserController) UpdateEmail(c *gin.Context) {
@@ -132,11 +129,9 @@ func (uc *UserController) UpdateEmail(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, result)
-	return
 }
 
 func (uc *UserController) UpdatePhone(c *gin.Context) {
-
 	validations := utils.NewIamValidations()
 	id := c.Param("id")
 	request := new(siogeneric.UpdatePhoneRequest)
@@ -158,7 +153,6 @@ func (uc *UserController) UpdatePhone(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, result)
-	return
 }
 
 func (uc *UserController) DeleteUser(c *gin.Context) {
@@ -169,5 +163,4 @@ func (uc *UserController) DeleteUser(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, response)
-	return
 }
