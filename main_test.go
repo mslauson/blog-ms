@@ -3,33 +3,24 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	"net/http/httptest"
 	"strings"
 	"testing"
 
+	siotest "gitea.slauson.io/slausonio/go-testing/sio_test"
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
-	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"github.com/stretchr/testify/assert"
 )
 
 var awUser = &siogeneric.AwUser{
 	ID:    "10000069",
-	Phone: "5555555555",
-	Email: "test-integration@slauson.io",
+	Phone: "+15555555555",
+	Email: "iam-integration@slauson.io",
 	Name:  "Iam Integration",
 }
-
-func runTestServer(t *testing.T) (*httptest.Server, string) {
-	s := httptest.NewServer(CreateRouter())
-	token, err := sioUtils.NewTokenClient().CreateToken()
-	if err != nil {
-		t.Fatal(err)
-	}
-	return s, token.AccessToken
-}
+var createdUsers = []*siogeneric.AwUser{}
 
 func TestCreateUser_HappyScenarios(t *testing.T) {
-	ts, token := runTestServer(t)
+	ts, token := siotest.RunTestServer(t, CreateRouter())
 	defer ts.Close()
 
 	tests := []struct {
@@ -77,6 +68,15 @@ func TestCreateUser_HappyScenarios(t *testing.T) {
 				http.StatusOK,
 				resp.StatusCode,
 			)
+			result := &siogeneric.AwUser{}
+			siotest.ParseHappyResponse(t, resp, result)
+
+			assert.Equal(t, awUser.ID, result.ID)
+			assert.Equal(t, awUser.Phone, result.Phone)
+			assert.Equal(t, awUser.Email, result.Email)
+			assert.Equal(t, awUser.Name, result.Name)
+
+			createdUsers = append(createdUsers, result)
 		})
 	}
 }

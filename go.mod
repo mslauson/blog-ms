@@ -3,7 +3,7 @@ module gitea.slauson.io/slausonio/iam-ms
 go 1.20
 
 require (
-	gitea.slauson.io/slausonio/go-testing v0.0.4
+	gitea.slauson.io/slausonio/go-testing v0.0.11
 	gitea.slauson.io/slausonio/go-types v0.0.122
 	gitea.slauson.io/slausonio/go-utils v0.0.65
 	gitea.slauson.io/slausonio/sio-loki v0.0.4
