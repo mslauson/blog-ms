@@ -592,7 +592,7 @@ linters-settings:
     # A comma-separated list of prefixes, which, if set, checks import paths
     # with the given prefixes are grouped after 3rd-party packages.
     # Default: ""
-    local-prefixes: github.com/org/project
+    local-prefixes: 
 
   golint:
     # Minimal confidence for issues.
@@ -730,41 +730,41 @@ linters-settings:
     # To specify a set of rules to explicitly exclude.
     # Available rules: https://github.com/securego/gosec#available-rules
     # Default: []
-    excludes:
-      - G101 # Look for hard coded credentials
-      - G102 # Bind to all interfaces
-      - G103 # Audit the use of unsafe block
-      - G104 # Audit errors not checked
-      - G106 # Audit the use of ssh.InsecureIgnoreHostKey
-      - G107 # Url provided to HTTP request as taint input
-      - G108 # Profiling endpoint automatically exposed on /debug/pprof
-      - G109 # Potential Integer overflow made by strconv.Atoi result conversion to int16/32
-      - G110 # Potential DoS vulnerability via decompression bomb
-      - G111 # Potential directory traversal
-      - G112 # Potential slowloris attack
-      - G113 # Usage of Rat.SetString in math/big with an overflow (CVE-2022-23772)
-      - G114 # Use of net/http serve function that has no support for setting timeouts
-      - G201 # SQL query construction using format string
-      - G202 # SQL query construction using string concatenation
-      - G203 # Use of unescaped data in HTML templates
-      - G204 # Audit use of command execution
-      - G301 # Poor file permissions used when creating a directory
-      - G302 # Poor file permissions used with chmod
-      - G303 # Creating tempfile using a predictable path
-      - G304 # File path provided as taint input
-      - G305 # File traversal when extracting zip/tar archive
-      - G306 # Poor file permissions used when writing to a new file
-      - G307 # Deferring a method which returns an error
-      - G401 # Detect the usage of DES, RC4, MD5 or SHA1
-      - G402 # Look for bad TLS connection settings
-      - G403 # Ensure minimum RSA key length of 2048 bits
-      - G404 # Insecure random number source (rand)
-      - G501 # Import blocklist: crypto/md5
-      - G502 # Import blocklist: crypto/des
-      - G503 # Import blocklist: crypto/rc4
-      - G504 # Import blocklist: net/http/cgi
-      - G505 # Import blocklist: crypto/sha1
-      - G601 # Implicit memory aliasing of items from a range statement
+    # excludes:
+    #   - G101 # Look for hard coded credentials
+    #   - G102 # Bind to all interfaces
+    #   - G103 # Audit the use of unsafe block
+    #   - G104 # Audit errors not checked
+    #   - G106 # Audit the use of ssh.InsecureIgnoreHostKey
+    #   - G107 # Url provided to HTTP request as taint input
+    #   - G108 # Profiling endpoint automatically exposed on /debug/pprof
+    #   - G109 # Potential Integer overflow made by strconv.Atoi result conversion to int16/32
+    #   - G110 # Potential DoS vulnerability via decompression bomb
+    #   - G111 # Potential directory traversal
+    #   - G112 # Potential slowloris attack
+    #   - G113 # Usage of Rat.SetString in math/big with an overflow (CVE-2022-23772)
+    #   - G114 # Use of net/http serve function that has no support for setting timeouts
+    #   - G201 # SQL query construction using format string
+    #   - G202 # SQL query construction using string concatenation
+    #   - G203 # Use of unescaped data in HTML templates
+    #   - G204 # Audit use of command execution
+    #   - G301 # Poor file permissions used when creating a directory
+    #   - G302 # Poor file permissions used with chmod
+    #   - G303 # Creating tempfile using a predictable path
+    #   - G304 # File path provided as taint input
+    #   - G305 # File traversal when extracting zip/tar archive
+    #   - G306 # Poor file permissions used when writing to a new file
+    #   - G307 # Deferring a method which returns an error
+    #   - G401 # Detect the usage of DES, RC4, MD5 or SHA1
+    #   - G402 # Look for bad TLS connection settings
+    #   - G403 # Ensure minimum RSA key length of 2048 bits
+    #   - G404 # Insecure random number source (rand)
+    #   - G501 # Import blocklist: crypto/md5
+    #   - G502 # Import blocklist: crypto/des
+    #   - G503 # Import blocklist: crypto/rc4
+    #   - G504 # Import blocklist: net/http/cgi
+    #   - G505 # Import blocklist: crypto/sha1
+    #   - G601 # Implicit memory aliasing of items from a range statement
 
     # Exclude generated files
     # Default: false
@@ -1945,117 +1945,116 @@ linters:
   disable-all: false
   # Enable specific linter
   # https://golangci-lint.run/usage/linters/#enabled-by-default
-  # enable:
-    # - asasalint
-    # - asciicheck
-    # - bidichk
-    # - bodyclose
-    # - containedctx
-    # - contextcheck
-    # - cyclop
-    # - deadcode
-    # - decorder
-    # - depguard
-    # - dogsled
-    # - dupl
-    # - dupword
-    # - durationcheck
-    # - errcheck
-    # - errchkjson
-    # - errname
-    # - errorlint
-    # - execinquery
-    # - exhaustive
-    # - exhaustivestruct
-    # - exhaustruct
-    # - exportloopref
-    # - forbidigo
-    # - forcetypeassert
-    # - funlen
-    # - gci
-    # - ginkgolinter
-    # - gocheckcompilerdirectives
-    # - gochecknoglobals
-    # - gochecknoinits
-    # - gocognit
-    # - goconst
-    # - gocritic
-    # - gocyclo
-    # - godot
-    # - godox
-    # - goerr113
-    # - gofmt
-    # - gofumpt
-    # - goheader
-    # - goimports
-    # - golint
-    # - gomnd
-    # - gomoddirectives
-    # - gomodguard
-    # - goprintffuncname
-    # - gosec
-    # - gosimple
-    # - gosmopolitan
-    # - govet
-    # - grouper
-    # - ifshort
-    # - importas
-    # - ineffassign
-    # - interfacebloat
-    # - interfacer
-    # - ireturn
-    # - lll
-    # - loggercheck
-    # - maintidx
-    # - makezero
-    # - maligned
-    # - misspell
-    # - musttag
-    # - nakedret
-    # - nestif
-    # - nilerr
-    # - nilnil
-    # - nlreturn
-    # - noctx
-    # - nolintlint
-    # - nonamedreturns
-    # - nosnakecase
-    # - nosprintfhostport
-    # - paralleltest
-    # - prealloc
-    # - predeclared
-    # - promlinter
-    # - reassign
-    # - revive
-    # - rowserrcheck
-    # - scopelint
-    # - sqlclosecheck
-    # - staticcheck
-    # - structcheck
-    # - stylecheck
-    # - tagalign
-    # - tagliatelle
-    # - tenv
-    # - testableexamples
-    # - testpackage
-    # - thelper
-    # - tparallel
-    # - typecheck
-    # - unconvert
-    # - unparam
-    # - unused
-    # - usestdlibvars
-    # - varcheck
-    # - varnamelen
-    # - wastedassign
-    # - whitespace
-    # - wrapcheck
-    # - wsl
-    # - zerologlint
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - containedctx
+    - contextcheck
+    - cyclop
+    - deadcode
+    - decorder
+    - depguard
+    - dogsled
+    - dupl
+    - dupword
+    - durationcheck
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - execinquery
+    - exhaustive
+    - exhaustivestruct
+    - exhaustruct
+    - exportloopref
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - ginkgolinter
+    - gocheckcompilerdirectives
+    - gochecknoglobals
+    - gochecknoinits
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - godox
+    - goerr113
+    - gofmt
+    - gofumpt
+    - goheader
+    - goimports
+    - golint
+    - gomnd
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - gosmopolitan
+    - govet
+    - grouper
+    - ifshort
+    - importas
+    - ineffassign
+    - interfacebloat
+    - interfacer
+    - ireturn
+    - lll
+    - loggercheck
+    - maintidx
+    - makezero
+    - maligned
+    - misspell
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnil
+    - nlreturn
+    - noctx
+    - nolintlint
+    - nonamedreturns
+    - nosnakecase
+    - nosprintfhostport
+    - paralleltest
+    - prealloc
+    - predeclared
+    - promlinter
+    - reassign
+    - revive
+    - rowserrcheck
+    - scopelint
+    - sqlclosecheck
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - tagalign
+    - tagliatelle
+    - tenv
+    - testableexamples
+    - testpackage
+    - thelper
+    - tparallel
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - usestdlibvars
+    - varcheck
+    - varnamelen
+    - wastedassign
+    - whitespace
+    - wrapcheck
+    - wsl
+    - zerologlint
 
   # Enable all available linters.
   # Default: false
-  enable-all: true
+  enable-all: false
   # Disable specific linter
   # https://golangci-lint.run/usage/linters/#disabled-by-default
   # presets:
