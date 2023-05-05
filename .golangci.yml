@@ -1953,7 +1953,6 @@ linters:
     - containedctx
     - contextcheck
     - cyclop
-    - deadcode
     - decorder
     - depguard
     - dogsled
@@ -1966,7 +1965,6 @@ linters:
     - errorlint
     - execinquery
     - exhaustive
-    - exhaustivestruct
     - exhaustruct
     - exportloopref
     - forbidigo
@@ -1987,7 +1985,6 @@ linters:
     - gofumpt
     - goheader
     - goimports
-    - golint
     - gomnd
     - gomoddirectives
     - gomodguard
@@ -1996,7 +1993,6 @@ linters:
     - gosimple
     - govet
     - grouper
-    - ifshort
     - importas
     - ineffassign
     - interfacebloat
@@ -2006,7 +2002,6 @@ linters:
     - loggercheck
     - maintidx
     - makezero
-    - maligned
     - misspell
     - musttag
     - nakedret
@@ -2017,7 +2012,6 @@ linters:
     - noctx
     - nolintlint
     - nonamedreturns
-    - nosnakecase
     - nosprintfhostport
     - paralleltest
     - prealloc
@@ -2026,7 +2020,6 @@ linters:
     - reassign
     - revive
     - rowserrcheck
-    - scopelint
     - sqlclosecheck
     - staticcheck
     - structcheck
@@ -2042,7 +2035,6 @@ linters:
     - unparam
     - unused
     - usestdlibvars
-    - varcheck
     - varnamelen
     - wastedassign
     - whitespace
