@@ -3,6 +3,7 @@ package service
 import (
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
+	"gitea.slauson.io/slausonio/iam-ms/constants"
 
 	"gitea.slauson.io/slausonio/iam-ms/client"
 )
@@ -43,7 +44,7 @@ func (s *UserService) ListUsers() (*siogeneric.AwlistResponse, error) {
 func (s *UserService) GetUserByID(id string) (*siogeneric.AwUser, error) {
 	response, err := s.awClient.GetUserByID(id)
 	if err != nil {
-		return nil, err
+		return nil, sioerror.NewSioNotFoundError(constants.NoUserFound)
 	}
 
 	return response, nil

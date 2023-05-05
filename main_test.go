@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"testing"
@@ -285,6 +286,103 @@ func TestCreateUser_Errors(t *testing.T) {
 	}
 }
 
+func TestGetUserById(t *testing.T) {
+	ts, token := siotest.RunTestServer(t, CreateRouter())
+	defer ts.Close()
+
+	for _, user := range createdUsers {
+		t.Run(fmt.Sprintf("Get user by id ID: %s", user.ID), func(t *testing.T) {
+			req, err := http.NewRequest(
+				"GET",
+				fmt.Sprintf("%s%s%s", ts.URL, "/api/iam/v1/user/", user.ID),
+				nil,
+			)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer resp.Body.Close()
+
+			result := &siogeneric.AwUser{}
+			siotest.ParseHappyResponse(t, resp, result)
+			assert.Equal(t, awUser.ID, result.ID)
+			assert.Equal(t, awUser.Phone, result.Phone)
+			assert.Equal(t, awUser.Email, result.Email)
+			assert.Equal(t, awUser.Name, result.Name)
+		})
+	}
+}
+
+func TestGetUserById_NotFound(t *testing.T) {
+	ts, token := siotest.RunTestServer(t, CreateRouter())
+	defer ts.Close()
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("%s%s", ts.URL, "/api/iam/v1/user/99999999"),
+		nil,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer resp.Body.Close()
+
+	siotest.ParseCheckIfCorrectError(
+		t,
+		resp,
+		"User with the requested ID could not be found.",
+		http.StatusNotFound,
+	)
+}
+
+func TestListUsers(t *testing.T) {
+	ts, token := siotest.RunTestServer(t, CreateRouter())
+	defer ts.Close()
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("%s%s", ts.URL, "/api/iam/v1/user"),
+		nil,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}(resp.Body)
+
+	result := &siogeneric.AwlistResponse{}
+	siotest.ParseHappyResponse(t, resp, result)
+
+	assert.Greater(t, len(result.Users), 0, "expected users to be greater than 0")
+	assert.Greater(t, result.Total, 0, "expected total to be greater than 0")
+
+}
+
 func TestUpdateEmail_HappyScenarios(t *testing.T) {
 	ts, token := siotest.RunTestServer(t, CreateRouter())
 	defer ts.Close()
@@ -342,7 +440,6 @@ func TestUpdateEmail_HappyScenarios(t *testing.T) {
 			// assert.Equal(t, awUser.Phone, result.Phone)
 			// assert.Equal(t, awUser.Email, result.Email)
 			// assert.Equal(t, awUser.Name, result.Name)
-
 		})
 	}
 }
