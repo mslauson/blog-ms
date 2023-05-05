@@ -38,6 +38,8 @@ gitea.slauson.io/slausonio/go-utils v0.0.73 h1:iFr5AuWFm0lmgv412tFfnTkmDCfmqnXQH
 gitea.slauson.io/slausonio/go-utils v0.0.73/go.mod h1:gaubDbhQQaezANKFPmTkJ3Ap/hU2CxNksH6igJ64/3Y=
 gitea.slauson.io/slausonio/go-utils v0.0.74 h1:TB/ysyvfXudkqku5hXlwXoDQ5xcaBFaiJK+F+zpiUqs=
 gitea.slauson.io/slausonio/go-utils v0.0.74/go.mod h1:gaubDbhQQaezANKFPmTkJ3Ap/hU2CxNksH6igJ64/3Y=
+gitea.slauson.io/slausonio/go-utils v0.0.76 h1:jaofVzHFxeV75vySygU3sABKqhxgroJdYczSl6pHHto=
+gitea.slauson.io/slausonio/go-utils v0.0.76/go.mod h1:gaubDbhQQaezANKFPmTkJ3Ap/hU2CxNksH6igJ64/3Y=
 gitea.slauson.io/slausonio/sio-loki v0.0.4 h1:JoxLWCU4fBKnGQGnDJhJRDNhYtuJeKLczOkmQ1mFldw=
 gitea.slauson.io/slausonio/sio-loki v0.0.4/go.mod h1:P5sPqmajSpV6wHO6mKLulbds2HGI6z+vhbK9Ln0D1uU=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=

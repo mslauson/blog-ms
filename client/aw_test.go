@@ -33,8 +33,7 @@ var (
 	mAwUser = siogeneric.AwUser{
 		Email: "t@t.com",
 	}
-	mAwUserPtr = &mAwUser
-	mUserList  = &siogeneric.AwlistResponse{
+	mUserList = &siogeneric.AwlistResponse{
 		Total: 1,
 		Users: []siogeneric.AwUser{mAwUser},
 	}
@@ -49,9 +48,6 @@ var (
 		Name:     "test_name",
 		Phone:    "test_phone",
 	}
-	uEmailR    = &siogeneric.UpdateEmailRequest{Email: "test"}
-	uPhoneR    = &siogeneric.UpdatePhoneRequest{Number: "1235"}
-	uPasswordR = &siogeneric.UpdatePasswordRequest{Password: "1235"}
 )
 
 func TestAwClient_ListUsers(t *testing.T) {

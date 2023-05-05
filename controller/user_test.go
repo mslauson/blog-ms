@@ -32,14 +32,16 @@ var (
 
 func initController(
 	t *testing.T,
-) (*UserController, *mocks.IamUserService, *sioUtils.EncryptionUtil) {
+) (*UserController, *mocks.IamUserService, *sioUtils.EncryptionUtil, *sioUtils.MockSioRestHelpers) {
 	ms := mocks.NewIamUserService(t)
 	eu := sioUtils.NewEncryptionUtil()
+	h := sioUtils.NewMockSioRestHelpers(t)
 	controller := &UserController{
 		s: ms,
+		h: h,
 	}
 
-	return controller, ms, eu
+	return controller, ms, eu, h
 }
 
 func MockJson(c *gin.Context, content interface{}, method string) {
@@ -58,7 +60,7 @@ func MockJson(c *gin.Context, content interface{}, method string) {
 }
 
 func TestListUsers(t *testing.T) {
-	uc, ms, _ := initController(t)
+	uc, ms, _, _ := initController(t)
 
 	var (
 		w    = httptest.NewRecorder()
@@ -71,7 +73,7 @@ func TestListUsers(t *testing.T) {
 }
 
 func TestListUsersError(t *testing.T) {
-	uc, ms, _ := initController(t)
+	uc, ms, _, _ := initController(t)
 
 	var (
 		w    = httptest.NewRecorder()
@@ -85,9 +87,10 @@ func TestListUsersError(t *testing.T) {
 
 func TestUserController_CreateUser(t *testing.T) {
 	tests := []struct {
-		name    string
-		request *siogeneric.AwCreateUserRequest
-		result  *siogeneric.AwUser
+		name      string
+		request   *siogeneric.AwCreateUserRequest
+		result    *siogeneric.AwUser
+		bindError error
 	}{
 		{
 			name: "happy",
@@ -98,7 +101,8 @@ func TestUserController_CreateUser(t *testing.T) {
 				Name:     "b",
 				Password: "MattTesting&*^1",
 			},
-			result: mAwUserPtr,
+			result:    mAwUserPtr,
+			bindError: nil,
 		},
 		{
 			name: "Bad Request - No UserID",
@@ -108,7 +112,8 @@ func TestUserController_CreateUser(t *testing.T) {
 				Name:     "b",
 				Password: "MattTesting&*^1",
 			},
-			result: nil,
+			result:    nil,
+			bindError: errors.New("asdf"),
 		},
 		{
 			name: "Bad Request - No Email",
@@ -119,7 +124,8 @@ func TestUserController_CreateUser(t *testing.T) {
 				Name:     "b",
 				Password: "MattTesting&*^1",
 			},
-			result: nil,
+			result:    nil,
+			bindError: errors.New("asdf"),
 		},
 		{
 			name: "Bad Request - bad Email",
@@ -152,7 +158,8 @@ func TestUserController_CreateUser(t *testing.T) {
 				Name:     "b",
 				Password: "",
 			},
-			result: nil,
+			result:    nil,
+			bindError: errors.New("asdf"),
 		},
 		{
 			name: "Bad Password Missing Number",
@@ -207,7 +214,8 @@ func TestUserController_CreateUser(t *testing.T) {
 				Name:     "",
 				Password: "MattTesting&*^1",
 			},
-			result: nil,
+			result:    nil,
+			bindError: errors.New("asdf"),
 		},
 		{
 			name: "long Name",
@@ -229,7 +237,8 @@ func TestUserController_CreateUser(t *testing.T) {
 				Name:     "b",
 				Password: "MattTesting&*^1",
 			},
-			result: nil,
+			result:    nil,
+			bindError: errors.New("asdf"),
 		},
 		{
 			name: "Bad Phone short",
@@ -265,7 +274,7 @@ func TestUserController_CreateUser(t *testing.T) {
 				Header: make(http.Header),
 			}
 
-			uc, ms, eu := initController(t)
+			uc, ms, eu, h := initController(t)
 
 			err := eu.EncryptInterface(tt.request)
 			if err != nil {
@@ -274,6 +283,7 @@ func TestUserController_CreateUser(t *testing.T) {
 			}
 
 			MockJson(c, tt.request, "POST")
+			h.On("DecryptAndHandle", mock.AnythingOfType("*siogeneric.AwCreateUserRequest"), mock.AnythingOfType("*gin.Context")).Return(tt.bindError)
 			if tt.result != nil {
 				ms.On("CreateUser", mock.AnythingOfType("*siogeneric.AwCreateUserRequest")).
 					Return(tt.result, nil)
@@ -304,7 +314,7 @@ func TestUserController_CreateUserServiceFailure(t *testing.T) {
 		Header: make(http.Header),
 	}
 
-	uc, ms, eu := initController(t)
+	uc, ms, eu, h := initController(t)
 
 	err := eu.EncryptInterface(request)
 	if err != nil {
@@ -313,6 +323,8 @@ func TestUserController_CreateUserServiceFailure(t *testing.T) {
 	}
 
 	MockJson(c, request, "POST")
+	h.On("DecryptAndHandle", mock.AnythingOfType("*siogeneric.AwCreateUserRequest"), mock.AnythingOfType("*gin.Context")).Return(nil)
+
 	ms.On("CreateUser", mock.AnythingOfType("*siogeneric.AwCreateUserRequest")).
 		Return(mAwUserPtr, errors.New("error"))
 	uc.CreateUser(c)
@@ -322,22 +334,25 @@ func TestUserController_CreateUserServiceFailure(t *testing.T) {
 
 func TestUserController_UpdatePassword(t *testing.T) {
 	tests := []struct {
-		name    string
-		request *siogeneric.UpdatePasswordRequest
-		status  int
-		result  *siogeneric.AwUser
+		name      string
+		request   *siogeneric.UpdatePasswordRequest
+		status    int
+		result    *siogeneric.AwUser
+		bindError error
 	}{
 		{
-			name:    "happy",
-			request: &siogeneric.UpdatePasswordRequest{Password: "Mm112a23!"},
-			status:  http.StatusOK,
-			result:  mAwUserPtr,
+			name:      "happy",
+			request:   &siogeneric.UpdatePasswordRequest{Password: "Mm112a23!"},
+			status:    http.StatusOK,
+			result:    mAwUserPtr,
+			bindError: nil,
 		},
 		{
-			name:    "No Password",
-			request: &siogeneric.UpdatePasswordRequest{Password: ""},
-			status:  http.StatusBadRequest,
-			result:  nil,
+			name:      "No Password",
+			request:   &siogeneric.UpdatePasswordRequest{Password: ""},
+			status:    http.StatusBadRequest,
+			result:    nil,
+			bindError: errors.New("asdf"),
 		},
 		{
 			name:    "Bad Password Missing Number",
@@ -377,7 +392,7 @@ func TestUserController_UpdatePassword(t *testing.T) {
 
 			c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
 
-			uc, ms, eu := initController(t)
+			uc, ms, eu, h := initController(t)
 
 			err := eu.EncryptInterface(tt.request)
 			if err != nil {
@@ -386,6 +401,9 @@ func TestUserController_UpdatePassword(t *testing.T) {
 			}
 
 			MockJson(c, tt.request, "PUT")
+
+			h.On("DecryptAndHandle", mock.AnythingOfType("*siogeneric.UpdatePasswordRequest"), mock.AnythingOfType("*gin.Context")).Return(tt.bindError)
+
 			if tt.result != nil {
 				ms.On("UpdatePassword", "a", mock.AnythingOfType("*siogeneric.UpdatePasswordRequest")).
 					Return(tt.result, nil)
@@ -416,7 +434,7 @@ func TestUserController_UpdatePasswordServiceFailure(t *testing.T) {
 
 	c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
 
-	uc, ms, eu := initController(t)
+	uc, ms, eu, h := initController(t)
 
 	err := eu.EncryptInterface(request)
 	if err != nil {
@@ -425,6 +443,7 @@ func TestUserController_UpdatePasswordServiceFailure(t *testing.T) {
 	}
 
 	MockJson(c, request, "PUT")
+	h.On("DecryptAndHandle", mock.AnythingOfType("*siogeneric.UpdatePasswordRequest"), mock.AnythingOfType("*gin.Context")).Return(nil)
 	ms.On("UpdatePassword", "a", mock.AnythingOfType("*siogeneric.UpdatePasswordRequest")).
 		Return(mAwUserPtr, errors.New("error"))
 	uc.UpdatePassword(c)
@@ -434,16 +453,17 @@ func TestUserController_UpdatePasswordServiceFailure(t *testing.T) {
 
 func TestUserController_UpdateEmail(t *testing.T) {
 	tests := []struct {
-		name    string
-		request *siogeneric.UpdateEmailRequest
-		result  *siogeneric.AwUser
+		name      string
+		request   *siogeneric.UpdateEmailRequest
+		result    *siogeneric.AwUser
+		bindError error
 	}{
 		{
 			name:    "happy",
 			request: &siogeneric.UpdateEmailRequest{Email: "fake@fake.com"},
 			result:  mAwUserPtr,
 		},
-		{name: "No Email", request: &siogeneric.UpdateEmailRequest{Email: ""}, result: nil},
+		{name: "No Email", request: &siogeneric.UpdateEmailRequest{Email: ""}, result: nil, bindError: errors.New("asdf")},
 		{
 			name:    "Bad Email ",
 			request: &siogeneric.UpdateEmailRequest{Email: "fakefake.com"},
@@ -470,7 +490,7 @@ func TestUserController_UpdateEmail(t *testing.T) {
 
 			c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
 
-			uc, ms, eu := initController(t)
+			uc, ms, eu, h := initController(t)
 
 			err := eu.EncryptInterface(tt.request)
 			if err != nil {
@@ -479,6 +499,9 @@ func TestUserController_UpdateEmail(t *testing.T) {
 			}
 
 			MockJson(c, tt.request, "PUT")
+
+			h.On("DecryptAndHandle", mock.AnythingOfType("*siogeneric.UpdateEmailRequest"), mock.AnythingOfType("*gin.Context")).Return(tt.bindError)
+
 			if tt.result != nil {
 				ms.On("UpdateEmail", "a", mock.AnythingOfType("*siogeneric.UpdateEmailRequest")).
 					Return(tt.result, nil)
@@ -510,7 +533,7 @@ func TestUserController_UpdateEmailServiceFailure(t *testing.T) {
 
 	c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
 
-	uc, ms, eu := initController(t)
+	uc, ms, eu, h := initController(t)
 
 	err := eu.EncryptInterface(request)
 	if err != nil {
@@ -519,6 +542,8 @@ func TestUserController_UpdateEmailServiceFailure(t *testing.T) {
 	}
 
 	MockJson(c, request, "PUT")
+	h.On("DecryptAndHandle", mock.AnythingOfType("*siogeneric.UpdateEmailRequest"), mock.AnythingOfType("*gin.Context")).Return(nil)
+
 	ms.On("UpdateEmail", "a", mock.AnythingOfType("*siogeneric.UpdateEmailRequest")).
 		Return(mAwUserPtr, errors.New("error"))
 	uc.UpdateEmail(c)
@@ -531,13 +556,14 @@ func TestUserController_UpdatePhone(t *testing.T) {
 		name    string
 		request *siogeneric.UpdatePhoneRequest
 		result  *siogeneric.AwUser
+		bindErr error
 	}{
 		{
 			name:    "happy",
 			request: &siogeneric.UpdatePhoneRequest{Number: "1239323939"},
 			result:  mAwUserPtr,
 		},
-		{name: "No Phone", request: &siogeneric.UpdatePhoneRequest{Number: ""}, result: nil},
+		{name: "No Phone", request: &siogeneric.UpdatePhoneRequest{Number: ""}, result: nil, bindErr: errors.New("asdf")},
 		{
 			name:    "Bad Phone too short ",
 			request: &siogeneric.UpdatePhoneRequest{Number: "23423"},
@@ -562,7 +588,8 @@ func TestUserController_UpdatePhone(t *testing.T) {
 
 			c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
 
-			uc, ms, eu := initController(t)
+			uc, ms, eu, h := initController(t)
+			h.On("DecryptAndHandle", mock.AnythingOfType("*siogeneric.UpdateEmailRequest"), mock.AnythingOfType("*gin.Context")).Return(tt.bindErr)
 
 			err := eu.EncryptInterface(tt.request)
 			if err != nil {
@@ -604,7 +631,7 @@ func TestUserController_UpdatePhoneServiceFailure(t *testing.T) {
 
 	c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}}
 
-	uc, ms, eu := initController(t)
+	uc, ms, eu, h := initController(t)
 
 	err := eu.EncryptInterface(request)
 	if err != nil {
@@ -613,6 +640,9 @@ func TestUserController_UpdatePhoneServiceFailure(t *testing.T) {
 	}
 
 	MockJson(c, request, "PUT")
+
+	h.On("DecryptAndHandle", mock.AnythingOfType("*siogeneric.UpdateEmailRequest"), mock.AnythingOfType("*gin.Context")).Return(nil)
+
 	ms.On("UpdatePhone", "a", mock.AnythingOfType("*siogeneric.UpdatePhoneRequest")).
 		Return(mAwUserPtr, errors.New("error"))
 	uc.UpdatePhone(c)
@@ -621,7 +651,7 @@ func TestUserController_UpdatePhoneServiceFailure(t *testing.T) {
 }
 
 func TestGetUserById(t *testing.T) {
-	uc, ms, _ := initController(t)
+	uc, ms, _, _ := initController(t)
 
 	var (
 		w    = httptest.NewRecorder()
@@ -639,7 +669,7 @@ func TestGetUserById(t *testing.T) {
 }
 
 func TestGetUserByIdError(t *testing.T) {
-	uc, ms, _ := initController(t)
+	uc, ms, _, _ := initController(t)
 
 	var (
 		w    = httptest.NewRecorder()
@@ -657,7 +687,7 @@ func TestGetUserByIdError(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
-	uc, ms, _ := initController(t)
+	uc, ms, _, _ := initController(t)
 
 	var (
 		w    = httptest.NewRecorder()
@@ -675,7 +705,7 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestDeleteUserError(t *testing.T) {
-	uc, ms, _ := initController(t)
+	uc, ms, _, _ := initController(t)
 
 	var (
 		w    = httptest.NewRecorder()
