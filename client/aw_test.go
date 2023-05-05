@@ -2,8 +2,10 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -27,6 +29,15 @@ func initForTests(t *testing.T) (*AwClient, *sioUtils.MockSioRestHelpers) {
 }
 
 var (
+	mAwUser = siogeneric.AwUser{
+		Email: "t@t.com",
+	}
+	mAwUserPtr = &mAwUser
+	mUserList  = &siogeneric.AwlistResponse{
+		Total: 1,
+		Users: []siogeneric.AwUser{mAwUser},
+	}
+
 	sessionReq = &siogeneric.AwEmailSessionRequest{
 		Email:    "test",
 		Password: "test",
@@ -44,21 +55,29 @@ var (
 
 func TestAwClient_ListUsers(t *testing.T) {
 	tests := []struct {
-		name  string
-		happy bool
-		r     error
+		name     string
+		happy    bool
+		result   *siogeneric.AwlistResponse
+		execErr  error
+		ParseErr error
+		code     int
 	}{
-		{name: "Happy Path", happy: true, r: nil},
-		{name: "Error Path", happy: false, r: fmt.Errorf("test error")},
+		{name: "Happy Path", happy: true, result: mUserList, execErr: nil, ParseErr: nil, code: http.StatusOK},
+		{name: "Exec Error", happy: false, result: nil, execErr: fmt.Errorf("test error"), ParseErr: nil, code: http.StatusInternalServerError},
+		{name: "Parse Error", happy: false, result: nil, execErr: nil, ParseErr: fmt.Errorf("test error"), code: http.StatusOK},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			au := new(siogeneric.AwlistResponse)
-			h.On("DoHttpRequestAndParse", mock.AnythingOfType("*http.Request"), au).
-				Return(tt.r)
+			mockRes := mockHttpResponse(t, mAwUser, tt.code)
+			h.On("ExecuteRequest", mock.AnythingOfType("*http.Request")).
+				Return(mockRes, tt.execErr)
 
+			if tt.execErr == nil {
+				h.On("ParseResponse", mock.AnythingOfType("*http.Response"), mock.AnythingOfType("*siogeneric.AwlistResponse")).
+					Return(tt.ParseErr)
+			}
 			result, err := ac.ListUsers()
 			if tt.happy && result == nil {
 				t.Errorf("expected result but got nil")
@@ -90,7 +109,7 @@ func TestAwClient_GetUserByID(t *testing.T) {
 			ac, h := initForTests(t)
 
 			au := new(siogeneric.AwUser)
-			h.On("DoHttpRequestAndParse", mock.AnythingOfType("*http.Request"), au).
+			h.On("ParseResponse", mock.AnythingOfType("*http.Request"), au).
 				Return(tt.r)
 
 			result, err := ac.GetUserByID("test")
@@ -124,7 +143,7 @@ func TestAwClient_CreateUser(t *testing.T) {
 			ac, h := initForTests(t)
 
 			au := new(siogeneric.AwUser)
-			h.On("DoHttpRequestAndParse", mock.AnythingOfType("*http.Request"), au).
+			h.On("ParseResponse", mock.AnythingOfType("*http.Request"), au).
 				Return(tt.r)
 
 			result, err := ac.CreateUser(mCr)
@@ -158,7 +177,7 @@ func TestAwClient_UpdatePassword(t *testing.T) {
 			ac, h := initForTests(t)
 
 			au := new(siogeneric.AwUser)
-			h.On("DoHttpRequestAndParse", mock.AnythingOfType("*http.Request"), au).
+			h.On("ParseResponse", mock.AnythingOfType("*http.Request"), au).
 				Return(tt.r)
 
 			result, err := ac.UpdatePassword("a", uPasswordR)
@@ -192,7 +211,7 @@ func TestAwClient_UpdatePhone(t *testing.T) {
 			ac, h := initForTests(t)
 
 			au := new(siogeneric.AwUser)
-			h.On("DoHttpRequestAndParse", mock.AnythingOfType("*http.Request"), au).
+			h.On("ParseResponse", mock.AnythingOfType("*http.Request"), au).
 				Return(tt.r)
 
 			result, err := ac.UpdatePhone("a", uPhoneR)
@@ -226,7 +245,7 @@ func TestAwClient_UpdateEmail(t *testing.T) {
 			ac, h := initForTests(t)
 
 			au := new(siogeneric.AwUser)
-			h.On("DoHttpRequestAndParse", mock.AnythingOfType("*http.Request"), au).
+			h.On("ParseResponse", mock.AnythingOfType("*http.Request"), au).
 				Return(tt.r)
 
 			result, err := ac.UpdateEmail("a", uEmailR)
@@ -288,7 +307,7 @@ func TestAwClient_CreateEmailSession(t *testing.T) {
 			ac, h := initForTests(t)
 
 			aw := new(siogeneric.AwSession)
-			h.On("DoHttpRequestAndParse", mock.AnythingOfType("*http.Request"), aw).
+			h.On("ParseResponse", mock.AnythingOfType("*http.Request"), aw).
 				Return(tt.r)
 
 			result, err := ac.CreateEmailSession(sessionReq)
@@ -324,7 +343,7 @@ func TestAwClient_DeleteUserSession(t *testing.T) {
 			h.On("DoHttpRequest", mock.AnythingOfType("*http.Request")).
 				Return(tt.req, tt.err)
 
-			err := ac.DeleteSession("a")
+			err := ac.DeleteSession("1", "a")
 			if tt.req != nil && err != nil {
 				t.Errorf("expected request to resolve but got error %v", err)
 				return
@@ -334,4 +353,17 @@ func TestAwClient_DeleteUserSession(t *testing.T) {
 			}
 		})
 	}
+}
+
+func mockHttpResponse(t *testing.T, v interface{}, code int) *http.Response {
+	jsonData, err := json.Marshal(v)
+	if err != nil {
+		t.Fatalf("Error marshaling struct: %v\n", err)
+	}
+
+	response := &http.Response{
+		StatusCode: code,
+		Body:       io.NopCloser(bytes.NewBuffer(jsonData)),
+	}
+	return response
 }

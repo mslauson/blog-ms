@@ -28,6 +28,16 @@ gitea.slauson.io/slausonio/go-utils v0.0.68 h1:vlwM7gvtiyYZ/76Kjxwz0RYiUbb/7YXbZ
 gitea.slauson.io/slausonio/go-utils v0.0.68/go.mod h1:gaubDbhQQaezANKFPmTkJ3Ap/hU2CxNksH6igJ64/3Y=
 gitea.slauson.io/slausonio/go-utils v0.0.69 h1:2ffvxfWayrZ27swLtoT92NJ/+3k9mCu/bp2ni9enXyE=
 gitea.slauson.io/slausonio/go-utils v0.0.69/go.mod h1:gaubDbhQQaezANKFPmTkJ3Ap/hU2CxNksH6igJ64/3Y=
+gitea.slauson.io/slausonio/go-utils v0.0.70 h1:efLzAKp56m+aMkosNo3Tm9aXNYrC+LjlR7Az/cjH9W0=
+gitea.slauson.io/slausonio/go-utils v0.0.70/go.mod h1:gaubDbhQQaezANKFPmTkJ3Ap/hU2CxNksH6igJ64/3Y=
+gitea.slauson.io/slausonio/go-utils v0.0.71 h1:PWv4WynC6D1os6Fa6QjWe9TLdOlgezeIgGE5bWX426g=
+gitea.slauson.io/slausonio/go-utils v0.0.71/go.mod h1:gaubDbhQQaezANKFPmTkJ3Ap/hU2CxNksH6igJ64/3Y=
+gitea.slauson.io/slausonio/go-utils v0.0.72 h1:KH3Ym1pwfiOeSu6kgljVwDHC3xkS3yxyzRFl1V7zsHg=
+gitea.slauson.io/slausonio/go-utils v0.0.72/go.mod h1:gaubDbhQQaezANKFPmTkJ3Ap/hU2CxNksH6igJ64/3Y=
+gitea.slauson.io/slausonio/go-utils v0.0.73 h1:iFr5AuWFm0lmgv412tFfnTkmDCfmqnXQHh3kBFJcX7U=
+gitea.slauson.io/slausonio/go-utils v0.0.73/go.mod h1:gaubDbhQQaezANKFPmTkJ3Ap/hU2CxNksH6igJ64/3Y=
+gitea.slauson.io/slausonio/go-utils v0.0.74 h1:TB/ysyvfXudkqku5hXlwXoDQ5xcaBFaiJK+F+zpiUqs=
+gitea.slauson.io/slausonio/go-utils v0.0.74/go.mod h1:gaubDbhQQaezANKFPmTkJ3Ap/hU2CxNksH6igJ64/3Y=
 gitea.slauson.io/slausonio/sio-loki v0.0.4 h1:JoxLWCU4fBKnGQGnDJhJRDNhYtuJeKLczOkmQ1mFldw=
 gitea.slauson.io/slausonio/sio-loki v0.0.4/go.mod h1:P5sPqmajSpV6wHO6mKLulbds2HGI6z+vhbK9Ln0D1uU=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
