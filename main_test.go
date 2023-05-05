@@ -458,7 +458,7 @@ func TestUpdateEmail_Errors(t *testing.T) {
 		id         string
 	}{
 		{
-			name: "not found",
+			name: "Not Found",
 			request: &siogeneric.UpdateEmailRequest{
 				Email: "629ab286599f7b5b67ee1d88093b0280608ed13e9083b7ea883cba59c5330860",
 			},
@@ -467,7 +467,14 @@ func TestUpdateEmail_Errors(t *testing.T) {
 			id:         "123",
 		},
 		{
-			name: "bad email",
+			name:       "Missing Email",
+			request:    &siogeneric.UpdateEmailRequest{},
+			error:      "Key: 'UpdateEmailRequest.Email' Error:Field validation for 'Email' failed on the 'required' tag",
+			statusCode: http.StatusBadRequest,
+			id:         "123",
+		},
+		{
+			name: "Bad Email",
 			request: &siogeneric.UpdateEmailRequest{
 				Email: "f418e9a1f5f0b1b052e7c2ba97cb6b96",
 			},
@@ -476,7 +483,7 @@ func TestUpdateEmail_Errors(t *testing.T) {
 			id:         id,
 		},
 		{
-			name: "Email too long",
+			name: "Email Too Long",
 			request: &siogeneric.UpdateEmailRequest{
 				Email: "184be7fa35e55150a59032b480fdd0ce015c67c375a1bb08a46f35dd178a944c0c2d5157a95b68ce6b339457c87c0c0be4e9b35039327fef8fee586773fe76c2b395c7496ced1aa20dfec178562dc1504cb154a5eeffbf876e7d775c8703754a9257499083d7e9c89d8987a6c81b9f112e49050ba018dd8e967a68ab23582d9c31d56df3ba47d15cc41dd1104d73d9253b2a4d03b3c48510a24706c5e6cf1b9037e25de2f2f4f8df92fa2802f37e661caea499a20c3295b431bdb15d7815ae417ca2bbc963fd7752ec47a4c9eb43894e1287ef18e0f73619405219f3d3c936a445bbd2a6b8a5ee342da211ee6fa65dd52bb41b5240992d745ad0ad1a79dd4f21fc673b22464b1772d0146f30fd220b98a9a7bc26862d8daa5a9d6fb09afa11cc672558151bb024cda12f7c9fdd18941480b5d139290236368bafbbe4986341565a1a0f090c9ebde17e8a443a0bfdca94",
 			},
@@ -590,7 +597,7 @@ func TestUpdatePassword_Errors(t *testing.T) {
 		id         string
 	}{
 		{
-			name: "not found",
+			name: "Not Found",
 			request: &siogeneric.UpdatePasswordRequest{
 				Password: "c73583a948d7662f30828d764834552b",
 			},
@@ -599,7 +606,7 @@ func TestUpdatePassword_Errors(t *testing.T) {
 			id:         "123",
 		},
 		{
-			name:       "no password",
+			name:       "No Password",
 			request:    &siogeneric.UpdatePasswordRequest{},
 			error:      "Key: 'UpdatePasswordRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag",
 			statusCode: http.StatusBadRequest,
@@ -753,6 +760,13 @@ func TestUpdatePhone_Errors(t *testing.T) {
 			},
 			error:      "User with the requested ID could not be found.",
 			statusCode: http.StatusNotFound,
+			id:         "123",
+		},
+		{
+			name:       "Missing Number",
+			request:    &siogeneric.UpdatePhoneRequest{},
+			error:      "Key: 'UpdatePhoneRequest.Number' Error:Field validation for 'Number' failed on the 'required' tag",
+			statusCode: http.StatusBadRequest,
 			id:         "123",
 		},
 		{
