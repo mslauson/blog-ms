@@ -17,7 +17,7 @@ type IamSessionService interface {
 	CreateEmailSession(
 		r *siogeneric.AwEmailSessionRequest,
 	) (*siogeneric.AwSession, error)
-	DeleteSession(sID string) (siogeneric.SuccessResponse, error)
+	DeleteSession(ID string, sID string) (siogeneric.SuccessResponse, error)
 }
 
 func NewSessionService() *SessionService {
@@ -37,9 +37,10 @@ func (s *SessionService) CreateEmailSession(
 }
 
 func (s *SessionService) DeleteSession(
+	ID string,
 	sID string,
 ) (siogeneric.SuccessResponse, error) {
-	err := s.awClient.DeleteSession(sID)
+	err := s.awClient.DeleteSession(ID, sID)
 	if err != nil {
 		return siogeneric.SuccessResponse{
 				Success: false,

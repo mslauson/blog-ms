@@ -30,7 +30,7 @@ type AppwriteClient interface {
 	UpdatePassword(id string, r *siogeneric.UpdatePasswordRequest) (*siogeneric.AwUser, error)
 	DeleteUser(id string) error
 	CreateEmailSession(r *siogeneric.AwEmailSessionRequest) (*siogeneric.AwSession, error)
-	DeleteSession(sID string) error
+	DeleteSession(ID string, sID string) error
 }
 
 func NewAwClient() *AwClient {
@@ -191,8 +191,8 @@ func (c *AwClient) CreateEmailSession(
 	return response, nil
 }
 
-func (c *AwClient) DeleteSession(sID string) error {
-	url := fmt.Sprintf("%s/account/sessions/%s", c.host, sID)
+func (c *AwClient) DeleteSession(ID, sID string) error {
+	url := fmt.Sprintf("%s/users/%s/sessions/%s", c.host, ID, sID)
 	req, _ := http.NewRequest("DELETE", url, nil)
 
 	req.Header = c.defaultHeaders

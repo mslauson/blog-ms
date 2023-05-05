@@ -43,8 +43,9 @@ func (sc *SessionController) CreateEmailSession(c *gin.Context) {
 }
 
 func (sc *SessionController) DeleteSession(c *gin.Context) {
-	sessionId := c.Param("id")
-	response, err := sc.s.DeleteSession(sessionId)
+	ID := c.Param("id")
+	sessionID := c.Param("sessionId")
+	response, err := sc.s.DeleteSession(ID, sessionID)
 	if err != nil {
 		_ = c.Error(err)
 		return

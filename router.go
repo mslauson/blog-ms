@@ -39,7 +39,7 @@ func CreateRouter() *gin.Engine {
 		session := v1.Group("/session")
 		{
 			session.POST("/email", sc.CreateEmailSession)
-			session.DELETE("/:id", sc.DeleteSession)
+			session.DELETE("/:id/:sessionId", sc.DeleteSession)
 		}
 	}
 
