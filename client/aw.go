@@ -10,6 +10,7 @@ import (
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
+	"gitea.slauson.io/slausonio/iam-ms/constants"
 )
 
 type AwClient struct {
@@ -36,8 +37,8 @@ func NewAwClient() *AwClient {
 	return &AwClient{
 		h: sioUtils.NewRestHelpers(),
 		defaultHeaders: map[string][]string{
-			"Content-Type":       {"application/json"},
-			"X-Appwrite-Project": {os.Getenv("IAM_PROJECT")},
+			"Content-Type":                 {"application/json"},
+			constants.AW_HEADER_PROJECT_ID: {os.Getenv("IAM_PROJECT")},
 		},
 		host: os.Getenv("IAM_HOST"),
 		key:  os.Getenv("IAM_KEY"),
@@ -49,7 +50,7 @@ func (c *AwClient) ListUsers() (*siogeneric.AwlistResponse, error) {
 	req, _ := http.NewRequest("GET", url, nil)
 
 	req.Header = c.defaultHeaders
-	req.Header.Add("X-Appwrite-Key", c.key)
+	req.Header.Add(constants.AW_HEADER_KEY, c.key)
 	response := new(siogeneric.AwlistResponse)
 	if err := c.executeAndParseResponse(req, response); err != nil {
 		return nil, err
@@ -61,7 +62,7 @@ func (c *AwClient) GetUserByID(id string) (*siogeneric.AwUser, error) {
 	url := fmt.Sprintf("%s/users/%s", c.host, id)
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header = c.defaultHeaders
-	req.Header.Add("X-Appwrite-Key", c.key)
+	req.Header.Add(constants.AW_HEADER_KEY, c.key)
 
 	response := new(siogeneric.AwUser)
 	if err := c.executeAndParseResponse(req, response); err != nil {
@@ -82,7 +83,7 @@ func (c *AwClient) CreateUser(r *siogeneric.AwCreateUserRequest) (*siogeneric.Aw
 	req, _ := http.NewRequest("POST", url, sr)
 
 	req.Header = c.defaultHeaders
-	req.Header.Add("X-Appwrite-Key", c.key)
+	req.Header.Add(constants.AW_HEADER_KEY, c.key)
 
 	response := new(siogeneric.AwUser)
 	if err := c.executeAndParseResponse(req, response); err != nil {
@@ -105,7 +106,7 @@ func (c *AwClient) UpdateEmail(
 	req, _ := http.NewRequest("PATCH", url, sr)
 
 	req.Header = c.defaultHeaders
-	req.Header.Add("X-Appwrite-Key", c.key)
+	req.Header.Add(constants.AW_HEADER_KEY, c.key)
 
 	response := new(siogeneric.AwUser)
 	if err := c.executeAndParseResponse(req, response); err != nil {
@@ -128,7 +129,7 @@ func (c *AwClient) UpdatePassword(
 	req, _ := http.NewRequest("PATCH", url, sr)
 
 	req.Header = c.defaultHeaders
-	req.Header.Add("X-Appwrite-Key", c.key)
+	req.Header.Add(constants.AW_HEADER_KEY, c.key)
 
 	response := new(siogeneric.AwUser)
 	if err := c.executeAndParseResponse(req, response); err != nil {
@@ -151,7 +152,7 @@ func (c *AwClient) UpdatePhone(
 	req, _ := http.NewRequest("PATCH", url, sr)
 
 	req.Header = c.defaultHeaders
-	req.Header.Add("X-Appwrite-Key", c.key)
+	req.Header.Add(constants.AW_HEADER_KEY, c.key)
 
 	response := new(siogeneric.AwUser)
 	if err := c.executeAndParseResponse(req, response); err != nil {
@@ -164,7 +165,7 @@ func (c *AwClient) DeleteUser(id string) error {
 	url := fmt.Sprintf("%s/users/%s", c.host, id)
 	req, _ := http.NewRequest("DELETE", url, nil)
 	req.Header = c.defaultHeaders
-	req.Header.Add("X-Appwrite-Key", c.key)
+	req.Header.Add(constants.AW_HEADER_KEY, c.key)
 
 	return c.executeAndParseResponse(req, nil)
 }
@@ -195,7 +196,7 @@ func (c *AwClient) DeleteSession(ID, sID string) error {
 	req, _ := http.NewRequest("DELETE", url, nil)
 
 	req.Header = c.defaultHeaders
-	req.Header.Add("X-Appwrite-Key", c.key)
+	req.Header.Add(constants.AW_HEADER_KEY, c.key)
 
 	return c.executeAndParseResponse(req, nil)
 }
