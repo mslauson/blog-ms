@@ -16,46 +16,45 @@ func NewIamValidations() *IamValidations {
 }
 
 func (v *IamValidations) ValidateCreateUserRequest(r *siogeneric.AwCreateUserRequest) error {
-	err := v.validator.ValidateEmail(r.Email)
-	if err != nil {
+	if err := v.validator.ValidateEmail(r.Email); err != nil {
 		return err
 	}
-	err = v.validator.ValidatePassword(r.Password)
-	if err != nil {
-		return err
-	}
-	err = v.validator.ValidateName(r.Name)
-	if err != nil {
-		return err
-	}
-	err = v.validator.ValidatePhone(r.Phone)
 
-	if err != nil {
+	if err := v.validator.ValidatePassword(r.Password); err != nil {
 		return err
 	}
+
+	if err := v.validator.ValidateName(r.Name); err != nil {
+		return err
+	}
+
+	if err := v.validator.ValidatePhone(r.Phone); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (v *IamValidations) ValidateUpdatePasswordRequest(r *siogeneric.UpdatePasswordRequest) error {
-	err := v.validator.ValidatePassword(r.Password)
-	if err != nil {
+	if err := v.validator.ValidatePassword(r.Password); err != nil {
 		return err
 	}
+
 	return nil
 }
 
 func (v *IamValidations) ValidateUpdateEmailRequest(r *siogeneric.UpdateEmailRequest) error {
-	err := v.validator.ValidateEmail(r.Email)
-	if err != nil {
+	if err := v.validator.ValidateEmail(r.Email); err != nil {
 		return err
 	}
+
 	return nil
 }
 
 func (v *IamValidations) ValidateUpdatePhoneRequest(r *siogeneric.UpdatePhoneRequest) error {
-	err := v.validator.ValidatePhone(r.Number)
-	if err != nil {
+	if err := v.validator.ValidatePhone(r.Number); err != nil {
 		return err
 	}
+
 	return nil
 }
