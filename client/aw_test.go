@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
@@ -49,6 +50,11 @@ var (
 		Phone:    "test_phone",
 	}
 )
+
+func TestNewAwClient(t *testing.T) {
+	ac := NewAwClient()
+	assert.NotNilf(t, ac, "expected non-nil AwClient")
+}
 
 func TestAwClient_ListUsers(t *testing.T) {
 	tests := []struct {
@@ -259,7 +265,10 @@ func TestAwClient_UpdatePassword(t *testing.T) {
 					Return(tt.parseErr)
 			}
 
-			result, err := ac.CreateUser(mCr)
+			result, err := ac.UpdatePassword(
+				"test",
+				&siogeneric.UpdatePasswordRequest{Password: "test"},
+			)
 			if tt.happy && result == nil {
 				t.Errorf("expected result but got nil")
 				return
@@ -312,7 +321,7 @@ func TestAwClient_UpdatePhone(t *testing.T) {
 				h.On("ParseResponse", mock.AnythingOfType("*http.Response"), mock.AnythingOfType("*siogeneric.AwUser")).
 					Return(tt.parseErr)
 			}
-			result, err := ac.CreateUser(mCr)
+			result, err := ac.UpdatePhone("123", &siogeneric.UpdatePhoneRequest{Number: "123"})
 			if tt.happy && result == nil {
 				t.Errorf("expected result but got nil")
 				return
@@ -365,7 +374,7 @@ func TestAwClient_UpdateEmail(t *testing.T) {
 				h.On("ParseResponse", mock.AnythingOfType("*http.Response"), mock.AnythingOfType("*siogeneric.AwUser")).
 					Return(tt.parseErr)
 			}
-			result, err := ac.CreateUser(mCr)
+			result, err := ac.UpdateEmail("123", &siogeneric.UpdateEmailRequest{Email: "a@a.com"})
 			if tt.happy && result == nil {
 				t.Errorf("expected result but got nil")
 				return
