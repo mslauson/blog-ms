@@ -58,7 +58,7 @@ func initControllerForSessionTests(
 }
 
 func TestNewSessionController(t *testing.T) {
-	sc, _, _ := NewSessionController()
+	sc := NewSessionController()
 	assert.NotNil(t, sc)
 }
 

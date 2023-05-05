@@ -70,10 +70,16 @@ func initSessionServiceTest(t *testing.T) (*SessionService, *mocks.AppwriteClien
 	return ss, ac
 }
 
+func TestNewSessionService(t *testing.T) {
+	ss := NewSessionService()
+	assert.NotNil(t, ss)
+}
+
 func TestSessionService_CreateUser(t *testing.T) {
 	ss, awClient := initSessionServiceTest(t)
 
-	awClient.On("CreateEmailSession", mock.AnythingOfType("*siogeneric.AwEmailSessionRequest")).Return(mUserSession, nil)
+	awClient.On("CreateEmailSession", mock.AnythingOfType("*siogeneric.AwEmailSessionRequest")).
+		Return(mUserSession, nil)
 	actual, err := ss.CreateEmailSession(sessionReq)
 	assert.Equalf(t, mUserSession, actual, "actual: %v", actual)
 	assert.Emptyf(t, err, "err: %v", err)
@@ -82,7 +88,8 @@ func TestSessionService_CreateUser(t *testing.T) {
 func TestSessionService_CreateUser_Error(t *testing.T) {
 	ss, awClient := initSessionServiceTest(t)
 
-	awClient.On("CreateEmailSession", mock.AnythingOfType("*siogeneric.AwEmailSessionRequest")).Return(nil, siotest.TError)
+	awClient.On("CreateEmailSession", mock.AnythingOfType("*siogeneric.AwEmailSessionRequest")).
+		Return(nil, siotest.TError)
 	actual, err := ss.CreateEmailSession(sessionReq)
 	assert.Nilf(t, actual, "expected nil, actual: %v", actual)
 	assert.Equalf(t, err.Error(), siotest.TUnauthorizedError.Error(), "error: %v", err.Error())
@@ -103,5 +110,11 @@ func TestSessionService_DeleteSession_Error(t *testing.T) {
 	awClient.On("DeleteSession", "a", "a").Return(siotest.TError)
 	actual, err := ss.DeleteSession("a", "a")
 	assert.False(t, actual.Success)
-	assert.Equalf(t, err.Error(), sioerror.NewSioNotFoundError(constants.NoUserFound).Error(), "error: %v", err.Error())
+	assert.Equalf(
+		t,
+		err.Error(),
+		sioerror.NewSioNotFoundError(constants.NoUserFound).Error(),
+		"error: %v",
+		err.Error(),
+	)
 }
