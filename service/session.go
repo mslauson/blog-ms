@@ -45,7 +45,7 @@ func (s *SessionService) DeleteSession(
 		return siogeneric.SuccessResponse{
 				Success: false,
 			}, sioerror.NewSioNotFoundError(
-				constants.NoCustomerFound,
+				constants.NoUserFound,
 			)
 	}
 

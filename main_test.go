@@ -20,6 +20,7 @@ var awUser = &siogeneric.AwUser{
 	Name:  "Iam Integration",
 }
 var createdUsers []*siogeneric.AwUser
+var createdSessions []*siogeneric.AwSession
 
 func TestCreateUser_HappyScenarios(t *testing.T) {
 	ts, token := siotest.RunTestServer(t, CreateRouter())
@@ -815,6 +816,204 @@ func TestUpdatePhone_Errors(t *testing.T) {
 			defer resp.Body.Close()
 
 			siotest.ParseCheckIfCorrectError(t, resp, test.error, test.statusCode)
+		})
+	}
+}
+
+func TestCreateUserEmailSession_HappyScenarios(t *testing.T) {
+	ts, token := siotest.RunTestServer(t, CreateRouter())
+	defer ts.Close()
+
+	tests := []struct {
+		name    string
+		request *siogeneric.AwEmailSessionRequest
+	}{
+		{
+			name: "happy",
+			request: &siogeneric.AwEmailSessionRequest{
+				Email:    "629ab286599f7b5b67ee1d88093b0280608ed13e9083b7ea883cba59c5330860",
+				Password: "c73583a948d7662f30828d764834552b",
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rJSON, err := json.Marshal(test.request)
+			if err != nil {
+				t.Fatal(err)
+			}
+			sr := strings.NewReader(string(rJSON))
+			// Test
+			req, err := http.NewRequest("POST", ts.URL+"/api/iam/v1/session/email", sr)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer resp.Body.Close()
+			assert.Equalf(
+				t,
+				resp.StatusCode,
+				http.StatusOK,
+				"expected status code %d, got %d",
+				http.StatusOK,
+				resp.StatusCode,
+			)
+			result := &siogeneric.AwSession{}
+			siotest.ParseHappyResponse(t, resp, result)
+
+			createdSessions = append(createdSessions, result)
+		})
+	}
+}
+
+func TestCreateUserEmailSession_Errors(t *testing.T) {
+	ts, token := siotest.RunTestServer(t, CreateRouter())
+	defer ts.Close()
+
+	tests := []struct {
+		name       string
+		request    *siogeneric.AwEmailSessionRequest
+		error      string
+		statusCode int
+	}{
+
+		{
+			name: "Missing Email",
+			request: &siogeneric.AwEmailSessionRequest{
+				Password: "43dad3e484522e9252e30db80557d1d4",
+			},
+			statusCode: http.StatusBadRequest,
+			error:      "Key: 'AwEmailSessionRequest.Email' Error:Field validation for 'Email' failed on the 'required' tag",
+		},
+		{
+			name: "Missing Pass",
+			request: &siogeneric.AwEmailSessionRequest{
+				Email: "efd623543c981069ca0c05c57b59d69bf97f684cd69a15f4cef7c8260447c82c",
+			},
+			statusCode: http.StatusBadRequest,
+			error:      "Key: 'AwEmailSessionRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag",
+		},
+		{
+			name: "Email Not Registered",
+			request: &siogeneric.AwEmailSessionRequest{
+				Email:    "8a4fd52750c8e9d33329c8f74ae7a649da80f369808f7313d94bce55aaaa6e75",
+				Password: "4054e3ef184cf2ba201222322be92f3b",
+			},
+			statusCode: http.StatusUnauthorized,
+			error:      "Invalid credentials. Please check the email and password.",
+		}, {
+			name: "Invalid Password",
+			request: &siogeneric.AwEmailSessionRequest{
+				Email:    "efd623543c981069ca0c05c57b59d69bf97f684cd69a15f4cef7c8260447c82c",
+				Password: "e2ec24edf5511abf81e3e75fb855ccc8",
+			},
+			statusCode: http.StatusUnauthorized,
+			error:      "Invalid credentials. Please check the email and password.",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rJSON, err := json.Marshal(test.request)
+			if err != nil {
+				t.Fatal(err)
+			}
+			sr := strings.NewReader(string(rJSON))
+			// Test
+			req, err := http.NewRequest("POST", ts.URL+"/api/iam/v1/session/email", sr)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+					t.Fatal(err)
+				}
+			}(resp.Body)
+
+			siotest.ParseCheckIfCorrectError(t, resp, test.error, test.statusCode)
+		})
+	}
+}
+
+func TestDeleteUserSession(t *testing.T) {
+	ts, token := siotest.RunTestServer(t, CreateRouter())
+	defer ts.Close()
+
+	for _, session := range createdSessions {
+		t.Run(fmt.Sprintf("Delete Session ID: %s", session.ID), func(t *testing.T) {
+			req, err := http.NewRequest(
+				"DELETE",
+				fmt.Sprintf("%s/api/iam/v1/session/%s/%s", ts.URL, session.UserId, session.ID),
+				nil,
+			)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer resp.Body.Close()
+
+			result := &siogeneric.SuccessResponse{}
+			siotest.ParseHappyResponse(t, resp, result)
+
+			assert.Truef(t, result.Success, "expected success to be true, got false")
+		})
+	}
+}
+
+func TestDeleteUserSession_NotFound(t *testing.T) {
+	ts, token := siotest.RunTestServer(t, CreateRouter())
+	defer ts.Close()
+
+	for _, session := range createdSessions {
+		t.Run(fmt.Sprintf("Delete Session ID: %s", session.ID), func(t *testing.T) {
+			req, err := http.NewRequest(
+				"DELETE",
+				fmt.Sprintf("%s/api/iam/v1/session/%s/%s", ts.URL, session.UserId, session.ID),
+				nil,
+			)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer resp.Body.Close()
+
+			siotest.ParseCheckIfCorrectError(
+				t,
+				resp,
+				"User with the requested ID could not be found.",
+				http.StatusNotFound,
+			)
 		})
 	}
 }
