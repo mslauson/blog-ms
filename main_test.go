@@ -138,7 +138,7 @@ func TestDeleteUser_NotFound(t *testing.T) {
 
 			defer resp.Body.Close()
 
-			siotest.ParseCheckIfCorrectError(t, resp, "user not found", http.StatusNotFound)
+			siotest.ParseCheckIfCorrectError(t, resp, "User with the requested ID could not be found.", http.StatusNotFound)
 		})
 	}
 }

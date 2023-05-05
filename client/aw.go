@@ -167,12 +167,7 @@ func (c *AwClient) DeleteUser(id string) error {
 	req.Header = c.defaultHeaders
 	req.Header.Add("X-Appwrite-Key", c.key)
 
-	_, err := c.h.DoHttpRequest(req)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return c.executeAndParseResponse(req, nil)
 }
 
 func (c *AwClient) CreateEmailSession(
@@ -203,19 +198,14 @@ func (c *AwClient) DeleteSession(sID string) error {
 	req.Header = c.defaultHeaders
 	req.Header.Add("X-Appwrite-Key", c.key)
 
-	_, err := c.h.DoHttpRequest(req)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return c.executeAndParseResponse(req, nil)
 }
 
 func (c *AwClient) executeAndParseResponse(
 	req *http.Request,
 	response interface{},
 ) error {
-	res, err := c.h.DoHttpRequest(req)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -227,7 +217,7 @@ func (c *AwClient) executeAndParseResponse(
 		}
 		logrus.Error(errRes)
 		return sioerror.NewSioIamError(errRes)
-	} else {
+	} else if response != nil {
 		if err := sioUtils.ParseResponse(res, response); err != nil {
 			return err
 		}
