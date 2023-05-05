@@ -75,6 +75,7 @@ func (s *UserService) UpdatePhone(
 	id string,
 	r *siogeneric.UpdatePhoneRequest,
 ) (*siogeneric.AwUser, error) {
+	r.Number = "+1" + r.Number
 	response, err := s.awClient.UpdatePhone(id, r)
 	if err != nil {
 		return nil, err

@@ -285,6 +285,412 @@ func TestCreateUser_Errors(t *testing.T) {
 	}
 }
 
+func TestUpdateEmail_HappyScenarios(t *testing.T) {
+	ts, token := siotest.RunTestServer(t, CreateRouter())
+	defer ts.Close()
+
+	tests := []struct {
+		name    string
+		request *siogeneric.UpdateEmailRequest
+	}{
+		{
+			name: "happy",
+			request: &siogeneric.UpdateEmailRequest{
+				Email: "629ab286599f7b5b67ee1d88093b0280608ed13e9083b7ea883cba59c5330860",
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rJSON, err := json.Marshal(test.request)
+			if err != nil {
+				t.Fatal(err)
+			}
+			sr := strings.NewReader(string(rJSON))
+			// Test
+			req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/iam/v1/user/%s/email", ts.URL, createdUsers[0].ID), sr)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer resp.Body.Close()
+			assert.Equalf(
+				t,
+				resp.StatusCode,
+				http.StatusOK,
+				"expected status code %d, got %d",
+				http.StatusOK,
+				resp.StatusCode,
+			)
+			result := &siogeneric.AwUser{}
+			siotest.ParseHappyResponse(t, resp, result)
+
+			// TODO: change when encrypt response
+			//assert.Equal(t, awUser.ID, result.ID)
+			//assert.Equal(t, awUser.Phone, result.Phone)
+			//assert.Equal(t, awUser.Email, result.Email)
+			//assert.Equal(t, awUser.Name, result.Name)
+
+			createdUsers = append(createdUsers, result)
+		})
+	}
+}
+func TestUpdateEmail_Errors(t *testing.T) {
+	ts, token := siotest.RunTestServer(t, CreateRouter())
+	defer ts.Close()
+
+	id := createdUsers[0].ID
+
+	tests := []struct {
+		name       string
+		request    *siogeneric.UpdateEmailRequest
+		error      string
+		statusCode int
+		id         string
+	}{
+		{
+			name: "not found",
+			request: &siogeneric.UpdateEmailRequest{
+				Email: "629ab286599f7b5b67ee1d88093b0280608ed13e9083b7ea883cba59c5330860",
+			},
+			error:      "User with the requested ID could not be found.",
+			statusCode: http.StatusNotFound,
+			id:         "123",
+		},
+		{
+			name: "bad email",
+			request: &siogeneric.UpdateEmailRequest{
+				Email: "f418e9a1f5f0b1b052e7c2ba97cb6b96",
+			},
+			error:      "invalid email",
+			statusCode: http.StatusBadRequest,
+			id:         id,
+		},
+		{
+			name: "Email too long",
+			request: &siogeneric.UpdateEmailRequest{
+				Email: "184be7fa35e55150a59032b480fdd0ce015c67c375a1bb08a46f35dd178a944c0c2d5157a95b68ce6b339457c87c0c0be4e9b35039327fef8fee586773fe76c2b395c7496ced1aa20dfec178562dc1504cb154a5eeffbf876e7d775c8703754a9257499083d7e9c89d8987a6c81b9f112e49050ba018dd8e967a68ab23582d9c31d56df3ba47d15cc41dd1104d73d9253b2a4d03b3c48510a24706c5e6cf1b9037e25de2f2f4f8df92fa2802f37e661caea499a20c3295b431bdb15d7815ae417ca2bbc963fd7752ec47a4c9eb43894e1287ef18e0f73619405219f3d3c936a445bbd2a6b8a5ee342da211ee6fa65dd52bb41b5240992d745ad0ad1a79dd4f21fc673b22464b1772d0146f30fd220b98a9a7bc26862d8daa5a9d6fb09afa11cc672558151bb024cda12f7c9fdd18941480b5d139290236368bafbbe4986341565a1a0f090c9ebde17e8a443a0bfdca94",
+			},
+			error:      "invalid email",
+			statusCode: http.StatusBadRequest,
+			id:         id,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rJSON, err := json.Marshal(test.request)
+			if err != nil {
+				t.Fatal(err)
+			}
+			sr := strings.NewReader(string(rJSON))
+			req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/iam/v1/user/%s/email", ts.URL, test.id), sr)
+
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer resp.Body.Close()
+
+			siotest.ParseCheckIfCorrectError(t, resp, test.error, test.statusCode)
+		})
+	}
+}
+func TestUpdatePassword_HappyScenarios(t *testing.T) {
+	ts, token := siotest.RunTestServer(t, CreateRouter())
+	defer ts.Close()
+
+	tests := []struct {
+		name    string
+		request *siogeneric.UpdatePasswordRequest
+	}{
+		{
+			name: "happy",
+			request: &siogeneric.UpdatePasswordRequest{
+				Password: "c73583a948d7662f30828d764834552b",
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rJSON, err := json.Marshal(test.request)
+			if err != nil {
+				t.Fatal(err)
+			}
+			sr := strings.NewReader(string(rJSON))
+			// Test
+			req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/iam/v1/user/%s/password", ts.URL, createdUsers[0].ID), sr)
+
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer resp.Body.Close()
+			assert.Equalf(
+				t,
+				resp.StatusCode,
+				http.StatusOK,
+				"expected status code %d, got %d",
+				http.StatusOK,
+				resp.StatusCode,
+			)
+			result := &siogeneric.AwUser{}
+			siotest.ParseHappyResponse(t, resp, result)
+
+			assert.Equal(t, awUser.ID, result.ID)
+			assert.Equal(t, awUser.Phone, result.Phone)
+			assert.Equal(t, awUser.Email, result.Email)
+			assert.Equal(t, awUser.Name, result.Name)
+
+			createdUsers = append(createdUsers, result)
+		})
+	}
+}
+
+func TestUpdatePassword_Errors(t *testing.T) {
+	ts, token := siotest.RunTestServer(t, CreateRouter())
+	defer ts.Close()
+
+	id := createdUsers[0].ID
+
+	tests := []struct {
+		name       string
+		request    *siogeneric.UpdatePasswordRequest
+		error      string
+		statusCode int
+		id         string
+	}{
+		{
+			name: "not found",
+			request: &siogeneric.UpdatePasswordRequest{
+				Password: "c73583a948d7662f30828d764834552b",
+			},
+			error:      "User with the requested ID could not be found.",
+			statusCode: http.StatusNotFound,
+			id:         "123",
+		},
+		{
+			name:       "no password",
+			request:    &siogeneric.UpdatePasswordRequest{},
+			error:      "Key: 'UpdatePasswordRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag",
+			statusCode: http.StatusBadRequest,
+			id:         id,
+		},
+		{
+			name: "Bad Password Missing Number",
+			request: &siogeneric.UpdatePasswordRequest{
+				Password: "f83aac7a772ed502d2cecd4d1c91d900",
+			},
+			statusCode: http.StatusBadRequest,
+			id:         id,
+			error:      "invalid password: Requirements are 8 char min, 1 upper, 1 special, and 1 numerical",
+		},
+		{
+			name: "Bad Password Missing Upper",
+			request: &siogeneric.UpdatePasswordRequest{
+				Password: "efd623543c981069ca0c05c57b59d69bf97f684cd69a15f4cef7c8260447c82c",
+			},
+			statusCode: http.StatusBadRequest,
+			id:         id,
+			error:      "invalid password: Requirements are 8 char min, 1 upper, 1 special, and 1 numerical",
+		},
+		{
+			name: "Bad Password Missing Special",
+			request: &siogeneric.UpdatePasswordRequest{
+
+				Password: "c7510a622ca0a4f52576023c0ff7c7a6",
+			},
+			statusCode: http.StatusBadRequest,
+			id:         id,
+			error:      "invalid password: Requirements are 8 char min, 1 upper, 1 special, and 1 numerical",
+		},
+		{
+			name: "Short Password",
+			request: &siogeneric.UpdatePasswordRequest{
+				Password: "43dad3e484522e9252e30db80557d1d4",
+			},
+			statusCode: http.StatusBadRequest,
+			id:         id,
+			error:      "invalid password: Requirements are 8 char min, 1 upper, 1 special, and 1 numerical",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rJSON, err := json.Marshal(test.request)
+			if err != nil {
+				t.Fatal(err)
+			}
+			sr := strings.NewReader(string(rJSON))
+			req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/iam/v1/user/%s/password", ts.URL, test.id), sr)
+
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer resp.Body.Close()
+
+			siotest.ParseCheckIfCorrectError(t, resp, test.error, test.statusCode)
+		})
+	}
+}
+
+func TestUpdatePhone_HappyScenarios(t *testing.T) {
+	ts, token := siotest.RunTestServer(t, CreateRouter())
+	defer ts.Close()
+
+	tests := []struct {
+		name    string
+		request *siogeneric.UpdatePhoneRequest
+	}{
+		{
+			name: "happy",
+			request: &siogeneric.UpdatePhoneRequest{
+				Number: "6f124736c6b70801fde7273624f7bb9d",
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rJSON, err := json.Marshal(test.request)
+			if err != nil {
+				t.Fatal(err)
+			}
+			sr := strings.NewReader(string(rJSON))
+			// Test
+			req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/iam/v1/user/%s/phone", ts.URL, createdUsers[0].ID), sr)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer resp.Body.Close()
+			assert.Equalf(
+				t,
+				resp.StatusCode,
+				http.StatusOK,
+				"expected status code %d, got %d",
+				http.StatusOK,
+				resp.StatusCode,
+			)
+			result := &siogeneric.AwUser{}
+			siotest.ParseHappyResponse(t, resp, result)
+
+			assert.Equal(t, awUser.ID, result.ID)
+			assert.Equal(t, awUser.Phone, result.Phone)
+			assert.Equal(t, awUser.Email, result.Email)
+			assert.Equal(t, awUser.Name, result.Name)
+
+			createdUsers = append(createdUsers, result)
+		})
+	}
+}
+
+func TestUpdatePhone_Errors(t *testing.T) {
+	ts, token := siotest.RunTestServer(t, CreateRouter())
+	defer ts.Close()
+
+	id := createdUsers[0].ID
+
+	tests := []struct {
+		name       string
+		request    *siogeneric.UpdatePhoneRequest
+		error      string
+		statusCode int
+		id         string
+	}{
+		{
+			name: "not found",
+			request: &siogeneric.UpdatePhoneRequest{
+				Number: "6f124736c6b70801fde7273624f7bb9d",
+			},
+			error:      "User with the requested ID could not be found.",
+			statusCode: http.StatusNotFound,
+			id:         "123",
+		},
+		{
+			name: "invalid short",
+			request: &siogeneric.UpdatePhoneRequest{
+				Number: "d64f9807ee288ab37faf7150edf3eb08",
+			},
+			error:      "please enter a ten digit mobile number",
+			statusCode: http.StatusBadRequest,
+			id:         id,
+		},
+		{
+			name: "invalid long",
+			request: &siogeneric.UpdatePhoneRequest{
+				Number: "d64f9807ee288ab37faf7150edf3eb08",
+			},
+			error:      "please enter a ten digit mobile number",
+			statusCode: http.StatusBadRequest,
+			id:         id,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rJSON, err := json.Marshal(test.request)
+			if err != nil {
+				t.Fatal(err)
+			}
+			sr := strings.NewReader(string(rJSON))
+			req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/iam/v1/user/%s/phone", ts.URL, test.id), sr)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer resp.Body.Close()
+
+			siotest.ParseCheckIfCorrectError(t, resp, test.error, test.statusCode)
+		})
+	}
+}
+
 func TestDeleteUser(t *testing.T) {
 	ts, token := siotest.RunTestServer(t, CreateRouter())
 	defer ts.Close()

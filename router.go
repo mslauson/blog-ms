@@ -29,17 +29,17 @@ func CreateRouter() *gin.Engine {
 		{
 			user.GET("", uc.ListUsers)
 			user.POST("", uc.CreateUser)
-			user.GET("/:userId", uc.GetUserById)
-			user.PUT("/:userId/password", uc.UpdatePassword)
-			user.PUT("/:userId/email", uc.UpdateEmail)
-			user.PUT("/:userId/phone", uc.UpdatePhone)
+			user.GET("/:id", uc.GetUserById)
+			user.PUT("/:id/password", uc.UpdatePassword)
+			user.PUT("/:id/email", uc.UpdateEmail)
+			user.PUT("/:id/phone", uc.UpdatePhone)
 			user.DELETE("/:id", uc.DeleteUser)
 		}
 
 		session := v1.Group("/session")
 		{
 			session.POST("/email", sc.CreateEmailSession)
-			session.DELETE("/:sessionId", sc.DeleteSession)
+			session.DELETE("/:id", sc.DeleteSession)
 		}
 	}
 
