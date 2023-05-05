@@ -9,13 +9,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gitea.slauson.io/slausonio/go-types/siogeneric"
-	"github.com/stretchr/testify/assert"
-
-	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
+	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"gitea.slauson.io/slausonio/iam-ms/service/mocks"
 )
 
@@ -33,6 +32,7 @@ var (
 func initController(
 	t *testing.T,
 ) (*UserController, *mocks.IamUserService, *sioUtils.EncryptionUtil) {
+
 	ms := mocks.NewIamUserService(t)
 	eu := sioUtils.NewEncryptionUtil()
 	controller := &UserController{
@@ -42,7 +42,7 @@ func initController(
 	return controller, ms, eu
 }
 
-func MockJson(c *gin.Context, content interface{}, method string) {
+func MockJson(c *gin.Context, content any, method string) {
 	c.Request.Method = method // or PUT
 	c.Request.Header.Set("Content-Type", "application/json")
 

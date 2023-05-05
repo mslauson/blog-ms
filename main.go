@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"os"
 
-	"gitea.slauson.io/slausonio/sio-loki/hooks"
 	log "github.com/sirupsen/logrus"
+
+	"gitea.slauson.io/slausonio/sio-loki/hooks"
 )
 
 func init() {

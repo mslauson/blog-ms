@@ -3,9 +3,10 @@ package utils
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestValidateCreateUserRequest(t *testing.T) {

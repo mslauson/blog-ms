@@ -3,9 +3,10 @@ package main
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"gitea.slauson.io/slausonio/go-utils/siomw"
 	"gitea.slauson.io/slausonio/iam-ms/controller"
-	"github.com/gin-gonic/gin"
 )
 
 func CreateRouter() *gin.Engine {

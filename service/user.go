@@ -3,9 +3,8 @@ package service
 import (
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
-	"gitea.slauson.io/slausonio/iam-ms/constants"
-
 	"gitea.slauson.io/slausonio/iam-ms/client"
+	"gitea.slauson.io/slausonio/iam-ms/constants"
 )
 
 type UserService struct {

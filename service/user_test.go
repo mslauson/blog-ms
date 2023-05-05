@@ -2,15 +2,16 @@ package service
 
 import (
 	"fmt"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
 	siotest "gitea.slauson.io/slausonio/go-testing/sio_test"
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
 	"gitea.slauson.io/slausonio/iam-ms/client/mocks"
 	"gitea.slauson.io/slausonio/iam-ms/constants"
-	"github.com/stretchr/testify/mock"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 var (

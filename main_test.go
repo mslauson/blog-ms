@@ -8,9 +8,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	siotest "gitea.slauson.io/slausonio/go-testing/sio_test"
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
-	"github.com/stretchr/testify/assert"
 )
 
 var awUser = &siogeneric.AwUser{
@@ -19,8 +20,11 @@ var awUser = &siogeneric.AwUser{
 	Email: "iam-integration@slauson.io",
 	Name:  "Iam Integration",
 }
-var createdUsers []*siogeneric.AwUser
-var createdSessions []*siogeneric.AwSession
+
+var (
+	createdUsers    []*siogeneric.AwUser
+	createdSessions []*siogeneric.AwSession
+)
 
 func TestCreateUser_HappyScenarios(t *testing.T) {
 	ts, token := siotest.RunTestServer(t, CreateRouter())
@@ -381,7 +385,6 @@ func TestListUsers(t *testing.T) {
 
 	assert.Greater(t, len(result.Users), 0, "expected users to be greater than 0")
 	assert.Greater(t, result.Total, 0, "expected total to be greater than 0")
-
 }
 
 func TestUpdateEmail_HappyScenarios(t *testing.T) {
@@ -884,7 +887,6 @@ func TestCreateUserEmailSession_Errors(t *testing.T) {
 		error      string
 		statusCode int
 	}{
-
 		{
 			name: "Missing Email",
 			request: &siogeneric.AwEmailSessionRequest{
@@ -909,7 +911,8 @@ func TestCreateUserEmailSession_Errors(t *testing.T) {
 			},
 			statusCode: http.StatusUnauthorized,
 			error:      "Invalid credentials. Please check the email and password.",
-		}, {
+		},
+		{
 			name: "Invalid Password",
 			request: &siogeneric.AwEmailSessionRequest{
 				Email:    "efd623543c981069ca0c05c57b59d69bf97f684cd69a15f4cef7c8260447c82c",

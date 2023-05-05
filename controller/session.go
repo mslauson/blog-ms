@@ -3,10 +3,10 @@ package controller
 import (
 	"net/http"
 
-	"gitea.slauson.io/slausonio/go-types/siogeneric"
-	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"github.com/gin-gonic/gin"
 
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
+	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"gitea.slauson.io/slausonio/iam-ms/service"
 )
 

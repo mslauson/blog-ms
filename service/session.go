@@ -3,7 +3,6 @@ package service
 import (
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
-
 	"gitea.slauson.io/slausonio/iam-ms/client"
 	"gitea.slauson.io/slausonio/iam-ms/constants"
 )
@@ -17,7 +16,7 @@ type IamSessionService interface {
 	CreateEmailSession(
 		r *siogeneric.AwEmailSessionRequest,
 	) (*siogeneric.AwSession, error)
-	DeleteSession(ID string, sID string) (siogeneric.SuccessResponse, error)
+	DeleteSession(ID, sID string) (siogeneric.SuccessResponse, error)
 }
 
 func NewSessionService() *SessionService {

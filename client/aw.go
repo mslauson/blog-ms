@@ -29,7 +29,7 @@ type AppwriteClient interface {
 	UpdatePassword(id string, r *siogeneric.UpdatePasswordRequest) (*siogeneric.AwUser, error)
 	DeleteUser(id string) error
 	CreateEmailSession(r *siogeneric.AwEmailSessionRequest) (*siogeneric.AwSession, error)
-	DeleteSession(ID string, sID string) error
+	DeleteSession(ID, sID string) error
 }
 
 func NewAwClient() *AwClient {
@@ -202,7 +202,7 @@ func (c *AwClient) DeleteSession(ID, sID string) error {
 
 func (c *AwClient) executeAndParseResponse(
 	req *http.Request,
-	response interface{},
+	response any,
 ) error {
 	res, err := c.h.ExecuteRequest(req)
 	if err != nil {

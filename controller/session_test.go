@@ -2,16 +2,23 @@ package controller
 
 import (
 	"errors"
-	"gitea.slauson.io/slausonio/go-types/siogeneric"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
+	"github.com/stretchr/testify/assert"
+
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"gitea.slauson.io/slausonio/iam-ms/service/mocks"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/mock"
 )
 
 var mUserSession = &siogeneric.AwSession{
@@ -52,7 +59,7 @@ func initControllerForSessionTests(t *testing.T) (*SessionController, *mocks.Iam
 	return sc, ss, eu
 }
 
-// func TestNewSessionController(t *testing.T) {
+// Func TestNewSessionController(t *testing.T) {
 // 	c, ms, eu := initControllerForSession
 // 	tests := []struct {
 // 		name string
@@ -70,7 +77,6 @@ func initControllerForSessionTests(t *testing.T) (*SessionController, *mocks.Iam
 // }
 
 func TestSessionController_CreateEmailSession(t *testing.T) {
-
 	tests := []struct {
 		name    string
 		request *siogeneric.AwEmailSessionRequest
@@ -136,10 +142,9 @@ func TestUserController_CreateEmailSessionServiceFailure(t *testing.T) {
 	sc.CreateEmailSession(c)
 
 	assert.Truef(t, c.Errors != nil, "c.Errors shouldn't be nil")
-
+}
 }
 func TestDeleteSession(t *testing.T) {
-
 	uc, ms, _ := initControllerForSessionTests(t)
 
 	var (
@@ -158,7 +163,6 @@ func TestDeleteSession(t *testing.T) {
 }
 
 func TestDeleteSessionError(t *testing.T) {
-
 	uc, ms, _ := initControllerForSessionTests(t)
 
 	var (

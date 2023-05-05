@@ -9,10 +9,10 @@ import (
 	"net/http"
 	"testing"
 
-	"gitea.slauson.io/slausonio/go-types/siogeneric"
-
-	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"github.com/stretchr/testify/mock"
+
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
+	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 )
 
 func initForTests(t *testing.T) (*AwClient, *sioUtils.MockSioRestHelpers) {
@@ -524,7 +524,7 @@ func TestAwClient_DeleteUserSession(t *testing.T) {
 	}
 }
 
-func mockHttpResponse(t *testing.T, v interface{}, code int) *http.Response {
+func mockHttpResponse(t *testing.T, v any, code int) *http.Response {
 	jsonData, err := json.Marshal(v)
 	if err != nil {
 		t.Fatalf("Error marshaling struct: %v\n", err)
