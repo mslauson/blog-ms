@@ -32,7 +32,6 @@ var (
 func initController(
 	t *testing.T,
 ) (*UserController, *mocks.IamUserService, *sioUtils.EncryptionUtil) {
-
 	ms := mocks.NewIamUserService(t)
 	eu := sioUtils.NewEncryptionUtil()
 	controller := &UserController{
@@ -55,6 +54,11 @@ func MockJson(c *gin.Context, content any, method string) {
 	// the bytes buffer though doesn't implement io.Closer,
 	// so you wrap it in a no-op closer
 	c.Request.Body = io.NopCloser(bytes.NewBuffer(jsonBytes))
+}
+
+func TestNewUserController(t *testing.T) {
+	uc := NewUserController()
+	assert.NotNil(t, uc)
 }
 
 func TestListUsers(t *testing.T) {
@@ -458,7 +462,12 @@ func TestUserController_UpdateEmail(t *testing.T) {
 			request: &siogeneric.UpdateEmailRequest{Email: "fake@fake.com"},
 			result:  mAwUserPtr,
 		},
-		{name: "No Email", request: &siogeneric.UpdateEmailRequest{Email: ""}, result: nil, bindError: errors.New("asdf")},
+		{
+			name:      "No Email",
+			request:   &siogeneric.UpdateEmailRequest{Email: ""},
+			result:    nil,
+			bindError: errors.New("asdf"),
+		},
 		{
 			name:    "Bad Email ",
 			request: &siogeneric.UpdateEmailRequest{Email: "fakefake.com"},
@@ -555,7 +564,12 @@ func TestUserController_UpdatePhone(t *testing.T) {
 			request: &siogeneric.UpdatePhoneRequest{Number: "1239323939"},
 			result:  mAwUserPtr,
 		},
-		{name: "No Phone", request: &siogeneric.UpdatePhoneRequest{Number: ""}, result: nil, bindErr: errors.New("asdf")},
+		{
+			name:    "No Phone",
+			request: &siogeneric.UpdatePhoneRequest{Number: ""},
+			result:  nil,
+			bindErr: errors.New("asdf"),
+		},
 		{
 			name:    "Bad Phone too short ",
 			request: &siogeneric.UpdatePhoneRequest{Number: "23423"},

@@ -23,7 +23,7 @@ func CreateRouter() *gin.Engine {
 	r.GET("/api/iam", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
-	// App
+
 	v1 := r.Group("/api/iam/v1", siomw.AuthMiddleware)
 	{
 		user := v1.Group("/user")

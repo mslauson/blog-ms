@@ -57,22 +57,10 @@ func initControllerForSessionTests(
 	return sc, ss, eu
 }
 
-// Func TestNewSessionController(t *testing.T) {
-// 	c, ms, eu := initControllerForSession
-// 	tests := []struct {
-// 		name string
-// 		want *SessionController
-// 	}{
-// 		{name}
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			if got := NewSessionController(); !reflect.DeepEqual(got, tt.want) {
-// 				t.Errorf("NewSessionController() = %v, want %v", got, tt.want)
-// 			}
-// 		})
-// 	}
-// }
+func TestNewSessionController(t *testing.T) {
+	sc, _, _ := NewSessionController()
+	assert.NotNil(t, sc)
+}
 
 func TestSessionController_CreateEmailSession(t *testing.T) {
 	tests := []struct {
