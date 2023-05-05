@@ -39,7 +39,6 @@ func (sc *SessionController) CreateEmailSession(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, response)
-	return
 }
 
 func (sc *SessionController) DeleteSession(c *gin.Context) {
@@ -52,5 +51,4 @@ func (sc *SessionController) DeleteSession(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
-	return
 }
