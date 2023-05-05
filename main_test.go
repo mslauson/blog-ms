@@ -18,7 +18,7 @@ var awUser = &siogeneric.AwUser{
 	Email: "iam-integration@slauson.io",
 	Name:  "Iam Integration",
 }
-var createdUsers = []*siogeneric.AwUser{}
+var createdUsers []*siogeneric.AwUser
 
 func TestCreateUser_HappyScenarios(t *testing.T) {
 	ts, token := siotest.RunTestServer(t, CreateRouter())
@@ -309,7 +309,11 @@ func TestUpdateEmail_HappyScenarios(t *testing.T) {
 			}
 			sr := strings.NewReader(string(rJSON))
 			// Test
-			req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/iam/v1/user/%s/email", ts.URL, createdUsers[0].ID), sr)
+			req, err := http.NewRequest(
+				"PUT",
+				fmt.Sprintf("%s/api/iam/v1/user/%s/email", ts.URL, createdUsers[0].ID),
+				sr,
+			)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -334,15 +338,15 @@ func TestUpdateEmail_HappyScenarios(t *testing.T) {
 			siotest.ParseHappyResponse(t, resp, result)
 
 			// TODO: change when encrypt response
-			//assert.Equal(t, awUser.ID, result.ID)
-			//assert.Equal(t, awUser.Phone, result.Phone)
-			//assert.Equal(t, awUser.Email, result.Email)
-			//assert.Equal(t, awUser.Name, result.Name)
+			// assert.Equal(t, awUser.ID, result.ID)
+			// assert.Equal(t, awUser.Phone, result.Phone)
+			// assert.Equal(t, awUser.Email, result.Email)
+			// assert.Equal(t, awUser.Name, result.Name)
 
-			createdUsers = append(createdUsers, result)
 		})
 	}
 }
+
 func TestUpdateEmail_Errors(t *testing.T) {
 	ts, token := siotest.RunTestServer(t, CreateRouter())
 	defer ts.Close()
@@ -392,8 +396,11 @@ func TestUpdateEmail_Errors(t *testing.T) {
 				t.Fatal(err)
 			}
 			sr := strings.NewReader(string(rJSON))
-			req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/iam/v1/user/%s/email", ts.URL, test.id), sr)
-
+			req, err := http.NewRequest(
+				"PUT",
+				fmt.Sprintf("%s/api/iam/v1/user/%s/email", ts.URL, test.id),
+				sr,
+			)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -411,6 +418,7 @@ func TestUpdateEmail_Errors(t *testing.T) {
 		})
 	}
 }
+
 func TestUpdatePassword_HappyScenarios(t *testing.T) {
 	ts, token := siotest.RunTestServer(t, CreateRouter())
 	defer ts.Close()
@@ -435,8 +443,11 @@ func TestUpdatePassword_HappyScenarios(t *testing.T) {
 			}
 			sr := strings.NewReader(string(rJSON))
 			// Test
-			req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/iam/v1/user/%s/password", ts.URL, createdUsers[0].ID), sr)
-
+			req, err := http.NewRequest(
+				"PUT",
+				fmt.Sprintf("%s/api/iam/v1/user/%s/password", ts.URL, createdUsers[0].ID),
+				sr,
+			)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -464,8 +475,6 @@ func TestUpdatePassword_HappyScenarios(t *testing.T) {
 			assert.Equal(t, awUser.Phone, result.Phone)
 			assert.Equal(t, awUser.Email, result.Email)
 			assert.Equal(t, awUser.Name, result.Name)
-
-			createdUsers = append(createdUsers, result)
 		})
 	}
 }
@@ -520,7 +529,6 @@ func TestUpdatePassword_Errors(t *testing.T) {
 		{
 			name: "Bad Password Missing Special",
 			request: &siogeneric.UpdatePasswordRequest{
-
 				Password: "c7510a622ca0a4f52576023c0ff7c7a6",
 			},
 			statusCode: http.StatusBadRequest,
@@ -545,8 +553,11 @@ func TestUpdatePassword_Errors(t *testing.T) {
 				t.Fatal(err)
 			}
 			sr := strings.NewReader(string(rJSON))
-			req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/iam/v1/user/%s/password", ts.URL, test.id), sr)
-
+			req, err := http.NewRequest(
+				"PUT",
+				fmt.Sprintf("%s/api/iam/v1/user/%s/password", ts.URL, test.id),
+				sr,
+			)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -589,7 +600,11 @@ func TestUpdatePhone_HappyScenarios(t *testing.T) {
 			}
 			sr := strings.NewReader(string(rJSON))
 			// Test
-			req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/iam/v1/user/%s/phone", ts.URL, createdUsers[0].ID), sr)
+			req, err := http.NewRequest(
+				"PUT",
+				fmt.Sprintf("%s/api/iam/v1/user/%s/phone", ts.URL, createdUsers[0].ID),
+				sr,
+			)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -617,8 +632,6 @@ func TestUpdatePhone_HappyScenarios(t *testing.T) {
 			assert.Equal(t, awUser.Phone, result.Phone)
 			assert.Equal(t, awUser.Email, result.Email)
 			assert.Equal(t, awUser.Name, result.Name)
-
-			createdUsers = append(createdUsers, result)
 		})
 	}
 }
@@ -672,7 +685,11 @@ func TestUpdatePhone_Errors(t *testing.T) {
 				t.Fatal(err)
 			}
 			sr := strings.NewReader(string(rJSON))
-			req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/iam/v1/user/%s/phone", ts.URL, test.id), sr)
+			req, err := http.NewRequest(
+				"PUT",
+				fmt.Sprintf("%s/api/iam/v1/user/%s/phone", ts.URL, test.id),
+				sr,
+			)
 			if err != nil {
 				t.Fatal(err)
 			}
