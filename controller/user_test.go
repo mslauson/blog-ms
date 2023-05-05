@@ -92,6 +92,7 @@ func TestUserController_CreateUser(t *testing.T) {
 		{
 			name: "happy",
 			request: &siogeneric.AwCreateUserRequest{
+				UserID:   "abc",
 				Phone:    "2121212131",
 				Email:    "t@t.com",
 				Name:     "b",
@@ -100,8 +101,19 @@ func TestUserController_CreateUser(t *testing.T) {
 			result: mAwUserPtr,
 		},
 		{
+			name: "Bad Request - No UserID",
+			request: &siogeneric.AwCreateUserRequest{
+				Phone:    "2121212131",
+				Email:    "t@t.com",
+				Name:     "b",
+				Password: "MattTesting&*^1",
+			},
+			result: nil,
+		},
+		{
 			name: "Bad Request - No Email",
 			request: &siogeneric.AwCreateUserRequest{
+				UserID:   "abc",
 				Phone:    "2121212131",
 				Email:    "",
 				Name:     "b",
@@ -112,6 +124,7 @@ func TestUserController_CreateUser(t *testing.T) {
 		{
 			name: "Bad Request - bad Email",
 			request: &siogeneric.AwCreateUserRequest{
+				UserID:   "abc",
 				Phone:    "2121212131",
 				Email:    "a(",
 				Name:     "b",
@@ -122,6 +135,7 @@ func TestUserController_CreateUser(t *testing.T) {
 		{
 			name: "Bad Request - bad too long",
 			request: &siogeneric.AwCreateUserRequest{
+				UserID:   "abc",
 				Phone:    "2121212131",
 				Email:    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@.com",
 				Name:     "b",
@@ -132,6 +146,7 @@ func TestUserController_CreateUser(t *testing.T) {
 		{
 			name: "No Password",
 			request: &siogeneric.AwCreateUserRequest{
+				UserID:   "abc",
 				Phone:    "2121212131",
 				Email:    "t@t.com",
 				Name:     "b",
@@ -142,6 +157,7 @@ func TestUserController_CreateUser(t *testing.T) {
 		{
 			name: "Bad Password Missing Number",
 			request: &siogeneric.AwCreateUserRequest{
+				UserID:   "abc",
 				Phone:    "2121212131",
 				Email:    "t@t.com",
 				Name:     "b",
@@ -152,6 +168,7 @@ func TestUserController_CreateUser(t *testing.T) {
 		{
 			name: "Bad Password Missing Upper",
 			request: &siogeneric.AwCreateUserRequest{
+				UserID:   "abc",
 				Phone:    "2121212131",
 				Email:    "t@t.com",
 				Name:     "b",
@@ -162,6 +179,7 @@ func TestUserController_CreateUser(t *testing.T) {
 		{
 			name: "Bad Password Missing Special",
 			request: &siogeneric.AwCreateUserRequest{
+				UserID:   "abc",
 				Phone:    "2121212131",
 				Email:    "t@t.com",
 				Name:     "b",
@@ -172,6 +190,7 @@ func TestUserController_CreateUser(t *testing.T) {
 		{
 			name: "Short Password",
 			request: &siogeneric.AwCreateUserRequest{
+				UserID:   "abc",
 				Phone:    "2121212131",
 				Email:    "t@t.com",
 				Name:     "b",
@@ -182,6 +201,7 @@ func TestUserController_CreateUser(t *testing.T) {
 		{
 			name: "No Name",
 			request: &siogeneric.AwCreateUserRequest{
+				UserID:   "abc",
 				Phone:    "2121212131",
 				Email:    "t@t.com",
 				Name:     "",
@@ -192,6 +212,7 @@ func TestUserController_CreateUser(t *testing.T) {
 		{
 			name: "long Name",
 			request: &siogeneric.AwCreateUserRequest{
+				UserID:   "abc",
 				Phone:    "2121212131",
 				Email:    "t@t.com",
 				Name:     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -202,6 +223,7 @@ func TestUserController_CreateUser(t *testing.T) {
 		{
 			name: "No Phone",
 			request: &siogeneric.AwCreateUserRequest{
+				UserID:   "abc",
 				Phone:    "",
 				Email:    "t@t.com",
 				Name:     "b",
@@ -212,6 +234,7 @@ func TestUserController_CreateUser(t *testing.T) {
 		{
 			name: "Bad Phone short",
 			request: &siogeneric.AwCreateUserRequest{
+				UserID:   "abc",
 				Phone:    "131",
 				Email:    "t@t.com",
 				Name:     "b",
@@ -222,6 +245,7 @@ func TestUserController_CreateUser(t *testing.T) {
 		{
 			name: "Bad Phone long",
 			request: &siogeneric.AwCreateUserRequest{
+				UserID:   "abc",
 				Phone:    "212121123123122131",
 				Email:    "t@t.com",
 				Name:     "b",
@@ -266,6 +290,7 @@ func TestUserController_CreateUser(t *testing.T) {
 
 func TestUserController_CreateUserServiceFailure(t *testing.T) {
 	request := &siogeneric.AwCreateUserRequest{
+		UserID:   "abc",
 		Phone:    "2121212131",
 		Email:    "t@t.com",
 		Name:     "b",

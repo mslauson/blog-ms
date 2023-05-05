@@ -54,10 +54,12 @@ func TestUserService_ListUsers(t *testing.T) {
 func TestUserService_ListUsers_Error(t *testing.T) {
 	us, awClient := initUserServiceTest(t)
 
-	awClient.On("ListUsers").Return(nil, tError)
+	te := sioerror.NewSioNotFoundError(constants.NoUserFound)
+
+	awClient.On("ListUsers").Return(nil, te)
 	actual, err := us.ListUsers()
 	assert.Nilf(t, actual, "expected nil, actual: %v", actual)
-	assert.Equalf(t, err.Error(), sioerror.NewSioNotFoundError(constants.NoCustomersFound).Error(), "actual error: %v", err.Error())
+	assert.Equalf(t, err.Error(), te.Error(), "actual error: %v", err.Error())
 }
 
 func TestUserService_GetUserByID(t *testing.T) {
@@ -75,7 +77,7 @@ func TestUserService_GetUserByID_Error(t *testing.T) {
 	awClient.On("GetUserByID", "a").Return(nil, tError)
 	actual, err := us.GetUserByID("a")
 	assert.Nilf(t, actual, "expected nil, actual: %v", actual)
-	assert.Equal(t, err.Error(), sioerror.NewSioNotFoundError(constants.NoCustomerFound).Error())
+	assert.Equal(t, err.Error(), sioerror.NewSioNotFoundError(constants.NoUserFound).Error())
 }
 
 func TestUserService_CreateUser(t *testing.T) {

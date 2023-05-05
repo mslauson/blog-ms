@@ -90,8 +90,8 @@ func TestSessionService_CreateUser_Error(t *testing.T) {
 func TestSessionService_DeleteSession(t *testing.T) {
 	ss, awClient := initSessionServiceTest(t)
 
-	awClient.On("DeleteSession", "a").Return(nil)
-	actual, err := ss.DeleteSession("a")
+	awClient.On("DeleteSession", "a", "a").Return(nil)
+	actual, err := ss.DeleteSession("a", "a")
 	assert.Truef(t, actual.Success, "actual.Success: %v", actual.Success)
 	assert.Emptyf(t, err, "err: %v", err)
 }
@@ -99,8 +99,8 @@ func TestSessionService_DeleteSession(t *testing.T) {
 func TestSessionService_DeleteSession_Error(t *testing.T) {
 	ss, awClient := initSessionServiceTest(t)
 
-	awClient.On("DeleteSession", "a").Return(siotest.TError)
-	actual, err := ss.DeleteSession("a")
+	awClient.On("DeleteSession", "a", "a").Return(siotest.TError)
+	actual, err := ss.DeleteSession("a", "a")
 	assert.False(t, actual.Success)
-	assert.Equalf(t, err.Error(), sioerror.NewSioNotFoundError(constants.NoCustomerFound).Error(), "error: %v", err.Error())
+	assert.Equalf(t, err.Error(), sioerror.NewSioNotFoundError(constants.NoUserFound).Error(), "error: %v", err.Error())
 }

@@ -150,8 +150,8 @@ func TestDeleteSession(t *testing.T) {
 		Header: make(http.Header),
 	}
 
-	c.Params = gin.Params{gin.Param{Key: "sessionId", Value: "a"}}
-	ms.On("DeleteSession", "a").Return(siogeneric.SuccessResponse{Success: true}, nil)
+	c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}, gin.Param{Key: "sessionId", Value: "a"}}
+	ms.On("DeleteSession", "a", "a").Return(siogeneric.SuccessResponse{Success: true}, nil)
 	uc.DeleteSession(c)
 
 	assert.Truef(t, c.Errors == nil, "c.Errors should be nil")
@@ -169,8 +169,8 @@ func TestDeleteSessionError(t *testing.T) {
 		Header: make(http.Header),
 	}
 
-	c.Params = gin.Params{gin.Param{Key: "sessionId", Value: "a"}}
-	ms.On("DeleteSession", "a").Return(siogeneric.SuccessResponse{Success: false}, errors.New("asdf"))
+	c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}, gin.Param{Key: "sessionId", Value: "a"}}
+	ms.On("DeleteSession", "a", "a").Return(siogeneric.SuccessResponse{Success: false}, errors.New("asdf"))
 	uc.DeleteSession(c)
 
 	assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil")
