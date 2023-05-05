@@ -1994,7 +1994,6 @@ linters:
     - goprintffuncname
     - gosec
     - gosimple
-    - gosmopolitan
     - govet
     - grouper
     - ifshort
@@ -2032,7 +2031,6 @@ linters:
     - staticcheck
     - structcheck
     - stylecheck
-    - tagalign
     - tagliatelle
     - tenv
     - testableexamples
@@ -2050,7 +2048,6 @@ linters:
     - whitespace
     - wrapcheck
     - wsl
-    - zerologlint
 
   # Enable all available linters.
   # Default: false
