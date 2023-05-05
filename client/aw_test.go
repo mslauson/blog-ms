@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
 
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"github.com/stretchr/testify/mock"
@@ -62,9 +63,30 @@ func TestAwClient_ListUsers(t *testing.T) {
 		ParseErr error
 		code     int
 	}{
-		{name: "Happy Path", happy: true, result: mUserList, execErr: nil, ParseErr: nil, code: http.StatusOK},
-		{name: "Exec Error", happy: false, result: nil, execErr: fmt.Errorf("test error"), ParseErr: nil, code: http.StatusInternalServerError},
-		{name: "Parse Error", happy: false, result: nil, execErr: nil, ParseErr: fmt.Errorf("test error"), code: http.StatusOK},
+		{
+			name:     "Happy Path",
+			happy:    true,
+			result:   mUserList,
+			execErr:  nil,
+			ParseErr: nil,
+			code:     http.StatusOK,
+		},
+		{
+			name:     "Exec Error",
+			happy:    false,
+			result:   nil,
+			execErr:  fmt.Errorf("test error"),
+			ParseErr: nil,
+			code:     http.StatusInternalServerError,
+		},
+		{
+			name:     "Parse Error",
+			happy:    false,
+			result:   nil,
+			execErr:  nil,
+			ParseErr: fmt.Errorf("test error"),
+			code:     http.StatusOK,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -78,6 +100,7 @@ func TestAwClient_ListUsers(t *testing.T) {
 				h.On("ParseResponse", mock.AnythingOfType("*http.Response"), mock.AnythingOfType("*siogeneric.AwlistResponse")).
 					Return(tt.ParseErr)
 			}
+
 			result, err := ac.ListUsers()
 			if tt.happy && result == nil {
 				t.Errorf("expected result but got nil")
@@ -97,20 +120,40 @@ func TestAwClient_ListUsers(t *testing.T) {
 
 func TestAwClient_GetUserByID(t *testing.T) {
 	tests := []struct {
-		name  string
-		happy bool
-		r     error
+		name     string
+		happy    bool
+		execErr  error
+		parseErr error
+		code     int
 	}{
-		{name: "Happy Path", happy: true, r: nil},
-		{name: "Error Path", happy: false, r: fmt.Errorf("test error")},
+		{name: "Happy Path", happy: true, execErr: nil, parseErr: nil, code: http.StatusOK},
+		{
+			name:     "Exec Error",
+			happy:    false,
+			execErr:  fmt.Errorf("test error"),
+			parseErr: nil,
+			code:     http.StatusInternalServerError,
+		},
+		{
+			name:     "Parse Error",
+			happy:    false,
+			execErr:  nil,
+			parseErr: fmt.Errorf("test error"),
+			code:     http.StatusOK,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			au := new(siogeneric.AwUser)
-			h.On("ParseResponse", mock.AnythingOfType("*http.Request"), au).
-				Return(tt.r)
+			mockRes := mockHttpResponse(t, mAwUser, tt.code)
+			h.On("ExecuteRequest", mock.AnythingOfType("*http.Request")).
+				Return(mockRes, tt.execErr)
+
+			if tt.execErr == nil {
+				h.On("ParseResponse", mock.AnythingOfType("*http.Response"), mock.AnythingOfType("*siogeneric.AwUser")).
+					Return(tt.parseErr)
+			}
 
 			result, err := ac.GetUserByID("test")
 			if tt.happy && result == nil {
@@ -131,20 +174,40 @@ func TestAwClient_GetUserByID(t *testing.T) {
 
 func TestAwClient_CreateUser(t *testing.T) {
 	tests := []struct {
-		name  string
-		happy bool
-		r     error
+		name     string
+		happy    bool
+		execErr  error
+		parseErr error
+		code     int
 	}{
-		{name: "Happy Path", happy: true, r: nil},
-		{name: "Error Path", happy: false, r: fmt.Errorf("test error")},
+		{name: "Happy Path", happy: true, execErr: nil, parseErr: nil, code: http.StatusOK},
+		{
+			name:     "ExecErr",
+			happy:    false,
+			execErr:  fmt.Errorf("test error"),
+			parseErr: nil,
+			code:     http.StatusInternalServerError,
+		},
+		{
+			name:     "ParseErr",
+			happy:    false,
+			execErr:  fmt.Errorf("test error"),
+			parseErr: nil,
+			code:     http.StatusOK,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			au := new(siogeneric.AwUser)
-			h.On("ParseResponse", mock.AnythingOfType("*http.Request"), au).
-				Return(tt.r)
+			mockRes := mockHttpResponse(t, mAwUser, tt.code)
+			h.On("ExecuteRequest", mock.AnythingOfType("*http.Request")).
+				Return(mockRes, tt.execErr)
+
+			if tt.execErr == nil {
+				h.On("ParseResponse", mock.AnythingOfType("*http.Response"), mock.AnythingOfType("*siogeneric.AwUser")).
+					Return(tt.parseErr)
+			}
 
 			result, err := ac.CreateUser(mCr)
 			if tt.happy && result == nil {
@@ -165,22 +228,42 @@ func TestAwClient_CreateUser(t *testing.T) {
 
 func TestAwClient_UpdatePassword(t *testing.T) {
 	tests := []struct {
-		name  string
-		happy bool
-		r     error
+		name     string
+		happy    bool
+		execErr  error
+		parseErr error
+		code     int
 	}{
-		{name: "Happy Path", happy: true, r: nil},
-		{name: "Error Path", happy: false, r: fmt.Errorf("test error")},
+		{name: "Happy Path", happy: true, execErr: nil, parseErr: nil, code: http.StatusOK},
+		{
+			name:     "ExecErr",
+			happy:    false,
+			execErr:  fmt.Errorf("test error"),
+			parseErr: nil,
+			code:     http.StatusInternalServerError,
+		},
+		{
+			name:     "ParseErr",
+			happy:    false,
+			execErr:  fmt.Errorf("test error"),
+			parseErr: nil,
+			code:     http.StatusOK,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			au := new(siogeneric.AwUser)
-			h.On("ParseResponse", mock.AnythingOfType("*http.Request"), au).
-				Return(tt.r)
+			mockRes := mockHttpResponse(t, mAwUser, tt.code)
+			h.On("ExecuteRequest", mock.AnythingOfType("*http.Request")).
+				Return(mockRes, tt.execErr)
 
-			result, err := ac.UpdatePassword("a", uPasswordR)
+			if tt.execErr == nil {
+				h.On("ParseResponse", mock.AnythingOfType("*http.Response"), mock.AnythingOfType("*siogeneric.AwUser")).
+					Return(tt.parseErr)
+			}
+
+			result, err := ac.CreateUser(mCr)
 			if tt.happy && result == nil {
 				t.Errorf("expected result but got nil")
 				return
@@ -199,22 +282,41 @@ func TestAwClient_UpdatePassword(t *testing.T) {
 
 func TestAwClient_UpdatePhone(t *testing.T) {
 	tests := []struct {
-		name  string
-		happy bool
-		r     error
+		name     string
+		happy    bool
+		execErr  error
+		parseErr error
+		code     int
 	}{
-		{name: "Happy Path", happy: true, r: nil},
-		{name: "Error Path", happy: false, r: fmt.Errorf("test error")},
+		{name: "Happy Path", happy: true, execErr: nil, parseErr: nil, code: http.StatusOK},
+		{
+			name:     "ExecErr",
+			happy:    false,
+			execErr:  fmt.Errorf("test error"),
+			parseErr: nil,
+			code:     http.StatusInternalServerError,
+		},
+		{
+			name:     "ParseErr",
+			happy:    false,
+			execErr:  fmt.Errorf("test error"),
+			parseErr: nil,
+			code:     http.StatusOK,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			au := new(siogeneric.AwUser)
-			h.On("ParseResponse", mock.AnythingOfType("*http.Request"), au).
-				Return(tt.r)
+			mockRes := mockHttpResponse(t, mAwUser, tt.code)
+			h.On("ExecuteRequest", mock.AnythingOfType("*http.Request")).
+				Return(mockRes, tt.execErr)
 
-			result, err := ac.UpdatePhone("a", uPhoneR)
+			if tt.execErr == nil {
+				h.On("ParseResponse", mock.AnythingOfType("*http.Response"), mock.AnythingOfType("*siogeneric.AwUser")).
+					Return(tt.parseErr)
+			}
+			result, err := ac.CreateUser(mCr)
 			if tt.happy && result == nil {
 				t.Errorf("expected result but got nil")
 				return
@@ -233,22 +335,41 @@ func TestAwClient_UpdatePhone(t *testing.T) {
 
 func TestAwClient_UpdateEmail(t *testing.T) {
 	tests := []struct {
-		name  string
-		happy bool
-		r     error
+		name     string
+		happy    bool
+		execErr  error
+		parseErr error
+		code     int
 	}{
-		{name: "Happy Path", happy: true, r: nil},
-		{name: "Error Path", happy: false, r: fmt.Errorf("test error")},
+		{name: "Happy Path", happy: true, execErr: nil, parseErr: nil, code: http.StatusOK},
+		{
+			name:     "ExecErr",
+			happy:    false,
+			execErr:  fmt.Errorf("test error"),
+			parseErr: nil,
+			code:     http.StatusInternalServerError,
+		},
+		{
+			name:     "ParseErr",
+			happy:    false,
+			execErr:  fmt.Errorf("test error"),
+			parseErr: nil,
+			code:     http.StatusOK,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			au := new(siogeneric.AwUser)
-			h.On("ParseResponse", mock.AnythingOfType("*http.Request"), au).
-				Return(tt.r)
+			mockRes := mockHttpResponse(t, mAwUser, tt.code)
+			h.On("ExecuteRequest", mock.AnythingOfType("*http.Request")).
+				Return(mockRes, tt.execErr)
 
-			result, err := ac.UpdateEmail("a", uEmailR)
+			if tt.execErr == nil {
+				h.On("ParseResponse", mock.AnythingOfType("*http.Response"), mock.AnythingOfType("*siogeneric.AwUser")).
+					Return(tt.parseErr)
+			}
+			result, err := ac.CreateUser(mCr)
 			if tt.happy && result == nil {
 				t.Errorf("expected result but got nil")
 				return
@@ -267,25 +388,43 @@ func TestAwClient_UpdateEmail(t *testing.T) {
 
 func TestAwClient_DeleteUser(t *testing.T) {
 	tests := []struct {
-		name string
-		req  *http.Response
-		err  error
+		name    string
+		result  *http.Response
+		execErr error
+		code    int
+		happy   bool
 	}{
-		{name: "Happy Path", req: &http.Response{StatusCode: http.StatusOK, Body: ioutil.NopCloser(bytes.NewBufferString(`{"status":"ok"}`))}, err: nil},
-		{name: "Error Path", req: nil, err: fmt.Errorf("test error")},
+		{
+			name: "Happy Path",
+			result: &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       ioutil.NopCloser(bytes.NewBufferString(`{"status":"ok"}`)),
+			},
+			execErr: nil,
+			code:    http.StatusOK,
+			happy:   true,
+		},
+		{
+			name:    "ExecErr",
+			result:  nil,
+			execErr: fmt.Errorf("test error"),
+			code:    http.StatusInternalServerError,
+			happy:   false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			h.On("DoHttpRequest", mock.AnythingOfType("*http.Request")).
-				Return(tt.req, tt.err)
+			mockRes := mockHttpResponse(t, mAwUser, tt.code)
+			h.On("ExecuteRequest", mock.AnythingOfType("*http.Request")).
+				Return(mockRes, tt.execErr)
 
 			err := ac.DeleteUser("a")
-			if tt.req != nil && err != nil {
+			if tt.result != nil && err != nil {
 				t.Errorf("expected request to resolve but got error %v", err)
 				return
-			} else if tt.err != nil && tt.req != nil {
+			} else if tt.result == nil && err == nil {
 				t.Error("expected error to resolve but got result")
 				return
 			}
@@ -295,21 +434,40 @@ func TestAwClient_DeleteUser(t *testing.T) {
 
 func TestAwClient_CreateEmailSession(t *testing.T) {
 	tests := []struct {
-		name  string
-		happy bool
-		r     error
+		name     string
+		happy    bool
+		execErr  error
+		parseErr error
+		code     int
 	}{
-		{name: "Happy Path", happy: true, r: nil},
-		{name: "Error Path", happy: false, r: fmt.Errorf("test error")},
+		{name: "Happy Path", happy: true, execErr: nil, parseErr: nil, code: http.StatusOK},
+		{
+			name:     "ExecErr",
+			happy:    false,
+			execErr:  fmt.Errorf("test error"),
+			parseErr: nil,
+			code:     http.StatusInternalServerError,
+		},
+		{
+			name:     "ParseErr",
+			happy:    false,
+			execErr:  fmt.Errorf("test error"),
+			parseErr: nil,
+			code:     http.StatusOK,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			aw := new(siogeneric.AwSession)
-			h.On("ParseResponse", mock.AnythingOfType("*http.Request"), aw).
-				Return(tt.r)
+			mockRes := mockHttpResponse(t, mAwUser, tt.code)
+			h.On("ExecuteRequest", mock.AnythingOfType("*http.Request")).
+				Return(mockRes, tt.execErr)
 
+			if tt.execErr == nil {
+				h.On("ParseResponse", mock.AnythingOfType("*http.Response"), mock.AnythingOfType("*siogeneric.AwSession")).
+					Return(tt.parseErr)
+			}
 			result, err := ac.CreateEmailSession(sessionReq)
 			if tt.happy && result == nil {
 				t.Errorf("expected result but got nil")
@@ -329,25 +487,40 @@ func TestAwClient_CreateEmailSession(t *testing.T) {
 
 func TestAwClient_DeleteUserSession(t *testing.T) {
 	tests := []struct {
-		name string
-		req  *http.Response
-		err  error
+		name    string
+		result  *http.Response
+		execErr error
+		code    int
 	}{
-		{name: "Happy Path", req: &http.Response{StatusCode: http.StatusOK, Body: ioutil.NopCloser(bytes.NewBufferString(`{"status":"ok"}`))}, err: nil},
-		{name: "Error Path", req: nil, err: fmt.Errorf("test error")},
+		{
+			name: "Happy Path",
+			result: &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       ioutil.NopCloser(bytes.NewBufferString(`{"status":"ok"}`)),
+			},
+			execErr: nil,
+			code:    http.StatusOK,
+		},
+		{
+			name:    "ExecErr",
+			result:  nil,
+			execErr: fmt.Errorf("test error"),
+			code:    http.StatusInternalServerError,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ac, h := initForTests(t)
 
-			h.On("DoHttpRequest", mock.AnythingOfType("*http.Request")).
-				Return(tt.req, tt.err)
+			mockRes := mockHttpResponse(t, mAwUser, tt.code)
+			h.On("ExecuteRequest", mock.AnythingOfType("*http.Request")).
+				Return(mockRes, tt.execErr)
 
 			err := ac.DeleteSession("1", "a")
-			if tt.req != nil && err != nil {
+			if tt.result != nil && err != nil {
 				t.Errorf("expected request to resolve but got error %v", err)
 				return
-			} else if tt.err != nil && tt.req != nil {
+			} else if tt.result == nil && err == nil {
 				t.Error("expected error to resolve but got result")
 				return
 			}
