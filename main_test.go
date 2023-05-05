@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"testing"
@@ -77,6 +78,67 @@ func TestCreateUser_HappyScenarios(t *testing.T) {
 			assert.Equal(t, awUser.Name, result.Name)
 
 			createdUsers = append(createdUsers, result)
+		})
+	}
+}
+
+func TestDeleteUser(t *testing.T) {
+	ts, token := siotest.RunTestServer(t, CreateRouter())
+	defer ts.Close()
+
+	for _, user := range createdUsers {
+		t.Run(fmt.Sprintf("Delete user.  ID: %s", user.ID), func(t *testing.T) {
+			req, err := http.NewRequest(
+				"DELETE",
+				fmt.Sprintf("%s%s%s", ts.URL, "/api/iam/v1/user/", user.ID),
+				nil,
+			)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer resp.Body.Close()
+
+			result := &siogeneric.SuccessResponse{}
+			siotest.ParseHappyResponse(t, resp, result)
+
+			assert.Truef(t, result.Success, "expected success to be true, got false")
+		})
+	}
+}
+
+func TestDeleteUser_NotFound(t *testing.T) {
+	ts, token := siotest.RunTestServer(t, CreateRouter())
+	defer ts.Close()
+
+	for _, user := range createdUsers {
+		t.Run(fmt.Sprintf("Delete user.  ID: %s", user.ID), func(t *testing.T) {
+			req, err := http.NewRequest(
+				"DELETE",
+				fmt.Sprintf("%s%s%s", ts.URL, "/api/iam/v1/user/", user.ID),
+				nil,
+			)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer resp.Body.Close()
+
+			siotest.ParseCheckIfCorrectError(t, resp, "user not found", http.StatusNotFound)
 		})
 	}
 }

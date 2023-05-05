@@ -10,6 +10,7 @@ import (
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
+	"github.com/sirupsen/logrus"
 )
 
 type AwClient struct {
@@ -219,14 +220,15 @@ func (c *AwClient) executeAndParseResponse(
 		return err
 	}
 
-	if res.StatusCode != http.StatusOK {
+	if !(res.StatusCode >= 200 && res.StatusCode <= 300) {
 		errRes := new(siogeneric.AppwriteError)
 		if err := sioUtils.ParseResponse(res, errRes); err != nil {
 			return err
 		}
+		logrus.Error(errRes)
 		return sioerror.NewSioIamError(errRes)
 	} else {
-		if err := c.h.DoHttpRequestAndParse(req, response); err != nil {
+		if err := sioUtils.ParseResponse(res, response); err != nil {
 			return err
 		}
 	}
