@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"gitea.slauson.io/slausonio/go-utils/siomw"
 	"gitea.slauson.io/slausonio/iam-ms/controller"
@@ -44,5 +46,6 @@ func CreateRouter() *gin.Engine {
 		}
 	}
 
+	r.GET("/api/iam/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return r
 }
