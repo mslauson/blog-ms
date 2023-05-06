@@ -6,6 +6,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	_ "gitea.slauson.io/slausonio/go-types/siogeneric"
+	_ "gitea.slauson.io/slausonio/iam-ms/docs"
 	"gitea.slauson.io/slausonio/sio-loki/hooks"
 )
 
@@ -24,6 +26,12 @@ func init() {
 	log.AddHook(lh)
 }
 
+// @title IAM Microservice
+// @description This MS handles all IAM related requests with the IAM provider
+// @version 1.0
+
+// @contact.name Matthew Slauson
+// @contact.email matthew@slauson.io
 func main() {
 	r := CreateRouter()
 
