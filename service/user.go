@@ -3,7 +3,6 @@ package service
 import (
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
-
 	"gitea.slauson.io/slausonio/iam-ms/client"
 	"gitea.slauson.io/slausonio/iam-ms/constants"
 )
@@ -35,7 +34,7 @@ func NewUserService() *UserService {
 func (s *UserService) ListUsers() (*siogeneric.AwlistResponse, error) {
 	response, err := s.awClient.ListUsers()
 	if err != nil {
-		return nil, sioerror.NewSioNotFoundError(constants.NoCustomersFound)
+		return nil, err
 	}
 
 	return response, nil
@@ -44,7 +43,7 @@ func (s *UserService) ListUsers() (*siogeneric.AwlistResponse, error) {
 func (s *UserService) GetUserByID(id string) (*siogeneric.AwUser, error) {
 	response, err := s.awClient.GetUserByID(id)
 	if err != nil {
-		return nil, sioerror.NewSioNotFoundError(constants.NoCustomerFound)
+		return nil, sioerror.NewSioNotFoundError(constants.NoUserFound)
 	}
 
 	return response, nil
@@ -67,7 +66,7 @@ func (s *UserService) UpdateEmail(
 ) (*siogeneric.AwUser, error) {
 	response, err := s.awClient.UpdateEmail(id, r)
 	if err != nil {
-		return nil, sioerror.NewSioBadRequestError(err.Error())
+		return nil, err
 	}
 	return response, nil
 }
@@ -76,9 +75,10 @@ func (s *UserService) UpdatePhone(
 	id string,
 	r *siogeneric.UpdatePhoneRequest,
 ) (*siogeneric.AwUser, error) {
+	r.Number = "+1" + r.Number
 	response, err := s.awClient.UpdatePhone(id, r)
 	if err != nil {
-		return nil, sioerror.NewSioBadRequestError(err.Error())
+		return nil, err
 	}
 	return response, nil
 }
@@ -89,7 +89,7 @@ func (s *UserService) UpdatePassword(
 ) (*siogeneric.AwUser, error) {
 	response, err := s.awClient.UpdatePassword(id, r)
 	if err != nil {
-		return nil, sioerror.NewSioBadRequestError(err.Error())
+		return nil, err
 	}
 	return response, nil
 }
@@ -97,7 +97,7 @@ func (s *UserService) UpdatePassword(
 func (s *UserService) DeleteUser(id string) (siogeneric.SuccessResponse, error) {
 	err := s.awClient.DeleteUser(id)
 	if err != nil {
-		return siogeneric.SuccessResponse{Success: false}, sioerror.NewSioNotFoundError(err.Error())
+		return siogeneric.SuccessResponse{Success: false}, err
 	}
 
 	return siogeneric.SuccessResponse{Success: true}, nil

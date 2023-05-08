@@ -2,16 +2,19 @@ package controller
 
 import (
 	"errors"
-	"gitea.slauson.io/slausonio/go-types/siogeneric"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"gitea.slauson.io/slausonio/go-utils/sioUtils"
-	"gitea.slauson.io/slausonio/iam-ms/service/mocks"
+	"github.com/stretchr/testify/assert"
+
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
+
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
+
+	"gitea.slauson.io/slausonio/go-utils/sioUtils"
+	"gitea.slauson.io/slausonio/iam-ms/service/mocks"
 )
 
 var mUserSession = &siogeneric.AwSession{
@@ -42,7 +45,9 @@ var mUserSession = &siogeneric.AwSession{
 	UserId:                    "blah",
 }
 
-func initControllerForSessionTests(t *testing.T) (*SessionController, *mocks.IamSessionService, *sioUtils.EncryptionUtil) {
+func initControllerForSessionTests(
+	t *testing.T,
+) (*SessionController, *mocks.IamSessionService, *sioUtils.EncryptionUtil) {
 	ss := mocks.NewIamSessionService(t)
 	eu := sioUtils.NewEncryptionUtil()
 	sc := &SessionController{
@@ -52,34 +57,36 @@ func initControllerForSessionTests(t *testing.T) (*SessionController, *mocks.Iam
 	return sc, ss, eu
 }
 
-// func TestNewSessionController(t *testing.T) {
-// 	c, ms, eu := initControllerForSession
-// 	tests := []struct {
-// 		name string
-// 		want *SessionController
-// 	}{
-// 		{name}
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			if got := NewSessionController(); !reflect.DeepEqual(got, tt.want) {
-// 				t.Errorf("NewSessionController() = %v, want %v", got, tt.want)
-// 			}
-// 		})
-// 	}
-// }
+func TestNewSessionController(t *testing.T) {
+	sc := NewSessionController()
+	assert.NotNil(t, sc)
+}
 
 func TestSessionController_CreateEmailSession(t *testing.T) {
-
 	tests := []struct {
 		name    string
 		request *siogeneric.AwEmailSessionRequest
 		want    *siogeneric.AwSession
 		status  int
 	}{
-		{name: "valid", request: &siogeneric.AwEmailSessionRequest{Email: "test@test.com", Password: "asdf"}, want: mUserSession, status: http.StatusOK},
-		{name: "Missing Email", request: &siogeneric.AwEmailSessionRequest{Email: "", Password: "asdf"}, want: nil, status: http.StatusBadRequest},
-		{name: "Missing Pass", request: &siogeneric.AwEmailSessionRequest{Email: "test@test.com", Password: ""}, want: nil, status: http.StatusBadRequest},
+		{
+			name:    "valid",
+			request: &siogeneric.AwEmailSessionRequest{Email: "test@test.com", Password: "asdf"},
+			want:    mUserSession,
+			status:  http.StatusOK,
+		},
+		{
+			name:    "Missing Email",
+			request: &siogeneric.AwEmailSessionRequest{Email: "", Password: "asdf"},
+			want:    nil,
+			status:  http.StatusBadRequest,
+		},
+		{
+			name:    "Missing Pass",
+			request: &siogeneric.AwEmailSessionRequest{Email: "test@test.com", Password: ""},
+			want:    nil,
+			status:  http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -101,7 +108,8 @@ func TestSessionController_CreateEmailSession(t *testing.T) {
 
 			MockJson(c, tt.request, "POST")
 			if tt.want != nil {
-				ss.On("CreateEmailSession", mock.AnythingOfType("*siogeneric.AwEmailSessionRequest")).Return(tt.want, nil)
+				ss.On("CreateEmailSession", mock.AnythingOfType("*siogeneric.AwEmailSessionRequest")).
+					Return(tt.want, nil)
 			}
 			sc.CreateEmailSession(c)
 			if tt.want != nil {
@@ -132,14 +140,14 @@ func TestUserController_CreateEmailSessionServiceFailure(t *testing.T) {
 	}
 
 	MockJson(c, request, "POST")
-	ss.On("CreateEmailSession", mock.AnythingOfType("*siogeneric.AwEmailSessionRequest")).Return(nil, errors.New("error"))
+	ss.On("CreateEmailSession", mock.AnythingOfType("*siogeneric.AwEmailSessionRequest")).
+		Return(nil, errors.New("error"))
 	sc.CreateEmailSession(c)
 
 	assert.Truef(t, c.Errors != nil, "c.Errors shouldn't be nil")
-
 }
-func TestDeleteSession(t *testing.T) {
 
+func TestDeleteSession(t *testing.T) {
 	uc, ms, _ := initControllerForSessionTests(t)
 
 	var (
@@ -150,15 +158,14 @@ func TestDeleteSession(t *testing.T) {
 		Header: make(http.Header),
 	}
 
-	c.Params = gin.Params{gin.Param{Key: "sessionId", Value: "a"}}
-	ms.On("DeleteSession", "a").Return(siogeneric.SuccessResponse{Success: true}, nil)
+	c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}, gin.Param{Key: "sessionId", Value: "a"}}
+	ms.On("DeleteSession", "a", "a").Return(siogeneric.SuccessResponse{Success: true}, nil)
 	uc.DeleteSession(c)
 
 	assert.Truef(t, c.Errors == nil, "c.Errors should be nil")
 }
 
 func TestDeleteSessionError(t *testing.T) {
-
 	uc, ms, _ := initControllerForSessionTests(t)
 
 	var (
@@ -169,8 +176,9 @@ func TestDeleteSessionError(t *testing.T) {
 		Header: make(http.Header),
 	}
 
-	c.Params = gin.Params{gin.Param{Key: "sessionId", Value: "a"}}
-	ms.On("DeleteSession", "a").Return(siogeneric.SuccessResponse{Success: false}, errors.New("asdf"))
+	c.Params = gin.Params{gin.Param{Key: "id", Value: "a"}, gin.Param{Key: "sessionId", Value: "a"}}
+	ms.On("DeleteSession", "a", "a").
+		Return(siogeneric.SuccessResponse{Success: false}, errors.New("asdf"))
 	uc.DeleteSession(c)
 
 	assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil")

@@ -1,0 +1,514 @@
+definitions:
+  siogeneric.AwCreateUserRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      userId:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - phone
+    - userId
+    type: object
+  siogeneric.AwEmailSessionRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  siogeneric.AwSession:
+    properties:
+      $createdAt:
+        type: string
+      $id:
+        type: string
+      clientCode:
+        type: string
+      clientEngine:
+        type: string
+      clientEngineVersion:
+        type: string
+      clientName:
+        type: string
+      clientType:
+        type: string
+      clientVersion:
+        type: string
+      countryCode:
+        type: string
+      countryName:
+        type: string
+      current:
+        type: boolean
+      deviceBrand:
+        type: string
+      deviceModel:
+        type: string
+      deviceName:
+        type: string
+      expire:
+        type: string
+      ip:
+        type: string
+      osCode:
+        type: string
+      osName:
+        type: string
+      osVersion:
+        type: string
+      provider:
+        type: string
+      providerAccessToken:
+        type: string
+      providerAccessTokenExpiry:
+        type: string
+      providerRefreshToken:
+        type: string
+      providerUid:
+        type: string
+      userId:
+        type: string
+    type: object
+  siogeneric.AwUser:
+    properties:
+      $createdAt:
+        type: string
+      $id:
+        type: string
+      $updatedAt:
+        type: string
+      email:
+        type: string
+      emailVerification:
+        type: boolean
+      hash:
+        type: string
+      hashOptions:
+        $ref: '#/definitions/siogeneric.HashOptions'
+      name:
+        type: string
+      password:
+        type: string
+      passwordUpdate:
+        type: string
+      phone:
+        type: string
+      phoneVerification:
+        type: boolean
+      prefs:
+        additionalProperties: {}
+        type: object
+      registration:
+        type: string
+      status:
+        type: boolean
+    type: object
+  siogeneric.AwlistResponse:
+    properties:
+      total:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/siogeneric.AwUser'
+        type: array
+    type: object
+  siogeneric.ErrorResponse:
+    properties:
+      error:
+        type: string
+      method:
+        type: string
+      path:
+        type: string
+    type: object
+  siogeneric.HashOptions:
+    properties:
+      memoryCost:
+        type: integer
+      threads:
+        type: integer
+      timeCost:
+        type: integer
+    type: object
+  siogeneric.SuccessResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  siogeneric.UpdateEmailRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  siogeneric.UpdatePasswordRequest:
+    properties:
+      password:
+        type: string
+    required:
+    - password
+    type: object
+  siogeneric.UpdatePhoneRequest:
+    properties:
+      number:
+        type: string
+    required:
+    - number
+    type: object
+info:
+  contact:
+    email: matthew@slauson.io
+    name: Matthew Slauson
+  description: This MS handles all IAM related requests with the IAM provider
+  title: IAM Microservice
+  version: "1.0"
+paths:
+  /api/iam/v1/session:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Session Request
+        in: body
+        name: sessionRequest
+        required: true
+        schema:
+          $ref: '#/definitions/siogeneric.AwEmailSessionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/siogeneric.AwSession'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Create Email Session
+      tags:
+      - session
+  /api/iam/v1/session/:id/:sessionId:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/siogeneric.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Delete Session
+      tags:
+      - session
+  /api/iam/v1/user:
+    get:
+      consumes:
+      - application/json
+      description: List Users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/siogeneric.AwlistResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: List Users
+      tags:
+      - user
+    post:
+      consumes:
+      - application/json
+      description: Create User
+      parameters:
+      - description: Create User Request
+        in: body
+        name: createRequest
+        required: true
+        schema:
+          $ref: '#/definitions/siogeneric.AwCreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/siogeneric.AwUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Create User
+      tags:
+      - user
+  /api/iam/v1/user/:id:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/siogeneric.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Delete User
+      tags:
+      - user
+    get:
+      consumes:
+      - application/json
+      description: Get user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/siogeneric.AwUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Get user by ID
+      tags:
+      - user
+  /api/iam/v1/user/:id/email:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Update Email Request
+        in: body
+        name: updateRequest
+        required: true
+        schema:
+          $ref: '#/definitions/siogeneric.UpdateEmailRequest'
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/siogeneric.AwUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Update Email
+      tags:
+      - user
+  /api/iam/v1/user/:id/password:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Update Password Request
+        in: body
+        name: updateRequest
+        required: true
+        schema:
+          $ref: '#/definitions/siogeneric.UpdatePasswordRequest'
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/siogeneric.AwUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Update Password
+      tags:
+      - user
+  /api/iam/v1/user/:id/phone:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Update Phone Request
+        in: body
+        name: updateRequest
+        required: true
+        schema:
+          $ref: '#/definitions/siogeneric.UpdatePhoneRequest'
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/siogeneric.AwUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Update Phone
+      tags:
+      - user
+swagger: "2.0"

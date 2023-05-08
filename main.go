@@ -1,22 +1,22 @@
 package main
 
 import (
+	"net/http"
 	"os"
 
-	"gitea.slauson.io/slausonio/sio-loki/hooks"
 	log "github.com/sirupsen/logrus"
+
+	_ "gitea.slauson.io/slausonio/go-types/siogeneric"
+	_ "gitea.slauson.io/slausonio/iam-ms/docs"
+	"gitea.slauson.io/slausonio/sio-loki/hooks"
 )
 
-type logBatch struct {
-	entries      []*log.Entry
-	maxEntries   int
-	maxTimeLimit int
-	sendSchedule chan bool
-	labels       map[string]string
-}
-
 func init() {
-	lh := hooks.NewLokiHook(10, 5, map[string]string{"app": "iam-ms", "environment": os.Getenv("ENV")})
+	lh := hooks.NewLokiHook(
+		10,
+		5,
+		map[string]string{"app": "iam-ms", "environment": os.Getenv("ENV")},
+	)
 	log.SetFormatter(&log.JSONFormatter{})
 
 	log.SetOutput(os.Stdout)
@@ -26,6 +26,17 @@ func init() {
 	log.AddHook(lh)
 }
 
+// @title IAM Microservice
+// @description This MS handles all IAM related requests with the IAM provider
+// @version 1.0
+
+// @contact.name Matthew Slauson
+// @contact.email matthew@slauson.io
 func main() {
-	CreateRouter()
+	r := CreateRouter()
+
+	err := http.ListenAndServe(":8080", r)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
 }

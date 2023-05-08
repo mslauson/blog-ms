@@ -3,10 +3,10 @@ package controller
 import (
 	"net/http"
 
-	"gitea.slauson.io/slausonio/go-types/siogeneric"
-	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"github.com/gin-gonic/gin"
 
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
+	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"gitea.slauson.io/slausonio/iam-ms/service"
 )
 
@@ -26,6 +26,18 @@ func NewSessionController() *SessionController {
 	}
 }
 
+// @Summary Create Email Session
+// POST
+// @Tags session
+// @Accept  json
+// @Produce  json
+// @Param sessionRequest body siogeneric.AwEmailSessionRequest true "Session Request"
+// @Success 200 {object} siogeneric.AwSession
+// @Failure 400 {object} siogeneric.ErrorResponse
+// @Failure 401 {object} siogeneric.ErrorResponse
+// @Failure 404 {object} siogeneric.ErrorResponse
+// @Failure 500 {object} siogeneric.ErrorResponse
+// @Router /api/iam/v1/session [post]
 func (sc *SessionController) CreateEmailSession(c *gin.Context) {
 	request := new(siogeneric.AwEmailSessionRequest)
 	err := sioUtils.DecryptAndHandle(request, c)
@@ -39,17 +51,28 @@ func (sc *SessionController) CreateEmailSession(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, response)
-	return
 }
 
+// @Summary Delete Session
+// PUT
+// @Tags session
+// @Accept  json
+// @Produce  json
+// @Param id path string true "User ID"
+// @Success 200 {object} siogeneric.SuccessResponse
+// @Failure 400 {object} siogeneric.ErrorResponse
+// @Failure 401 {object} siogeneric.ErrorResponse
+// @Failure 404 {object} siogeneric.ErrorResponse
+// @Failure 500 {object} siogeneric.ErrorResponse
+// @Router /api/iam/v1/session/:id/:sessionId [delete]
 func (sc *SessionController) DeleteSession(c *gin.Context) {
-	sessionId := c.Param("sessionId")
-	response, err := sc.s.DeleteSession(sessionId)
+	ID := c.Param("id")
+	sessionID := c.Param("sessionId")
+	response, err := sc.s.DeleteSession(ID, sessionID)
 	if err != nil {
 		_ = c.Error(err)
 		return
 	}
 
 	c.JSON(http.StatusOK, response)
-	return
 }
