@@ -16,6 +16,9 @@ spec:
         deploy: iam-ms
         app: iam-ms
       annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "2112"
+        prometheus.io/path: "/metrics"
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/role: "chore"
         vault.hashicorp.com/agent-pre-populate-only: "true"
