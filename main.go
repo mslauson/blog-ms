@@ -6,6 +6,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"gitea.slauson.io/slausonio/go-prom/sioprom"
 	_ "gitea.slauson.io/slausonio/go-types/siogeneric"
 	_ "gitea.slauson.io/slausonio/iam-ms/docs"
 	"gitea.slauson.io/slausonio/sio-loki/hooks"
@@ -33,8 +34,8 @@ func init() {
 // @contact.name Matthew Slauson
 // @contact.email matthew@slauson.io
 func main() {
+	go func() { sioprom.InitPrometheus() }()
 	r := CreateRouter()
-
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
 		log.Fatalf("error: %v", err)
