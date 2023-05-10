@@ -6,8 +6,12 @@ gitea.slauson.io/slausonio/go-types v0.0.122 h1:/3oVi0LHViyueo7NahP6vCdfdxbLvC7g
 gitea.slauson.io/slausonio/go-types v0.0.122/go.mod h1:Hy3pD3/NMxIWPxgwTCeETBhVKKcKEAlzQQAQUHbafcY=
 gitea.slauson.io/slausonio/go-utils v0.0.76 h1:jaofVzHFxeV75vySygU3sABKqhxgroJdYczSl6pHHto=
 gitea.slauson.io/slausonio/go-utils v0.0.76/go.mod h1:gaubDbhQQaezANKFPmTkJ3Ap/hU2CxNksH6igJ64/3Y=
+gitea.slauson.io/slausonio/go-utils v0.0.82 h1:TYa5b/ar9FTQUK5I1hQFHn9fiY4WZT8ddBc4IZo5+w0=
+gitea.slauson.io/slausonio/go-utils v0.0.82/go.mod h1:gaubDbhQQaezANKFPmTkJ3Ap/hU2CxNksH6igJ64/3Y=
 gitea.slauson.io/slausonio/sio-loki v0.0.4 h1:JoxLWCU4fBKnGQGnDJhJRDNhYtuJeKLczOkmQ1mFldw=
 gitea.slauson.io/slausonio/sio-loki v0.0.4/go.mod h1:P5sPqmajSpV6wHO6mKLulbds2HGI6z+vhbK9Ln0D1uU=
+gitea.slauson.io/slausonio/sio-loki v0.0.6 h1:YxgqY9v+RBtUr3/0JaxV6uFJ4XZyiyT7gRn4OaYb2Ps=
+gitea.slauson.io/slausonio/sio-loki v0.0.6/go.mod h1:P5sPqmajSpV6wHO6mKLulbds2HGI6z+vhbK9Ln0D1uU=
 github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc=
 github.com/KyleBanks/depth v1.2.1/go.mod h1:jzSb9d0L43HxTQfT+oSA1EEp2q+ne2uh6XgeJcm8brE=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
