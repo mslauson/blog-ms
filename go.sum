@@ -1,5 +1,7 @@
 gitea.slauson.io/slausonio/go-prom v0.0.1 h1:vcYDeabMlY8mfe8ZKUIiTRm1Iys5Hg3u2/ea7Qvx2cw=
 gitea.slauson.io/slausonio/go-prom v0.0.1/go.mod h1:+Z6x5chbl4wOX7zi8BdrRK5pVRt9tlDBpfJEOh69EIc=
+gitea.slauson.io/slausonio/go-prom v0.0.4 h1:kO3S+fIrQLv2vURNlJ1v8X9MI1SepDEizAaBsoeWEfE=
+gitea.slauson.io/slausonio/go-prom v0.0.4/go.mod h1:+Z6x5chbl4wOX7zi8BdrRK5pVRt9tlDBpfJEOh69EIc=
 gitea.slauson.io/slausonio/go-testing v0.0.11 h1:UrrLZvLhBGkVgX4lcbclRkYrjbCcUKC70W5peeA134g=
 gitea.slauson.io/slausonio/go-testing v0.0.11/go.mod h1:6xmM6tRhF5q1ZY3PYY/ezFkeJddzQ1l8jD5T0SpD7B0=
 gitea.slauson.io/slausonio/go-types v0.0.122 h1:/3oVi0LHViyueo7NahP6vCdfdxbLvC7g18G9seDG1Uo=
@@ -8,6 +10,8 @@ gitea.slauson.io/slausonio/go-utils v0.0.76 h1:jaofVzHFxeV75vySygU3sABKqhxgroJdY
 gitea.slauson.io/slausonio/go-utils v0.0.76/go.mod h1:gaubDbhQQaezANKFPmTkJ3Ap/hU2CxNksH6igJ64/3Y=
 gitea.slauson.io/slausonio/go-utils v0.0.82 h1:TYa5b/ar9FTQUK5I1hQFHn9fiY4WZT8ddBc4IZo5+w0=
 gitea.slauson.io/slausonio/go-utils v0.0.82/go.mod h1:gaubDbhQQaezANKFPmTkJ3Ap/hU2CxNksH6igJ64/3Y=
+gitea.slauson.io/slausonio/go-utils v0.0.83 h1:Sal7XBcNjJ03c4HhsQj63J2qROVNJJbkUOMEQ5aRtfg=
+gitea.slauson.io/slausonio/go-utils v0.0.83/go.mod h1://Bard0VL8sHAPDo15qYWSsQ6ziFJjGiAUzWULvWYPU=
 gitea.slauson.io/slausonio/sio-loki v0.0.4 h1:JoxLWCU4fBKnGQGnDJhJRDNhYtuJeKLczOkmQ1mFldw=
 gitea.slauson.io/slausonio/sio-loki v0.0.4/go.mod h1:P5sPqmajSpV6wHO6mKLulbds2HGI6z+vhbK9Ln0D1uU=
 gitea.slauson.io/slausonio/sio-loki v0.0.6 h1:YxgqY9v+RBtUr3/0JaxV6uFJ4XZyiyT7gRn4OaYb2Ps=

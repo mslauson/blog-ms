@@ -3,10 +3,10 @@ module gitea.slauson.io/slausonio/iam-ms
 go 1.20
 
 require (
-	gitea.slauson.io/slausonio/go-prom v0.0.1
+	gitea.slauson.io/slausonio/go-prom v0.0.4
 	gitea.slauson.io/slausonio/go-testing v0.0.11
 	gitea.slauson.io/slausonio/go-types v0.0.122
-	gitea.slauson.io/slausonio/go-utils v0.0.82
+	gitea.slauson.io/slausonio/go-utils v0.0.83
 	gitea.slauson.io/slausonio/sio-loki v0.0.6
 	github.com/gin-gonic/gin v1.9.0
 	github.com/sirupsen/logrus v1.9.0
