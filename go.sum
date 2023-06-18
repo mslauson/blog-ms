@@ -1,5 +1,5 @@
-gitea.slauson.io/slausonio/go-types v0.1.0 h1:ufnShqfkCxtWbZrrOiVA4hnb4+5NecpXMmTU5Zz8Nxk=
-gitea.slauson.io/slausonio/go-types v0.1.0/go.mod h1:nNHEtpd+MQosQgVJY8c9JyW0cO/Bd6D4B+yzxutegHE=
+gitea.slauson.io/slausonio/go-types v0.1.1 h1:bMOjP+XqwtYGTeb9+zNw7fVGavUHOBynibjaGLABSH4=
+gitea.slauson.io/slausonio/go-types v0.1.1/go.mod h1:nNHEtpd+MQosQgVJY8c9JyW0cO/Bd6D4B+yzxutegHE=
 gitea.slauson.io/slausonio/go-utils v0.1.0 h1:91wyfa0Vg07H2iOtNjoie6GuAiC0A1XRY9arPyJwdzQ=
 gitea.slauson.io/slausonio/go-utils v0.1.0/go.mod h1:X0R5+aclKRfaNVPYDwDvxF2JxDR3RBZ/9fpozx6Hwag=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
