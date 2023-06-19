@@ -76,13 +76,17 @@ func (bs *BlogSvc) UpdatePost(req *dto.UpdatePostRequest) (*dto.PostResponse, er
 	panic("not implemented") // TODO: Implement
 }
 
-func (bs *BlogSvc) SoftDeletePost(id int64) (*dto.PostResponse, error) {
-}
 
 func (bs *BlogSvc) UpdateComment(
 	req *dto.UpdateCommentRequest,
 ) (*dto.CommentResponse, error) {
 }
 
+func (bs *BlogSvc) SoftDeletePost(id int64) (*dto.PostResponse, error) {
+}
 func (bs *BlogSvc) SoftDeleteComment(id int64) (*dto.CommentResponse, error) {
+}
+
+func (bs *BlogSvc) postExistsByID(id int64) (bool, error) {
+	return bs.dao.ExistsByID(id)
 }

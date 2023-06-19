@@ -20,6 +20,7 @@ type PostDao interface {
 	PostExistsByID(ID int64) (bool, error)
 	CommentExistsByID(ID int64) (bool, error)
 	GetPostByID(ID int64) (*siogeneric.BlogPost, error)
+	GetCommentByID(ID int64) (*siogeneric.BlogComment, error)
 	GetAllPosts() (*[]*siogeneric.BlogPost, error)
 	GetAllCommentsByPostID(postID int64) (*[]*siogeneric.BlogComment, error)
 	UpdatePost(post *siogeneric.BlogPost) error
