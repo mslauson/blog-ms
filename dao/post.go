@@ -22,7 +22,7 @@ type PostDao interface {
 	GetAllCommentsByPostID(postID int64) (*[]siogeneric.BlogComment, error)
 	UpdatePost(post *siogeneric.BlogPost) error
 	AddComment(comment *siogeneric.BlogComment) error
-	UpdateComment(post *siogeneric.BlogPost, comment *siogeneric.BlogComment) error
+	UpdateComment(comment *siogeneric.BlogComment) error
 	SoftDeletePost(post *siogeneric.BlogPost) error
 	SoftDeleteComment(comment *siogeneric.BlogComment) error
 }
@@ -160,7 +160,7 @@ func (pd *PDao) UpdateComment(comment *siogeneric.BlogComment) error {
 	return nil
 }
 
-func (pd *PDao) DeletePost(post *siogeneric.BlogPost) error {
+func (pd *PDao) SoftDeletePost(post *siogeneric.BlogPost) error {
 	sql := `UPDATE blog 
 	SET
 	soft_deleted = $1,
@@ -174,7 +174,7 @@ func (pd *PDao) DeletePost(post *siogeneric.BlogPost) error {
 	return nil
 }
 
-func (pd *PDao) DeleteComment(comment *siogeneric.BlogComment) error {
+func (pd *PDao) SoftDeleteComment(comment *siogeneric.BlogComment) error {
 	sql := `UPDATE comment
 		SET 
 		soft_deleted = $1,
