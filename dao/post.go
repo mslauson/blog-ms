@@ -62,6 +62,24 @@ func (pd *PDao) ExistsByID(ID int64) (bool, error) {
 	return exists, err
 }
 
+func (pd *PDao) GetPostByID(ID int64) (*siogeneric.BlogPost, error) {
+	sql := `SELECT id, title, body, posted_date, updated_date, deletion_date, soft_deleted FROM blog_posts WHERE id = $1 AND soft_deleted = false`
+	row := pd.db.QueryRowContext(ctx, sql, ID)
+	post, err := pd.scanPost(row)
+	if err != nil {
+		return nil, err
+	}
+
+	comments, err := pd.GetAllCommentsByPostID(ID)
+	if err != nil {
+		return nil, err
+	}
+
+	post.Comments = comments
+
+	return post, nil
+}
+
 // func (pd *PDao) GetAllPosts() (*[]siogeneric.BlogPost, error) {
 // 	sql := `SELECT
 // 			p.id, p.title, p.body, p.posted_date, p.updated_date, p.deletion_date, p.soft_deleted,
@@ -100,7 +118,7 @@ func (pd *PDao) ExistsByID(ID int64) (bool, error) {
 // 	return allPosts, nil}
 
 func (pd *PDao) GetAllCommentsByPostID(postID int64) (*[]siogeneric.BlogComment, error) {
-	sql := `SELECT id, content, comment_date, soft_deleted, deletion_date FROM blog_comments WHERE post_id = $1`
+	sql := `SELECT id, content, comment_date, soft_deleted, deletion_date FROM blog_comments WHERE post_id = $1 AND soft_deleted = false`
 	rows, err := pd.db.QueryContext(ctx, sql, postID)
 	if err != nil {
 		return nil, err
