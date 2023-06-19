@@ -134,7 +134,7 @@ func (pd *PDao) UpdatePost(post *siogeneric.BlogPost) error {
 	return nil
 }
 
-func (pd *PDao) AddComment(comment *siogeneric.BlogComment) (*siogeneric.BlogComment, error) {
+func (pd *PDao) AddComment(comment *siogeneric.BlogComment) error {
 	sql := `INSERT INTO blog_comments (content, comment_date, post_id, user_id, soft_deleted) VALUES ($1, $2, $3, $4, $5) RETURNING id`
 	err := pd.db.QueryRowContext(
 		ctx,
@@ -145,7 +145,7 @@ func (pd *PDao) AddComment(comment *siogeneric.BlogComment) (*siogeneric.BlogCom
 		comment.UserID,
 		false,
 	).Scan(&comment.ID)
-	return comment, err
+	return err
 }
 
 func (pd *PDao) UpdateComment(comment *siogeneric.BlogComment) error {
