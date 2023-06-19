@@ -24,7 +24,7 @@ type PostDao interface {
 	AddComment(comment *siogeneric.BlogComment) error
 	UpdateComment(post *siogeneric.BlogPost, comment *siogeneric.BlogComment) error
 	SoftDeletePost(post *siogeneric.BlogPost) error
-	SoftDeleteComment(post *siogeneric.BlogPost, comment *siogeneric.BlogComment) error
+	SoftDeleteComment(comment *siogeneric.BlogComment) error
 }
 
 func NewPostDao() *PDao {
@@ -155,6 +155,33 @@ func (pd *PDao) UpdateComment(comment *siogeneric.BlogComment) error {
 		updated_date = COALESCE($2, updated_date)
 	`
 	if _, err := pd.db.ExecContext(ctx, sql, comment.Content, comment.UpdatedDate); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pd *PDao) DeletePost(post *siogeneric.BlogPost) error {
+	sql := `UPDATE blog 
+	SET
+	soft_deleted = $1,
+	delation_date = $2,
+	where id = $3
+	`
+
+	if _, err := pd.db.ExecContext(ctx, sql, true, post.DeletionDate, post.ID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pd *PDao) DeleteComment(comment *siogeneric.BlogComment) error {
+	sql := `UPDATE comment
+		SET 
+		soft_deleted = $1,
+		deletion_date = $2,
+		WHERE id = $3
+	`
+	if _, err := pd.db.ExecContext(ctx, sql, true, comment.DeletionDate, comment.ID); err != nil {
 		return err
 	}
 	return nil
