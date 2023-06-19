@@ -7,7 +7,7 @@ import (
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 )
 
-func mapCreatePostRequestToEntity(req *dto.CreatePostRequest) *siogeneric.BlogPost {
+func buildCreatePostEntity(req *dto.CreatePostRequest) *siogeneric.BlogPost {
 	return &siogeneric.BlogPost{
 		Title:       siogeneric.NewSioNullString(req.Title),
 		Body:        siogeneric.NewSioNullString(req.Body),
@@ -16,7 +16,7 @@ func mapCreatePostRequestToEntity(req *dto.CreatePostRequest) *siogeneric.BlogPo
 	}
 }
 
-func mapAddCommentRequestToEntity(req *dto.AddCommentRequest) *siogeneric.BlogComment {
+func buildAddCommentEntity(req *dto.AddCommentRequest) *siogeneric.BlogComment {
 	return &siogeneric.BlogComment{
 		Content:     siogeneric.NewSioNullString(req.Content),
 		CommentDate: siogeneric.NewSioNullTime(time.Now()),
@@ -25,7 +25,7 @@ func mapAddCommentRequestToEntity(req *dto.AddCommentRequest) *siogeneric.BlogCo
 	}
 }
 
-func mapUpdatePostRequestToEntity(req *dto.UpdatePostRequest) *siogeneric.BlogPost {
+func buildUpdatePostEntity(req *dto.UpdatePostRequest) *siogeneric.BlogPost {
 	return &siogeneric.BlogPost{
 		Title:       siogeneric.NewSioNullString(req.Title),
 		Body:        siogeneric.NewSioNullString(req.Body),
@@ -34,14 +34,14 @@ func mapUpdatePostRequestToEntity(req *dto.UpdatePostRequest) *siogeneric.BlogPo
 	}
 }
 
-func mapUpdateCommentRequestToEntity(req *dto.UpdateCommentRequest) *siogeneric.BlogComment {
+func buildUpdateCommentEntity(req *dto.UpdateCommentRequest) *siogeneric.BlogComment {
 	return &siogeneric.BlogComment{
 		Content:     siogeneric.NewSioNullString(req.Content),
 		UpdatedDate: siogeneric.NewSioNullTime(time.Now()),
 	}
 }
 
-func mapPostResponse(entity *siogeneric.BlogPost) *dto.PostResponse {
+func buildPostResponse(entity *siogeneric.BlogPost) *dto.PostResponse {
 	return &dto.PostResponse{
 		ID:           entity.ID.Int64,
 		Title:        entity.Title.String,
@@ -52,19 +52,19 @@ func mapPostResponse(entity *siogeneric.BlogPost) *dto.PostResponse {
 		SoftDeleted:  entity.SoftDeleted.Bool,
 		CreatedByID:  entity.CreatedByID.Int64,
 		UpdatedByID:  entity.UpdatedByID.Int64,
-		Comments:     mapCommentResponses(entity.Comments),
+		Comments:     buildCommentResponses(entity.Comments),
 	}
 }
 
-func mapAllPostsToResponse(entities *[]*siogeneric.BlogPost) *[]*dto.PostResponse {
+func buildAllPostsResponse(entities *[]*siogeneric.BlogPost) *[]*dto.PostResponse {
 	var postResponses []*dto.PostResponse
 	for _, entity := range *entities {
-		postResponses = append(postResponses, mapPostResponse(entity))
+		postResponses = append(postResponses, buildPostResponse(entity))
 	}
 	return &postResponses
 }
 
-func mapCommentResponses(comments *[]*siogeneric.BlogComment) *[]*dto.CommentResponse {
+func buildCommentResponses(comments *[]*siogeneric.BlogComment) *[]*dto.CommentResponse {
 	var commentReponses []*dto.CommentResponse
 	for _, comment := range *comments {
 		cr := &dto.CommentResponse{
