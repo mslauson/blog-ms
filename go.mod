@@ -3,7 +3,7 @@ module gitea.slauson.io/mslauson
 go 1.20
 
 require (
-	gitea.slauson.io/slausonio/go-types v0.1.2
+	gitea.slauson.io/slausonio/go-types v0.1.6
 	gitea.slauson.io/slausonio/go-utils v0.1.0
 )
 
