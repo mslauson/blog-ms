@@ -3,7 +3,7 @@ module gitea.slauson.io/blog/blog-ms
 go 1.20
 
 require (
-	gitea.slauson.io/slausonio/go-types v0.1.6
+	gitea.slauson.io/slausonio/go-types v0.1.7
 	gitea.slauson.io/slausonio/go-utils v0.1.0
 )
 

@@ -3,6 +3,8 @@ gitea.slauson.io/slausonio/go-types v0.1.5 h1:lZRPpaZEWqPKGdhWLw8shRK/g078jJ2ZSc
 gitea.slauson.io/slausonio/go-types v0.1.5/go.mod h1:nNHEtpd+MQosQgVJY8c9JyW0cO/Bd6D4B+yzxutegHE=
 gitea.slauson.io/slausonio/go-types v0.1.6 h1:VxfDRdxK3Xlr1jXJV0UMm4Tc9A7+pq+B1tWPHLS1pqY=
 gitea.slauson.io/slausonio/go-types v0.1.6/go.mod h1:nNHEtpd+MQosQgVJY8c9JyW0cO/Bd6D4B+yzxutegHE=
+gitea.slauson.io/slausonio/go-types v0.1.7 h1:KSuwdTxWI5iOefY7qU3wrjyRUJWKBp2iELOrS03WCSo=
+gitea.slauson.io/slausonio/go-types v0.1.7/go.mod h1:nNHEtpd+MQosQgVJY8c9JyW0cO/Bd6D4B+yzxutegHE=
 gitea.slauson.io/slausonio/go-utils v0.1.0 h1:91wyfa0Vg07H2iOtNjoie6GuAiC0A1XRY9arPyJwdzQ=
 gitea.slauson.io/slausonio/go-utils v0.1.0/go.mod h1:X0R5+aclKRfaNVPYDwDvxF2JxDR3RBZ/9fpozx6Hwag=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

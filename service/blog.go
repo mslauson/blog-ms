@@ -34,6 +34,8 @@ type BlogService interface {
 	SoftenDeleteComment(id int64) (*dto.CommentResponse, error)
 }
 
+
+// NewBlogSvc function 
 func NewBlogSvc() *BlogSvc {
 	return &BlogSvc{
 		dao: dao.NewPostDao(),
