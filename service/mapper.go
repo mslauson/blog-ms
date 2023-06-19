@@ -56,6 +56,14 @@ func mapPostResponse(entity *siogeneric.BlogPost) *dto.PostResponse {
 	}
 }
 
+func mapAllPostsToResponse(entities *[]*siogeneric.BlogPost) *[]*dto.PostResponse {
+	var postResponses []*dto.PostResponse
+	for _, entity := range *entities {
+		postResponses = append(postResponses, mapPostResponse(entity))
+	}
+	return &postResponses
+}
+
 func mapCommentResponses(comments *[]*siogeneric.BlogComment) *[]*dto.CommentResponse {
 	var commentReponses []*dto.CommentResponse
 	for _, comment := range *comments {
