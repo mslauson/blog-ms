@@ -1,6 +1,6 @@
 package service
 
-import "gitea.slauson.io/mslauson/dao"
+import "gitea.slauson.io/blog/blog-ms/dao"
 
 type BlogSvc struct {
 	dao dao.PostDao
