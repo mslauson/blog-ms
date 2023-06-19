@@ -18,8 +18,9 @@ type PostDao interface {
 	CreatePost(post *siogeneric.BlogPost) error
 	Exists(post *siogeneric.BlogPost) (bool, error)
 	ExistsByID(ID int64) (bool, error)
-	GetAllPosts() (*[]siogeneric.BlogPost, error)
-	GetAllCommentsByPostID(postID int64) (*[]siogeneric.BlogComment, error)
+	GetPostByID(ID int64) (*siogeneric.BlogPost, error)
+	GetAllPosts() (*[]*siogeneric.BlogPost, error)
+	GetAllCommentsByPostID(postID int64) (*[]*siogeneric.BlogComment, error)
 	UpdatePost(post *siogeneric.BlogPost) error
 	AddComment(comment *siogeneric.BlogComment) error
 	UpdateComment(comment *siogeneric.BlogComment) error
@@ -87,14 +88,14 @@ func (pd *PDao) GetPostByID(ID int64) (*siogeneric.BlogPost, error) {
 	return post, nil
 }
 
-func (pd *PDao) GetAllPosts() (*[]siogeneric.BlogPost, error) {
+func (pd *PDao) GetAllPosts() (*[]*siogeneric.BlogPost, error) {
 	sql := `SELECT id, title, body, posted_date, updated_date, deletion_date, soft_deleted FROM blog_posts WHERE soft_deleted = false`
 	rows, err := pd.db.QueryContext(ctx, sql)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	posts := make([]siogeneric.BlogPost, 0)
+	posts := make([]*siogeneric.BlogPost, 0)
 	for rows.Next() {
 		post, err := pd.scanPost(rows)
 		if err != nil {
@@ -105,12 +106,12 @@ func (pd *PDao) GetAllPosts() (*[]siogeneric.BlogPost, error) {
 			return nil, err
 		}
 		post.Comments = comments
-		posts = append(posts, *post)
+		posts = append(posts, post)
 	}
 	return &posts, nil
 }
 
-func (pd *PDao) GetAllCommentsByPostID(postID int64) (*[]siogeneric.BlogComment, error) {
+func (pd *PDao) GetAllCommentsByPostID(postID int64) (*[]*siogeneric.BlogComment, error) {
 	sql := `SELECT id, content, comment_date, soft_deleted, deletion_date FROM blog_comments WHERE post_id = $1 AND soft_deleted = false`
 	rows, err := pd.db.QueryContext(ctx, sql, postID)
 	if err != nil {
@@ -198,8 +199,8 @@ func (pd *PDao) scanPost(rows *sql.Rows) (*siogeneric.BlogPost, error) {
 	return post, nil
 }
 
-func (pd *PDao) scanComment(rows *sql.Rows) (*[]siogeneric.BlogComment, error) {
-	comments := &[]siogeneric.BlogComment{}
+func (pd *PDao) scanComment(rows *sql.Rows) (*[]*siogeneric.BlogComment, error) {
+	comments := &[]*siogeneric.BlogComment{}
 	for rows.Next() {
 		comment := siogeneric.BlogComment{}
 		err := rows.Scan(
@@ -212,7 +213,7 @@ func (pd *PDao) scanComment(rows *sql.Rows) (*[]siogeneric.BlogComment, error) {
 		if err != nil {
 			return nil, err
 		}
-		*comments = append(*comments, comment)
+		*comments = append(*comments, &comment)
 	}
 
 	return comments, nil
