@@ -64,20 +64,23 @@ func buildAllPostsResponse(entities *[]*siogeneric.BlogPost) *[]*dto.PostRespons
 	return &postResponses
 }
 
-func buildCommentResponses(comments *[]*siogeneric.BlogComment) *[]*dto.CommentResponse {
+func buildCommentResponse(entity *siogeneric.BlogComment) *dto.CommentResponse {
+	return &dto.CommentResponse{
+		ID:           entity.ID.Int64,
+		Content:      entity.Content.String,
+		CommentDate:  entity.CommentDate.Time,
+		UpdatedDate:  entity.UpdatedDate.Time,
+		SoftDeleted:  entity.SoftDeleted.Bool,
+		DeletionDate: entity.DeletionDate.Time,
+		PostID:       entity.PostID.Int64,
+		UserID:       entity.UserID.Int64,
+	}
+}
+
+func buildCommentResponses(entities *[]*siogeneric.BlogComment) *[]*dto.CommentResponse {
 	var commentReponses []*dto.CommentResponse
-	for _, comment := range *comments {
-		cr := &dto.CommentResponse{
-			ID:           comment.ID.Int64,
-			Content:      comment.Content.String,
-			CommentDate:  comment.CommentDate.Time,
-			UpdatedDate:  comment.UpdatedDate.Time,
-			SoftDeleted:  comment.SoftDeleted.Bool,
-			DeletionDate: comment.DeletionDate.Time,
-			PostID:       comment.PostID.Int64,
-			UserID:       comment.UserID.Int64,
-		}
-		commentReponses = append(commentReponses, cr)
+	for _, entity := range *entities {
+		commentReponses = append(commentReponses, buildCommentResponse(entity))
 	}
 	return &commentReponses
 }

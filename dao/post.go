@@ -16,7 +16,7 @@ type PDao struct {
 
 type PostDao interface {
 	CreatePost(post *siogeneric.BlogPost) error
-	Exists(post *siogeneric.BlogPost) (bool, error)
+	Exists(title string, createdByID int64) (bool, error)
 	ExistsByID(ID int64) (bool, error)
 	GetPostByID(ID int64) (*siogeneric.BlogPost, error)
 	GetAllPosts() (*[]*siogeneric.BlogPost, error)
@@ -48,10 +48,10 @@ func (pd *PDao) CreatePost(post *siogeneric.BlogPost) error {
 	return err
 }
 
-func (pd *PDao) Exists(post *siogeneric.BlogPost) (bool, error) {
+func (pd *PDao) Exists(title string, createdByID int64) (bool, error) {
 	sql := `SELECT EXISTS(SELECT 1 FROM blog_posts WHERE title = $1 created_by_id = $2)`
 	var exists bool
-	err := pd.db.QueryRowContext(ctx, sql, post.Title, post.CreatedByID).
+	err := pd.db.QueryRowContext(ctx, sql, title, createdByID).
 		Scan(&exists)
 	return exists, err
 }
