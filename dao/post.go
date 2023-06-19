@@ -213,7 +213,7 @@ func (pd *PDao) SoftDeleteComment(comment *siogeneric.BlogComment) error {
 	return nil
 }
 
-func (pd *PDao) scanPost(rows *query.Rows) (*siogeneric.BlogPost, error) {
+func (pd *PDao) scanPost(rows *sql.Rows) (*siogeneric.BlogPost, error) {
 	post := &siogeneric.BlogPost{}
 	err := rows.Scan(&post.ID, &post.Title, &post.Body, &post.PostedDate,
 		&post.UpdatedDate, &post.DeletionDate, &post.SoftDeleted)
@@ -224,7 +224,7 @@ func (pd *PDao) scanPost(rows *query.Rows) (*siogeneric.BlogPost, error) {
 	return post, nil
 }
 
-func (pd *PDao) scanComment(rows *query.Rows) (*siogeneric.BlogComment, error) {
+func (pd *PDao) scanComment(rows *sql.Rows) (*siogeneric.BlogComment, error) {
 	comment := &siogeneric.BlogComment{}
 	err := rows.Scan(
 		&comment.ID,
@@ -240,7 +240,7 @@ func (pd *PDao) scanComment(rows *query.Rows) (*siogeneric.BlogComment, error) {
 	return comment, nil
 }
 
-func (pd *PDao) scanComments(rows *query.Rows) (*[]*siogeneric.BlogComment, error) {
+func (pd *PDao) scanComments(rows *sql.Rows) (*[]*siogeneric.BlogComment, error) {
 	comments := &[]*siogeneric.BlogComment{}
 	for rows.Next() {
 		comment, err := pd.scanComment(rows)

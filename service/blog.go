@@ -49,7 +49,7 @@ func (bs *BlogSvc) GetAllPosts() (*[]*dto.PostResponse, error) {
 }
 
 func (bs *BlogSvc) CreatePost(req *dto.CreatePostRequest) (*dto.PostResponse, error) {
-	if exists, err := bs.dao.Exists(req.Title, req.CreatedByID); err != nil {
+	if exists, err := bs.dao.PostExists(req.Title, req.CreatedByID); err != nil {
 		return nil, siodao.HandleDbErr(err, POST)
 	} else if exists {
 		return nil, sioerror.NewSioBadRequestError(POST_EXISTS)
@@ -76,7 +76,6 @@ func (bs *BlogSvc) UpdatePost(req *dto.UpdatePostRequest) (*dto.PostResponse, er
 	panic("not implemented") // TODO: Implement
 }
 
-
 func (bs *BlogSvc) UpdateComment(
 	req *dto.UpdateCommentRequest,
 ) (*dto.CommentResponse, error) {
@@ -84,9 +83,26 @@ func (bs *BlogSvc) UpdateComment(
 
 func (bs *BlogSvc) SoftDeletePost(id int64) (*dto.PostResponse, error) {
 }
+
 func (bs *BlogSvc) SoftDeleteComment(id int64) (*dto.CommentResponse, error) {
 }
 
-func (bs *BlogSvc) postExistsByID(id int64) (bool, error) {
-	return bs.dao.ExistsByID(id)
+func (bs *BlogSvc) postExistsByID(id int64) error {
+	if exists, err := bs.dao.PostExistsByID(id); err != nil {
+		return siodao.HandleDbErr(err, POST)
+	} else if !exists {
+		return sioerror.NewSioNotFoundError(NO_POST_FOUND)
+	}
+
+	return nil
+}
+
+func (bs *BlogSvc) commentExistsByID(id int64) error {
+	if exists, err := bs.dao.CommentExistsByID(id); err != nil {
+		return siodao.HandleDbErr(err, COMMENT)
+	} else if !exists {
+		return sioerror.NewSioNotFoundError(NO_COMMENT_FOUND)
+	}
+
+	return nil
 }
