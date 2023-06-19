@@ -21,7 +21,7 @@ type PostDao interface {
 	GetAllPosts() (*[]siogeneric.BlogPost, error)
 	GetAllCommentsByPostID(postID int64) (*[]siogeneric.BlogComment, error)
 	UpdatePost(post *siogeneric.BlogPost) error
-	AddComment(post *siogeneric.BlogPost, comment *siogeneric.BlogComment) error
+	AddComment(comment *siogeneric.BlogComment) error
 	UpdateComment(post *siogeneric.BlogPost, comment *siogeneric.BlogComment) error
 	SoftDeletePost(post *siogeneric.BlogPost) error
 	SoftDeleteComment(post *siogeneric.BlogPost, comment *siogeneric.BlogComment) error
@@ -118,6 +118,46 @@ func (pd *PDao) GetAllCommentsByPostID(postID int64) (*[]siogeneric.BlogComment,
 	}
 	defer rows.Close()
 	return pd.scanComment(rows)
+}
+
+func (pd *PDao) UpdatePost(post *siogeneric.BlogPost) error {
+	sql := `UPDATE blog
+		SET 
+		title = COALESCE($1, title),
+		body = COALESCE($2,body),
+		updated_date = COALESCE($3, updated_date)
+		updated_by_id = COALESCE($4, updated_by_id)
+	`
+	if _, err := pd.db.ExecContext(ctx, sql, post.Title, post.Body, post.UpdatedDate, post.UpdatedByID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pd *PDao) AddComment(comment *siogeneric.BlogComment) (*siogeneric.BlogComment, error) {
+	sql := `INSERT INTO blog_comments (content, comment_date, post_id, user_id, soft_deleted) VALUES ($1, $2, $3, $4, $5) RETURNING id`
+	err := pd.db.QueryRowContext(
+		ctx,
+		sql,
+		comment.Content,
+		comment.CommentDate,
+		comment.PostID,
+		comment.UserID,
+		false,
+	).Scan(&comment.ID)
+	return comment, err
+}
+
+func (pd *PDao) UpdateComment(comment *siogeneric.BlogComment) error {
+	sql := `UPDATE blog_comments
+		SET 
+		content = COALESCE($1, content),
+		updated_date = COALESCE($2, updated_date)
+	`
+	if _, err := pd.db.ExecContext(ctx, sql, comment.Content, comment.UpdatedDate); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (pd *PDao) scanPost(rows *sql.Rows) (*siogeneric.BlogPost, error) {
