@@ -117,8 +117,7 @@ func (pd *PDao) GetAllCommentsByPostID(postID int64) (*[]siogeneric.BlogComment,
 		return nil, err
 	}
 	defer rows.Close()
-	comments := make([]siogeneric.BlogComment, 0)
-	return &comments, nil
+	return pd.scanComment(rows)
 }
 
 func (pd *PDao) scanPost(rows *sql.Rows) (*siogeneric.BlogPost, error) {
