@@ -3,6 +3,7 @@ package service
 import (
 	"time"
 
+	"gitea.slauson.io/blog/blog-ms/constants"
 	"gitea.slauson.io/blog/blog-ms/dao"
 	"gitea.slauson.io/blog/blog-ms/dto"
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
@@ -35,7 +36,7 @@ func NewBlogSvc() *BlogSvc {
 func (bs *BlogSvc) GetPost(id int64) (*dto.PostResponse, error) {
 	post, err := bs.dao.GetPostByID(id)
 	if err != nil {
-		return nil, siodao.HandleDbErr(err, POST)
+		return nil, siodao.HandleDbErr(err, constants.POST)
 	}
 
 	return buildPostResponse(post), nil
@@ -44,7 +45,7 @@ func (bs *BlogSvc) GetPost(id int64) (*dto.PostResponse, error) {
 func (bs *BlogSvc) GetAllPosts() (*[]*dto.PostResponse, error) {
 	post, err := bs.dao.GetAllPosts()
 	if err != nil {
-		return nil, siodao.HandleDbErr(err, POST)
+		return nil, siodao.HandleDbErr(err, constants.POST)
 	}
 
 	return buildAllPostsResponse(post), nil
@@ -52,14 +53,14 @@ func (bs *BlogSvc) GetAllPosts() (*[]*dto.PostResponse, error) {
 
 func (bs *BlogSvc) CreatePost(req *dto.CreatePostRequest) (*dto.PostResponse, error) {
 	if exists, err := bs.dao.PostExists(req.Title, req.CreatedByID); err != nil {
-		return nil, siodao.HandleDbErr(err, POST)
+		return nil, siodao.HandleDbErr(err, constants.POST)
 	} else if exists {
-		return nil, sioerror.NewSioBadRequestError(POST_EXISTS)
+		return nil, sioerror.NewSioBadRequestError(constants.POST_EXISTS)
 	}
 
 	post := buildCreatePostEntity(req)
 	if err := bs.dao.CreatePost(post); err != nil {
-		return nil, siodao.HandleDbErr(err, POST)
+		return nil, siodao.HandleDbErr(err, constants.POST)
 	}
 
 	return buildPostResponse(post), nil
@@ -68,7 +69,7 @@ func (bs *BlogSvc) CreatePost(req *dto.CreatePostRequest) (*dto.PostResponse, er
 func (bs *BlogSvc) AddComment(req *dto.AddCommentRequest) (*dto.CommentResponse, error) {
 	comment := buildAddCommentEntity(req)
 	if err := bs.dao.AddComment(comment); err != nil {
-		return nil, siodao.HandleDbErr(err, COMMENT)
+		return nil, siodao.HandleDbErr(err, constants.COMMENT)
 	}
 
 	return buildCommentResponse(comment), nil
@@ -81,12 +82,12 @@ func (bs *BlogSvc) UpdatePost(ID int64, req *dto.UpdatePostRequest) (*dto.PostRe
 
 	post := buildUpdatePostEntity(req)
 	if err := bs.dao.UpdatePost(post); err != nil {
-		return nil, siodao.HandleDbErr(err, POST)
+		return nil, siodao.HandleDbErr(err, constants.POST)
 	}
 
 	post, err := bs.dao.GetPostByID(ID)
 	if err != nil {
-		return nil, siodao.HandleDbErr(err, POST)
+		return nil, siodao.HandleDbErr(err, constants.POST)
 	}
 
 	return buildPostResponse(post), nil
@@ -101,12 +102,12 @@ func (bs *BlogSvc) UpdateComment(
 
 	comment := buildUpdateCommentEntity(req)
 	if err := bs.dao.UpdateComment(comment); err != nil {
-		return nil, siodao.HandleDbErr(err, COMMENT)
+		return nil, siodao.HandleDbErr(err, constants.COMMENT)
 	}
 
 	comment, err := bs.dao.GetCommentByID(ID)
 	if err != nil {
-		return nil, siodao.HandleDbErr(err, COMMENT)
+		return nil, siodao.HandleDbErr(err, constants.COMMENT)
 	}
 
 	return buildCommentResponse(comment), nil
@@ -121,7 +122,7 @@ func (bs *BlogSvc) SoftDeletePost(ID int64) (*siogeneric.SuccessResponse, error)
 	comment.DeletionDate = siogeneric.NewSioNullTime(time.Now())
 
 	if err := bs.dao.SoftDeleteComment(comment); err != nil {
-		return nil, siodao.HandleDbErr(err, POST)
+		return nil, siodao.HandleDbErr(err, constants.POST)
 	}
 
 	return &siogeneric.SuccessResponse{Success: true}, nil
@@ -136,7 +137,7 @@ func (bs *BlogSvc) SoftDeleteComment(ID int64) (*siogeneric.SuccessResponse, err
 	comment.DeletionDate = siogeneric.NewSioNullTime(time.Now())
 
 	if err := bs.dao.SoftDeleteComment(comment); err != nil {
-		return nil, siodao.HandleDbErr(err, COMMENT)
+		return nil, siodao.HandleDbErr(err, constants.COMMENT)
 	}
 
 	return &siogeneric.SuccessResponse{Success: true}, nil
@@ -144,9 +145,9 @@ func (bs *BlogSvc) SoftDeleteComment(ID int64) (*siogeneric.SuccessResponse, err
 
 func (bs *BlogSvc) postExistsByID(id int64) error {
 	if exists, err := bs.dao.PostExistsByID(id); err != nil {
-		return siodao.HandleDbErr(err, POST)
+		return siodao.HandleDbErr(err, constants.POST)
 	} else if !exists {
-		return sioerror.NewSioNotFoundError(NO_POST_FOUND)
+		return sioerror.NewSioNotFoundError(constants.NO_POST_FOUND)
 	}
 
 	return nil
@@ -154,9 +155,9 @@ func (bs *BlogSvc) postExistsByID(id int64) error {
 
 func (bs *BlogSvc) commentExistsByID(id int64) error {
 	if exists, err := bs.dao.CommentExistsByID(id); err != nil {
-		return siodao.HandleDbErr(err, COMMENT)
+		return siodao.HandleDbErr(err, constants.COMMENT)
 	} else if !exists {
-		return sioerror.NewSioNotFoundError(NO_COMMENT_FOUND)
+		return sioerror.NewSioNotFoundError(constants.NO_COMMENT_FOUND)
 	}
 
 	return nil
