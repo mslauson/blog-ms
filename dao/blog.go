@@ -134,6 +134,7 @@ func (bd *BDao) GetAllPosts() (*[]*siogeneric.BlogPost, error) {
 		post.Comments = comments
 		posts = append(posts, post)
 	}
+
 	return &posts, nil
 }
 
