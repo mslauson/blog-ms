@@ -25,8 +25,12 @@ var (
 		Title: siogeneric.NewSioNullString("test"),
 		Body:  siogeneric.NewSioNullString("test"),
 	}
-	posts    = &[]*siogeneric.BlogPost{post, post}
-	comments = &[]*siogeneric.BlogComment{comment, comment}
+	posts                = &[]*siogeneric.BlogPost{post, post}
+	comments             = &[]*siogeneric.BlogComment{comment, comment}
+	createPostRequest    = &dto.CreatePostRequest{Title: "test", Body: "test", CreatedByID: 1}
+	addCommentRequest    = &dto.AddCommentRequest{PostID: 1, UserID: 1, Content: "test"}
+	updatePostRequest    = &dto.UpdatePostRequest{Title: "test"}
+	updateCommentRequest = &dto.UpdateCommentRequest{Content: "test"}
 )
 
 func initEnv(t *testing.T) (*BlogSvc, *mocks.BlogDao) {
@@ -106,58 +110,276 @@ func TestGetAllPosts_NotFound(t *testing.T) {
 func TestCreatePost(t *testing.T) {
 	bs, dao := initEnv(t)
 
-	req := &dto.CreatePostRequest{Title: "test", Body: "test", CreatedByID: 1}
-
-	dao.On("PostExists", req.Title, req.CreatedByID).Return(false, nil)
+	dao.On("PostExists", createPostRequest.Title, createPostRequest.CreatedByID).Return(false, nil)
 	dao.On("CreatePost", mock.AnythingOfType("*siogeneric.BlogPost")).Return(nil)
 
-	resp, err := bs.CreatePost(req)
+	resp, err := bs.CreatePost(createPostRequest)
 	assert.NoError(t, err)
 	assert.Equal(t, post.Title.String, resp.Title)
 	assert.Equal(t, post.Body.String, resp.Body)
 	dao.AssertExpectations(t)
 }
 
+func TestCreatePost_ErrAlreadyExists(t *testing.T) {
+	bs, dao := initEnv(t)
+
+	testError := sioerror.NewSioBadRequestError("post already exists")
+
+	dao.On("PostExists", createPostRequest.Title, createPostRequest.CreatedByID).Return(true, nil)
+
+	resp, err := bs.CreatePost(createPostRequest)
+	assert.Error(t, err)
+	assert.Equal(t, testError.Error(), err.Error())
+	assert.Nil(t, resp)
+	dao.AssertExpectations(t)
+}
+
+func TestCreatePost_ErrExistsCheckUnexpectedErr(t *testing.T) {
+	bs, dao := initEnv(t)
+
+	testError := sioerror.NewSioInternalServerError(
+		"unexpected DB error: " + sql.ErrConnDone.Error(),
+	)
+
+	dao.On("PostExists", createPostRequest.Title, createPostRequest.CreatedByID).
+		Return(false, sql.ErrConnDone)
+
+	resp, err := bs.CreatePost(createPostRequest)
+	assert.Error(t, err)
+	assert.Equal(t, testError.Error(), err.Error())
+	assert.Nil(t, resp)
+	dao.AssertExpectations(t)
+}
+
+func TestCreatePost_CreateErr(t *testing.T) {
+	bs, dao := initEnv(t)
+
+	testError := sioerror.NewSioInternalServerError(
+		"unexpected DB error: " + sql.ErrConnDone.Error(),
+	)
+
+	dao.On("PostExists", createPostRequest.Title, createPostRequest.CreatedByID).Return(false, nil)
+	dao.On("CreatePost", mock.AnythingOfType("*siogeneric.BlogPost")).Return(sql.ErrConnDone)
+
+	resp, err := bs.CreatePost(createPostRequest)
+	assert.Error(t, err)
+	assert.Equal(t, testError.Error(), err.Error())
+	assert.Nil(t, resp)
+	dao.AssertExpectations(t)
+}
+
 func TestAddComment(t *testing.T) {
 	bs, dao := initEnv(t)
 
-	req := &dto.AddCommentRequest{PostID: 1, UserID: 1, Content: "test"}
-
+	dao.On("PostExistsByID", mock.AnythingOfType("int64")).Return(true, nil)
 	dao.On("AddComment", mock.AnythingOfType("*siogeneric.BlogComment")).Return(nil)
 
-	resp, err := bs.AddComment(req)
+	resp, err := bs.AddComment(addCommentRequest)
 	assert.NoError(t, err)
 	assert.Equal(t, comment.Content.String, resp.Content)
+	dao.AssertExpectations(t)
+}
+
+func TestAddComment_ErrNotFound(t *testing.T) {
+	bs, dao := initEnv(t)
+
+	testError := sioerror.NewSioNotFoundError("no post found")
+
+	dao.On("PostExistsByID", mock.AnythingOfType("int64")).Return(false, nil)
+
+	resp, err := bs.AddComment(addCommentRequest)
+	assert.Error(t, err)
+	assert.Equal(t, testError.Error(), err.Error())
+	assert.Nil(t, resp)
+	dao.AssertExpectations(t)
+}
+
+func TestAddComment_ErrExistsCheckUnexpectedErr(t *testing.T) {
+	bs, dao := initEnv(t)
+
+	testError := sioerror.NewSioInternalServerError(
+		"unexpected DB error: " + sql.ErrConnDone.Error(),
+	)
+
+	dao.On("PostExistsByID", mock.AnythingOfType("int64")).Return(false, sql.ErrConnDone)
+
+	resp, err := bs.AddComment(addCommentRequest)
+	assert.Error(t, err)
+	assert.Equal(t, testError.Error(), err.Error())
+	assert.Nil(t, resp)
+	dao.AssertExpectations(t)
+}
+
+func TestAddComment_CreateErr(t *testing.T) {
+	bs, dao := initEnv(t)
+
+	testError := sioerror.NewSioInternalServerError(
+		"unexpected DB error: " + sql.ErrConnDone.Error(),
+	)
+
+	dao.On("PostExistsByID", mock.AnythingOfType("int64")).Return(true, nil)
+	dao.On("AddComment", mock.AnythingOfType("*siogeneric.BlogComment")).Return(sql.ErrConnDone)
+
+	resp, err := bs.AddComment(addCommentRequest)
+	assert.Error(t, err)
+	assert.Equal(t, testError.Error(), err.Error())
+	assert.Nil(t, resp)
 	dao.AssertExpectations(t)
 }
 
 func TestUpdatePost(t *testing.T) {
 	bs, dao := initEnv(t)
 
-	req := &dto.UpdatePostRequest{Title: "test"}
-
 	dao.On("PostExistsByID", mock.AnythingOfType("int64")).Return(true, nil)
 	dao.On("UpdatePost", mock.AnythingOfType("*siogeneric.BlogPost")).Return(nil)
 	dao.On("GetPostByID", mock.AnythingOfType("int64")).Return(post, nil)
 
-	resp, err := bs.UpdatePost(post.ID.Int64, req)
+	resp, err := bs.UpdatePost(post.ID.Int64, updatePostRequest)
 	assert.NoError(t, err)
 	assert.Equal(t, post.Title.String, resp.Title)
+	dao.AssertExpectations(t)
+}
+
+func TestUpdatePost_ErrNotFound(t *testing.T) {
+	bs, dao := initEnv(t)
+
+	testError := sioerror.NewSioNotFoundError("no post found")
+
+	dao.On("PostExistsByID", mock.AnythingOfType("int64")).Return(false, nil)
+
+	resp, err := bs.UpdatePost(post.ID.Int64, updatePostRequest)
+	assert.Error(t, err)
+	assert.Equal(t, testError.Error(), err.Error())
+	assert.Nil(t, resp)
+	dao.AssertExpectations(t)
+}
+
+func TestUpdatePost_ErrExistsCheckUnexpectedErr(t *testing.T) {
+	bs, dao := initEnv(t)
+
+	testError := sioerror.NewSioInternalServerError(
+		"unexpected DB error: " + sql.ErrConnDone.Error(),
+	)
+
+	dao.On("PostExistsByID", mock.AnythingOfType("int64")).Return(false, sql.ErrConnDone)
+
+	resp, err := bs.UpdatePost(post.ID.Int64, updatePostRequest)
+	assert.Error(t, err)
+	assert.Equal(t, testError.Error(), err.Error())
+	assert.Nil(t, resp)
+	dao.AssertExpectations(t)
+}
+
+func TestUpdatePost_UpdateErr(t *testing.T) {
+	bs, dao := initEnv(t)
+
+	testError := sioerror.NewSioInternalServerError(
+		"unexpected DB error: " + sql.ErrConnDone.Error(),
+	)
+
+	dao.On("PostExistsByID", mock.AnythingOfType("int64")).Return(true, nil)
+	dao.On("UpdatePost", mock.AnythingOfType("*siogeneric.BlogPost")).Return(sql.ErrConnDone)
+
+	resp, err := bs.UpdatePost(post.ID.Int64, updatePostRequest)
+	assert.Error(t, err)
+	assert.Equal(t, testError.Error(), err.Error())
+	assert.Nil(t, resp)
+	dao.AssertExpectations(t)
+}
+
+func TestUpdatePost_GetErr(t *testing.T) {
+	bs, dao := initEnv(t)
+
+	testError := sioerror.NewSioInternalServerError(
+		"unexpected DB error: " + sql.ErrConnDone.Error(),
+	)
+
+	dao.On("PostExistsByID", mock.AnythingOfType("int64")).Return(true, nil)
+	dao.On("UpdatePost", mock.AnythingOfType("*siogeneric.BlogPost")).Return(nil)
+	dao.On("GetPostByID", mock.AnythingOfType("int64")).Return(nil, sql.ErrConnDone)
+
+	resp, err := bs.UpdatePost(post.ID.Int64, updatePostRequest)
+	assert.Error(t, err)
+	assert.Equal(t, testError.Error(), err.Error())
+	assert.Nil(t, resp)
 	dao.AssertExpectations(t)
 }
 
 func TestUpdateComment(t *testing.T) {
 	bs, dao := initEnv(t)
 
-	req := &dto.UpdateCommentRequest{Content: "test"}
-
 	dao.On("CommentExistsByID", mock.AnythingOfType("int64")).Return(true, nil)
 	dao.On("UpdateComment", mock.AnythingOfType("*siogeneric.BlogComment")).Return(nil)
 	dao.On("GetCommentByID", mock.AnythingOfType("int64")).Return(comment, nil)
 
-	resp, err := bs.UpdateComment(comment.ID.Int64, req)
+	resp, err := bs.UpdateComment(comment.ID.Int64, updateCommentRequest)
 	assert.NoError(t, err)
 	assert.Equal(t, comment.Content.String, resp.Content)
+	dao.AssertExpectations(t)
+}
+
+func TestUpdateComment_ErrNotFound(t *testing.T) {
+	bs, dao := initEnv(t)
+
+	testError := sioerror.NewSioNotFoundError("no comment found")
+
+	dao.On("CommentExistsByID", mock.AnythingOfType("int64")).Return(false, nil)
+
+	resp, err := bs.UpdateComment(comment.ID.Int64, updateCommentRequest)
+	assert.Error(t, err)
+	assert.Equal(t, testError.Error(), err.Error())
+	assert.Nil(t, resp)
+	dao.AssertExpectations(t)
+}
+
+func TestUpdateComment_ErrExistsCheckUnexpectedErr(t *testing.T) {
+	bs, dao := initEnv(t)
+
+	testError := sioerror.NewSioInternalServerError(
+		"unexpected DB error: " + sql.ErrConnDone.Error(),
+	)
+
+	dao.On("CommentExistsByID", mock.AnythingOfType("int64")).Return(false, sql.ErrConnDone)
+
+	resp, err := bs.UpdateComment(comment.ID.Int64, updateCommentRequest)
+	assert.Error(t, err)
+	assert.Equal(t, testError.Error(), err.Error())
+	assert.Nil(t, resp)
+	dao.AssertExpectations(t)
+}
+
+func TestUpdateComment_UpdateErr(t *testing.T) {
+	bs, dao := initEnv(t)
+
+	testError := sioerror.NewSioInternalServerError(
+		"unexpected DB error: " + sql.ErrConnDone.Error(),
+	)
+
+	dao.On("CommentExistsByID", mock.AnythingOfType("int64")).Return(true, nil)
+	dao.On("UpdateComment", mock.AnythingOfType("*siogeneric.BlogComment")).Return(sql.ErrConnDone)
+
+	resp, err := bs.UpdateComment(comment.ID.Int64, updateCommentRequest)
+	assert.Error(t, err)
+	assert.Equal(t, testError.Error(), err.Error())
+	assert.Nil(t, resp)
+	dao.AssertExpectations(t)
+}
+
+func TestUpdateComment_GetErr(t *testing.T) {
+	bs, dao := initEnv(t)
+
+	testError := sioerror.NewSioInternalServerError(
+		"unexpected DB error: " + sql.ErrConnDone.Error(),
+	)
+
+	dao.On("CommentExistsByID", mock.AnythingOfType("int64")).Return(true, nil)
+	dao.On("UpdateComment", mock.AnythingOfType("*siogeneric.BlogComment")).Return(nil)
+	dao.On("GetCommentByID", mock.AnythingOfType("int64")).Return(nil, sql.ErrConnDone)
+
+	resp, err := bs.UpdateComment(comment.ID.Int64, updateCommentRequest)
+	assert.Error(t, err)
+	assert.Equal(t, testError.Error(), err.Error())
+	assert.Nil(t, resp)
 	dao.AssertExpectations(t)
 }
 

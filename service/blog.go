@@ -69,6 +69,10 @@ func (bs *BlogSvc) CreatePost(req *dto.CreatePostRequest) (*dto.PostResponse, er
 }
 
 func (bs *BlogSvc) AddComment(req *dto.AddCommentRequest) (*dto.CommentResponse, error) {
+	if err := bs.postExistsByID(req.PostID); err != nil {
+		return nil, err
+	}
+
 	comment := buildAddCommentEntity(req)
 	if err := bs.dao.AddComment(comment); err != nil {
 		return nil, siodao.HandleDbErr(err, constants.COMMENT)
