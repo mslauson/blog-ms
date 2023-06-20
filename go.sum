@@ -4,6 +4,8 @@ gitea.slauson.io/slausonio/go-types v0.1.7 h1:KSuwdTxWI5iOefY7qU3wrjyRUJWKBp2iEL
 gitea.slauson.io/slausonio/go-types v0.1.7/go.mod h1:nNHEtpd+MQosQgVJY8c9JyW0cO/Bd6D4B+yzxutegHE=
 gitea.slauson.io/slausonio/go-utils v0.1.0 h1:91wyfa0Vg07H2iOtNjoie6GuAiC0A1XRY9arPyJwdzQ=
 gitea.slauson.io/slausonio/go-utils v0.1.0/go.mod h1:X0R5+aclKRfaNVPYDwDvxF2JxDR3RBZ/9fpozx6Hwag=
+gitea.slauson.io/slausonio/sio-loki v0.0.6 h1:YxgqY9v+RBtUr3/0JaxV6uFJ4XZyiyT7gRn4OaYb2Ps=
+gitea.slauson.io/slausonio/sio-loki v0.0.6/go.mod h1:P5sPqmajSpV6wHO6mKLulbds2HGI6z+vhbK9Ln0D1uU=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
 github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
