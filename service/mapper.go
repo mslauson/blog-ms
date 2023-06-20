@@ -78,6 +78,10 @@ func buildCommentResponse(entity *siogeneric.BlogComment) *dto.CommentResponse {
 }
 
 func buildCommentResponses(entities *[]*siogeneric.BlogComment) *[]*dto.CommentResponse {
+	if entities == nil {
+		return nil
+	}
+
 	var commentReponses []*dto.CommentResponse
 	for _, entity := range *entities {
 		commentReponses = append(commentReponses, buildCommentResponse(entity))
