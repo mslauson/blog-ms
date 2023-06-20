@@ -47,7 +47,7 @@ func (bs *BlogSvc) GetPost(id int64) (*dto.PostResponse, error) {
 func (bs *BlogSvc) GetAllPosts() (*[]*dto.PostResponse, error) {
 	post, err := bs.dao.GetAllPosts()
 	if err != nil {
-		return nil, siodao.HandleDbErr(err, constants.POST)
+		return nil, siodao.HandleDbErr(err, constants.POSTS)
 	}
 
 	return buildAllPostsResponse(post), nil

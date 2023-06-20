@@ -2,6 +2,7 @@ package constants
 
 const (
 	POST             = "post"
+	POSTS            = "posts"
 	COMMENT          = "comment"
 	POST_EXISTS      = "post already exists"
 	NO_POST_FOUND    = "no post found"

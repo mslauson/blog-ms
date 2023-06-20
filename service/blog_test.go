@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"testing"
 	"time"
 
@@ -10,6 +11,7 @@ import (
 	"gitea.slauson.io/blog/blog-ms/dao/mocks"
 	"gitea.slauson.io/blog/blog-ms/dto"
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
+	"gitea.slauson.io/slausonio/go-utils/sioerror"
 )
 
 var (
@@ -55,6 +57,23 @@ func TestGetPost_WithComments(t *testing.T) {
 	resp, err := bs.GetPost(testID)
 	assert.NoError(t, err)
 	assert.Equal(t, post.Title.String, resp.Title)
+	dao.AssertExpectations(t)
+}
+
+func TestGetPost_NotFound(t *testing.T) {
+	bs, dao := initEnv(t)
+
+	testID := int64(1)
+	post.Comments = comments
+
+	testError := sioerror.NewSioNotFoundError("post not found")
+
+	dao.On("GetPostByID", testID).Return(nil, sql.ErrNoRows)
+
+	resp, err := bs.GetPost(testID)
+	assert.Error(t, err)
+	assert.Equal(t, testError.Error(), err.Error())
+	assert.Nil(t, resp)
 	dao.AssertExpectations(t)
 }
 
