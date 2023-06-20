@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -50,6 +51,21 @@ func TestCreatePost(t *testing.T) {
 	require.Equal(t, int64(1), post.ID.Int64)
 }
 
+func TestCreatePost_Error(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectQuery(`INSERT INTO post`).
+		WithArgs(post.Title.String, post.Body.String, post.PostedDate.Time, post.CreatedByID.Int64, false).
+		WillReturnError(errors.New("test error"))
+	err = pd.CreatePost(post)
+	require.Error(t, err)
+}
+
 func TestPostExists(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
@@ -65,6 +81,22 @@ func TestPostExists(t *testing.T) {
 	exists, err := pd.PostExists(post.Title.String, post.CreatedByID.Int64)
 	require.NoError(t, err)
 	require.True(t, exists)
+}
+
+func TestPostExists_Error(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectQuery(`SELECT EXISTS`).
+		WithArgs(post.Title.String, post.CreatedByID.Int64).
+		WillReturnError(errors.New("test error"))
+	exists, err := pd.PostExists(post.Title.String, post.CreatedByID.Int64)
+	require.Error(t, err)
+	require.False(t, exists)
 }
 
 func TestPostExistsByID(t *testing.T) {
@@ -83,6 +115,21 @@ func TestPostExistsByID(t *testing.T) {
 	require.True(t, exists)
 }
 
+func TestPostExistsByID_Error(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectQuery(`SELECT EXISTS`).
+		WillReturnError(errors.New("test error"))
+	exists, err := pd.PostExistsByID(post.ID.Int64)
+	require.Error(t, err)
+	require.False(t, exists)
+}
+
 func TestCommentExistsByID(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
@@ -97,6 +144,21 @@ func TestCommentExistsByID(t *testing.T) {
 	exists, err := pd.CommentExistsByID(comment.ID.Int64)
 	require.NoError(t, err)
 	require.True(t, exists)
+}
+
+func TestCommentExistsByID_Error(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectQuery(`SELECT EXISTS`).
+		WillReturnError(errors.New("test error"))
+	exists, err := pd.CommentExistsByID(comment.ID.Int64)
+	require.Error(t, err)
+	require.False(t, exists)
 }
 
 func TestGetPostByID(t *testing.T) {
@@ -149,6 +211,56 @@ func TestGetPostByID(t *testing.T) {
 	require.NotNil(t, returnedPost)
 }
 
+func TestGetPostByID_ErrorPost(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectQuery(`SELECT`).
+		WillReturnError(errors.New("test error"))
+
+	mock.ExpectQuery(`SELECT`).
+		WillReturnError(errors.New("test error"))
+
+	returnedPost, err := pd.GetPostByID(post.ID.Int64)
+	require.Error(t, err)
+	require.Nil(t, returnedPost)
+}
+
+func TestGetPostByID_ErrorComment(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	rows := sqlmock.NewRows([]string{
+		"id",
+		"title",
+		"body",
+		"created_by_id",
+		"updated_by_id",
+		"posted_date",
+		"updated_date",
+		"deletion_date",
+		"soft_deleted",
+	}).
+		AddRow(post.ID.Int64, post.Title.String, post.Body.String, post.CreatedByID, post.UpdatedByID, post.PostedDate.Time, post.UpdatedDate, post.DeletionDate, post.SoftDeleted.Bool)
+	mock.ExpectQuery(`SELECT`).
+		WillReturnRows(rows)
+
+	mock.ExpectQuery(`SELECT`).
+		WillReturnError(errors.New("test error"))
+
+	returnedPost, err := pd.GetPostByID(post.ID.Int64)
+	require.Error(t, err)
+	require.Nil(t, returnedPost)
+}
+
 func TestGetCommentByID(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
@@ -182,6 +294,21 @@ func TestGetCommentByID(t *testing.T) {
 	require.NotNil(t, returnedComment)
 }
 
+func TestGetCommentByID_Err(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectQuery(`SELECT`).
+		WillReturnError(errors.New("test error"))
+	returnedComment, err := pd.GetCommentByID(comment.ID.Int64)
+	require.Error(t, err)
+	require.Nil(t, returnedComment)
+}
+
 func TestGetAllPosts(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
@@ -190,8 +317,26 @@ func TestGetAllPosts(t *testing.T) {
 
 	pd := &PDao{db: db}
 
-	rows := sqlmock.NewRows([]string{"id", "title", "body", "created_by_id", "updated_by_id", "posted_date", "updated_date", "deletion_date", "soft_deleted"}).
-		AddRow(post.ID.Int64, post.Title.String, post.Body.String, post.CreatedByID, post.UpdatedByID, post.PostedDate.Time, post.UpdatedDate, post.DeletionDate, post.SoftDeleted.Bool)
+	rows := sqlmock.NewRows([]string{
+		"id",
+		"title",
+		"body",
+		"created_by_id",
+		"updated_by_id",
+		"posted_date",
+		"updated_date",
+		"deletion_date",
+		"soft_deleted",
+	}).
+		AddRow(post.ID.Int64,
+			post.Title.String,
+			post.Body.String,
+			post.CreatedByID,
+			post.UpdatedByID,
+			post.PostedDate.Time,
+			post.UpdatedDate,
+			post.DeletionDate,
+			post.SoftDeleted.Bool)
 	mock.ExpectQuery(`SELECT`).
 		WillReturnRows(rows)
 
@@ -220,6 +365,61 @@ func TestGetAllPosts(t *testing.T) {
 	posts, err := pd.GetAllPosts()
 	require.NoError(t, err)
 	require.NotNil(t, posts)
+}
+
+func TestGetAllPosts_ErrPost(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectQuery(`SELECT`).
+		WillReturnError(errors.New("test error"))
+
+	posts, err := pd.GetAllPosts()
+	require.Error(t, err)
+	require.Nil(t, posts)
+}
+
+func TestGetAllPosts_ErrComments(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	rows := sqlmock.NewRows([]string{
+		"id",
+		"title",
+		"body",
+		"created_by_id",
+		"updated_by_id",
+		"posted_date",
+		"updated_date",
+		"deletion_date",
+		"soft_deleted",
+	}).
+		AddRow(post.ID.Int64,
+			post.Title.String,
+			post.Body.String,
+			post.CreatedByID,
+			post.UpdatedByID,
+			post.PostedDate.Time,
+			post.UpdatedDate,
+			post.DeletionDate,
+			post.SoftDeleted.Bool)
+	mock.ExpectQuery(`SELECT`).
+		WillReturnRows(rows)
+
+	mock.ExpectQuery(`SELECT`).
+		WillReturnError(errors.New("test error"))
+
+	posts, err := pd.GetAllPosts()
+	require.Error(t, err)
+	require.Nil(t, posts)
 }
 
 func TestGetAllCommentsByPostID(t *testing.T) {
@@ -256,6 +456,22 @@ func TestGetAllCommentsByPostID(t *testing.T) {
 	require.NotNil(t, comments)
 }
 
+func TestGetAllCommentsByPostID_Err(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectQuery(`SELECT`).
+		WillReturnError(errors.New("test error"))
+
+	comments, err := pd.GetAllCommentsByPostID(post.ID.Int64)
+	require.Error(t, err)
+	require.Nil(t, comments)
+}
+
 func TestUpdatePost(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
@@ -269,6 +485,21 @@ func TestUpdatePost(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	err = pd.UpdatePost(post)
 	require.NoError(t, err)
+}
+
+func TestUpdatePost_Err(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectExec(`UPDATE post`).
+		WithArgs(post.Title.String, post.Body.String, post.UpdatedDate.Time, post.UpdatedByID.Int64).
+		WillReturnError(errors.New("test error"))
+	err = pd.UpdatePost(post)
+	require.Error(t, err)
 }
 
 func TestAddComment(t *testing.T) {
@@ -288,6 +519,22 @@ func TestAddComment(t *testing.T) {
 	require.Equal(t, int64(1), comment.ID.Int64)
 }
 
+func TestAddComment_Err(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectQuery(`INSERT INTO comment`).
+		WithArgs(comment.Content.String, comment.CommentDate.Time, comment.PostID.Int64, comment.UserID.Int64, false).
+		WillReturnError(errors.New("test error"))
+
+	err = pd.AddComment(comment)
+	require.Error(t, err)
+}
+
 func TestUpdateComment(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
@@ -301,6 +548,22 @@ func TestUpdateComment(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	err = pd.UpdateComment(comment)
 	require.NoError(t, err)
+}
+
+func TestUpdateComment_Err(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectExec(`UPDATE comment`).
+		WithArgs(comment.Content.String, comment.UpdatedDate.Time).
+		WillReturnError(errors.New("test error"))
+
+	err = pd.UpdateComment(comment)
+	require.Error(t, err)
 }
 
 func TestSoftDeletePost(t *testing.T) {
@@ -318,6 +581,22 @@ func TestSoftDeletePost(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestSoftDeletePost_Err(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectExec(`UPDATE post`).
+		WithArgs(true, post.DeletionDate.Time, post.ID.Int64).
+		WillReturnError(errors.New("test error"))
+
+	err = pd.SoftDeletePost(post)
+	require.Error(t, err)
+}
+
 func TestSoftDeleteComment(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
@@ -331,6 +610,21 @@ func TestSoftDeleteComment(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	err = pd.SoftDeleteComment(comment)
 	require.NoError(t, err)
+}
+
+func TestSoftDeleteComment_Err(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectExec(`UPDATE comment`).
+		WithArgs(true, comment.DeletionDate.Time, comment.ID.Int64).
+		WillReturnError(errors.New("test error"))
+
+	err = pd.SoftDeleteComment(comment)
+	require.Error(t, err)
 }
 
 // require.NoError(t, mock.ExpectationsWereMet())
