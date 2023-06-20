@@ -1,7 +1,13 @@
 package handler
 
 import (
+	"net/http"
+
+	"gitea.slauson.io/blog/blog-ms/dto"
 	"gitea.slauson.io/blog/blog-ms/service"
+	"gitea.slauson.io/blog/blog-ms/utils"
+	"gitea.slauson.io/slausonio/go-utils/sioUtils"
+	"gitea.slauson.io/slausonio/go-utils/sioerror"
 	"github.com/gin-gonic/gin"
 )
 
@@ -39,8 +45,19 @@ func NewPostHdlr() *PostHdlr {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/post/v1/:id [get]
-func (PostHdlr) GetPost(c *gin.Context) {
-	panic("not implemented") // TODO: Implement
+func (ph *PostHdlr) GetPost(c *gin.Context) {
+	id := c.Param("id")
+
+	iId, err := sioUtils.ConvertToInt64(id)
+	if err != nil {
+		_ = c.Error(sioerror.NewSioBadRequestError(err.Error()))
+		return
+	}
+	if result, err := ph.svc.GetPost(iId); result != nil {
+		c.JSON(http.StatusOK, result)
+	} else {
+		_ = c.Error(err)
+	}
 }
 
 // GET
@@ -55,8 +72,19 @@ func (PostHdlr) GetPost(c *gin.Context) {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/post/v1/ [get]
-func (PostHdlr) GetAllPosts(c *gin.Context) {
-	panic("not implemented") // TODO: Implement
+func (ph *PostHdlr) GetAllPosts(c *gin.Context) {
+	// includeDeleted := c.DefaultQuery("includeDeleted", "false")
+	// idBool, err := sioUtils.ToBool(includeDeleted)
+	// if err != nil {
+	// 	_ = c.Error(sioerror.NewSioBadRequestError(err.Error()))
+	// 	return
+	// }
+
+	if result, err := ph.svc.GetAllPosts(); result != nil {
+		c.JSON(http.StatusOK, result)
+	} else {
+		_ = c.Error(err)
+	}
 }
 
 // POST
@@ -72,8 +100,25 @@ func (PostHdlr) GetAllPosts(c *gin.Context) {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/post/v1/ [post]
-func (PostHdlr) CreatePost(c *gin.Context) {
-	panic("not implemented") // TODO: Implement
+func (ph *PostHdlr) CreatePost(c *gin.Context) {
+	validations := utils.NewValidator()
+	var request dto.CreatePostRequest
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		_ = c.Error(sioerror.NewSioBadRequestError(err.Error()))
+		return
+	}
+
+	if err := validations.ValidateCreatePostRequest(&request); err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	if result, err := ph.svc.CreatePost(&request); result == nil {
+		_ = c.Error(err)
+	} else {
+		c.JSON(http.StatusOK, result)
+	}
 }
 
 // POST
@@ -89,8 +134,25 @@ func (PostHdlr) CreatePost(c *gin.Context) {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/post/v1/comment [post]
-func (PostHdlr) AddComment(c *gin.Context) {
-	panic("not implemented") // TODO: Implement
+func (ph *PostHdlr) AddComment(c *gin.Context) {
+	validations := utils.NewValidator()
+	var request dto.AddCommentRequest
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		_ = c.Error(sioerror.NewSioBadRequestError(err.Error()))
+		return
+	}
+
+	if err := validations.ValidateAddCommentRequest(&request); err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	if result, err := ph.svc.AddComment(&request); result == nil {
+		_ = c.Error(err)
+	} else {
+		c.JSON(http.StatusOK, result)
+	}
 }
 
 // PATCH
@@ -107,8 +169,34 @@ func (PostHdlr) AddComment(c *gin.Context) {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/post/v1/:id [patch]
-func (PostHdlr) UpdatePost(c *gin.Context) {
-	panic("not implemented") // TODO: Implement
+func (ph *PostHdlr) UpdatePost(c *gin.Context) {
+	validations := utils.NewValidator()
+
+	id := c.Param("id")
+
+	var request dto.UpdatePostRequest
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		_ = c.Error(sioerror.NewSioBadRequestError(err.Error()))
+		return
+	}
+
+	if err := validations.ValidateUpdatePostRequest(&request); err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	iId, err := sioUtils.ConvertToInt64(id)
+	if err != nil {
+		_ = c.Error(sioerror.NewSioBadRequestError(err.Error()))
+		return
+	}
+
+	if result, err := ph.svc.UpdatePost(iId, &request); result != nil {
+		c.JSON(http.StatusOK, result)
+	} else {
+		_ = c.Error(err)
+	}
 }
 
 // PATCH
@@ -125,8 +213,34 @@ func (PostHdlr) UpdatePost(c *gin.Context) {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/post/v1/comment/:id [patch]
-func (PostHdlr) UpdateComment(c *gin.Context) {
-	panic("not implemented") // TODO: Implement
+func (ph *PostHdlr) UpdateComment(c *gin.Context) {
+	validations := utils.NewValidator()
+
+	id := c.Param("id")
+
+	var request dto.UpdateCommentRequest
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		_ = c.Error(sioerror.NewSioBadRequestError(err.Error()))
+		return
+	}
+
+	if err := validations.ValidateUpdateCommentRequest(&request); err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	iId, err := sioUtils.ConvertToInt64(id)
+	if err != nil {
+		_ = c.Error(sioerror.NewSioBadRequestError(err.Error()))
+		return
+	}
+
+	if result, err := ph.svc.UpdateComment(iId, &request); result != nil {
+		c.JSON(http.StatusOK, result)
+	} else {
+		_ = c.Error(err)
+	}
 }
 
 // DELETE
@@ -142,8 +256,19 @@ func (PostHdlr) UpdateComment(c *gin.Context) {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/post/v1/:id [delete]
-func (PostHdlr) SoftDeletePost(c *gin.Context) {
-	panic("not implemented") // TODO: Implement
+func (ph *PostHdlr) SoftDeletePost(c *gin.Context) {
+	id := c.Param("id")
+
+	iId, err := sioUtils.ConvertToInt64(id)
+	if err != nil {
+		_ = c.Error(sioerror.NewSioBadRequestError(err.Error()))
+		return
+	}
+	if result, err := ph.svc.SoftDeletePost(iId); result != nil {
+		c.JSON(http.StatusOK, result)
+	} else {
+		_ = c.Error(err)
+	}
 }
 
 // DELETE
@@ -159,6 +284,17 @@ func (PostHdlr) SoftDeletePost(c *gin.Context) {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/post/v1/comment/:id [delete]
-func (PostHdlr) SoftDeleteComment(c *gin.Context) {
-	panic("not implemented") // TODO: Implement
+func (ph *PostHdlr) SoftDeleteComment(c *gin.Context) {
+	id := c.Param("id")
+
+	iId, err := sioUtils.ConvertToInt64(id)
+	if err != nil {
+		_ = c.Error(sioerror.NewSioBadRequestError(err.Error()))
+		return
+	}
+	if result, err := ph.svc.SoftDeleteComment(iId); result != nil {
+		c.JSON(http.StatusOK, result)
+	} else {
+		_ = c.Error(err)
+	}
 }
