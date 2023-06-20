@@ -147,7 +147,7 @@ func (pd *PDao) GetAllCommentsByPostID(postID int64) (*[]*siogeneric.BlogComment
 }
 
 func (pd *PDao) UpdatePost(post *siogeneric.BlogPost) error {
-	query := `UPDATE blog
+	query := `UPDATE post
 		SET 
 		title = COALESCE($1, title),
 		body = COALESCE($2,body),
@@ -187,7 +187,7 @@ func (pd *PDao) UpdateComment(comment *siogeneric.BlogComment) error {
 }
 
 func (pd *PDao) SoftDeletePost(post *siogeneric.BlogPost) error {
-	query := `UPDATE blog 
+	query := `UPDATE post 
 	SET
 	soft_deleted = $1,
 	delation_date = $2,
