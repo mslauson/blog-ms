@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TODO: Add Returns
 func TestPostDao(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
@@ -48,7 +49,7 @@ func TestPostDao(t *testing.T) {
 
 	t.Run("PostExists", func(t *testing.T) {
 		rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
-		mock.ExpectQuery(`SELECT EXISTS(SELECT 1 FROM post WHERE title = \$1 AND created_by_id = \$2)`).
+		mock.ExpectQuery(`SELECT EXISTS(SELECT 1 FROM post WHERE title = $1 AND created_by_id = $2)`).
 			WithArgs(post.Title.String, post.CreatedByID.Int64).
 			WillReturnRows(rows)
 		exists, err := pd.PostExists(post.Title.String, post.CreatedByID.Int64)
@@ -58,7 +59,7 @@ func TestPostDao(t *testing.T) {
 
 	t.Run("PostExistsByID", func(t *testing.T) {
 		rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
-		mock.ExpectQuery(`SELECT EXISTS(SELECT 1 FROM post WHERE id = \$1)`).
+		mock.ExpectQuery(`SELECT EXISTS(SELECT 1 FROM post WHERE id = $1)`).
 			WithArgs(post.ID.Int64).
 			WillReturnRows(rows)
 		exists, err := pd.PostExistsByID(post.ID.Int64)
@@ -68,7 +69,7 @@ func TestPostDao(t *testing.T) {
 
 	t.Run("CommentExistsByID", func(t *testing.T) {
 		rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
-		mock.ExpectQuery(`SELECT EXISTS(SELECT 1 FROM comment WHERE id = \$1)`).
+		mock.ExpectQuery(`SELECT EXISTS(SELECT 1 FROM comment WHERE id = $1)`).
 			WithArgs(comment.ID.Int64).
 			WillReturnRows(rows)
 		exists, err := pd.CommentExistsByID(comment.ID.Int64)
@@ -79,7 +80,7 @@ func TestPostDao(t *testing.T) {
 	t.Run("GetPostByID", func(t *testing.T) {
 		rows := sqlmock.NewRows([]string{"id", "title", "body", "posted_date", "created_by_id", "soft_deleted"}).
 			AddRow(post.ID.Int64, post.Title.String, post.Body.String, post.PostedDate.Time, post.CreatedByID.Int64, post.SoftDeleted.Bool)
-		mock.ExpectQuery(`SELECT id, title, body, posted_date, created_by_id, soft_deleted FROM post WHERE id = \$1`).
+		mock.ExpectQuery(`SELECT id, title, body, posted_date, created_by_id, soft_deleted FROM post WHERE id = $1`).
 			WithArgs(post.ID.Int64).
 			WillReturnRows(rows)
 		returnedPost, err := pd.GetPostByID(post.ID.Int64)
@@ -90,7 +91,7 @@ func TestPostDao(t *testing.T) {
 	t.Run("GetCommentByID", func(t *testing.T) {
 		rows := sqlmock.NewRows([]string{"id", "content", "comment_date", "post_id", "user_id", "soft_deleted"}).
 			AddRow(comment.ID.Int64, comment.Content.String, comment.CommentDate.Time, comment.PostID.Int64, comment.UserID.Int64, comment.SoftDeleted.Bool)
-		mock.ExpectQuery(`SELECT id, content, comment_date, post_id, user_id, soft_deleted FROM comment WHERE id = \$1`).
+		mock.ExpectQuery(`SELECT id, content, comment_date, post_id, user_id, soft_deleted FROM comment WHERE id = $1`).
 			WithArgs(comment.ID.Int64).
 			WillReturnRows(rows)
 		returnedComment, err := pd.GetCommentByID(comment.ID.Int64)
@@ -111,7 +112,7 @@ func TestPostDao(t *testing.T) {
 	t.Run("GetAllCommentsByPostID", func(t *testing.T) {
 		rows := sqlmock.NewRows([]string{"id", "content", "comment_date", "soft_deleted", "deletion_date"}).
 			AddRow(comment.ID.Int64, comment.Content.String, comment.CommentDate.Time, comment.SoftDeleted.Bool, comment.DeletionDate.Time)
-		mock.ExpectQuery(`SELECT id, content, comment_date, soft_deleted, deletion_date FROM comment WHERE post_id = \$1 AND soft_deleted = false`).
+		mock.ExpectQuery(`SELECT id, content, comment_date, soft_deleted, deletion_date FROM comment WHERE post_id = $1 AND soft_deleted = false`).
 			WithArgs(post.ID.Int64).
 			WillReturnRows(rows)
 		comments, err := pd.GetAllCommentsByPostID(post.ID.Int64)
