@@ -43,6 +43,10 @@ func (bv *BlogValidation) ValidateUpdatePostRequest(req *dto.UpdatePostRequest) 
 		return sioerror.NewSioInternalServerError(sioUtils.DecryptionFailed)
 	}
 
+	if req.Title == "" && req.Body == "" {
+		return sioerror.NewSioBadRequestError(POST_UPDATE_INVALID)
+	}
+
 	if req.Title != "" {
 		if err := bv.validateTitle(decryptedRequest.Title); err != nil {
 			return err
