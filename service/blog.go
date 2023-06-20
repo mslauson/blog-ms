@@ -12,10 +12,12 @@ import (
 )
 
 type BlogSvc struct {
-	dao dao.PostDao
+	dao dao.BlogDao
 }
 
 // BlogService interface
+//
+//go:generate mockery --name BlogService
 type BlogService interface {
 	GetPost(id int64) (*dto.PostResponse, error)
 	GetAllPosts() (*[]*dto.PostResponse, error)
@@ -29,7 +31,7 @@ type BlogService interface {
 
 func NewBlogSvc() *BlogSvc {
 	return &BlogSvc{
-		dao: dao.NewPostDao(),
+		dao: dao.NewBlogDao(),
 	}
 }
 

@@ -40,7 +40,7 @@ func TestCreatePost(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	rows := sqlmock.NewRows([]string{"id"}).AddRow(1)
 	mock.ExpectQuery(`INSERT INTO post`).
@@ -57,7 +57,7 @@ func TestCreatePost_Error(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectQuery(`INSERT INTO post`).
 		WithArgs(post.Title.String, post.Body.String, post.PostedDate.Time, post.CreatedByID.Int64, false).
@@ -72,7 +72,7 @@ func TestPostExists(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
 	mock.ExpectQuery(`SELECT EXISTS`).
@@ -89,7 +89,7 @@ func TestPostExists_Error(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectQuery(`SELECT EXISTS`).
 		WithArgs(post.Title.String, post.CreatedByID.Int64).
@@ -105,7 +105,7 @@ func TestPostExistsByID(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
 	mock.ExpectQuery(`SELECT EXISTS`).
@@ -121,7 +121,7 @@ func TestPostExistsByID_Error(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectQuery(`SELECT EXISTS`).
 		WillReturnError(errors.New("test error"))
@@ -136,7 +136,7 @@ func TestCommentExistsByID(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
 	mock.ExpectQuery(`SELECT EXISTS`).
@@ -152,7 +152,7 @@ func TestCommentExistsByID_Error(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectQuery(`SELECT EXISTS`).
 		WillReturnError(errors.New("test error"))
@@ -167,7 +167,7 @@ func TestGetPostByID(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	rows := sqlmock.NewRows([]string{
 		"id",
@@ -217,7 +217,7 @@ func TestGetPostByID_ErrorPost(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectQuery(`SELECT`).
 		WillReturnError(errors.New("test error"))
@@ -236,7 +236,7 @@ func TestGetPostByID_ErrorComment(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	rows := sqlmock.NewRows([]string{
 		"id",
@@ -267,7 +267,7 @@ func TestGetCommentByID(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	rows := sqlmock.NewRows([]string{
 		"id",
@@ -300,7 +300,7 @@ func TestGetCommentByID_Err(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectQuery(`SELECT`).
 		WillReturnError(errors.New("test error"))
@@ -315,7 +315,7 @@ func TestGetAllPosts(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	rows := sqlmock.NewRows([]string{
 		"id",
@@ -373,7 +373,7 @@ func TestGetAllPosts_ErrPost(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectQuery(`SELECT`).
 		WillReturnError(errors.New("test error"))
@@ -389,7 +389,7 @@ func TestGetAllPosts_ErrComments(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	rows := sqlmock.NewRows([]string{
 		"id",
@@ -428,7 +428,7 @@ func TestGetAllCommentsByPostID(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	rows := sqlmock.NewRows([]string{
 		"id",
@@ -462,7 +462,7 @@ func TestGetAllCommentsByPostID_Err(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectQuery(`SELECT`).
 		WillReturnError(errors.New("test error"))
@@ -478,7 +478,7 @@ func TestUpdatePost(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE post`).
 		WithArgs(post.Title.String, post.Body.String, post.UpdatedDate.Time, post.UpdatedByID.Int64).
@@ -493,7 +493,7 @@ func TestUpdatePost_Err(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE post`).
 		WithArgs(post.Title.String, post.Body.String, post.UpdatedDate.Time, post.UpdatedByID.Int64).
@@ -508,7 +508,7 @@ func TestAddComment(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	rows := sqlmock.NewRows([]string{"id"}).AddRow(1)
 	mock.ExpectQuery(`INSERT INTO comment`).
@@ -525,7 +525,7 @@ func TestAddComment_Err(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectQuery(`INSERT INTO comment`).
 		WithArgs(comment.Content.String, comment.CommentDate.Time, comment.PostID.Int64, comment.UserID.Int64, false).
@@ -541,7 +541,7 @@ func TestUpdateComment(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE comment`).
 		WithArgs(comment.Content.String, comment.UpdatedDate.Time).
@@ -556,7 +556,7 @@ func TestUpdateComment_Err(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE comment`).
 		WithArgs(comment.Content.String, comment.UpdatedDate.Time).
@@ -572,7 +572,7 @@ func TestSoftDeletePost(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE post`).
 		WithArgs(true, post.DeletionDate.Time, post.ID.Int64).
@@ -587,7 +587,7 @@ func TestSoftDeletePost_Err(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE post`).
 		WithArgs(true, post.DeletionDate.Time, post.ID.Int64).
@@ -603,7 +603,7 @@ func TestSoftDeleteComment(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE comment`).
 		WithArgs(true, comment.DeletionDate.Time, comment.ID.Int64).
@@ -617,7 +617,7 @@ func TestSoftDeleteComment_Err(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	pd := &PDao{db: db}
+	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE comment`).
 		WithArgs(true, comment.DeletionDate.Time, comment.ID.Int64).
