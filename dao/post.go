@@ -99,7 +99,7 @@ func (pd *PDao) GetPostByID(ID int64) (*siogeneric.BlogPost, error) {
 }
 
 func (pd *PDao) GetCommentByID(ID int64) (*siogeneric.BlogComment, error) {
-	query := `SELECT id, content, comment_date, soft_deleted, deletion_date FROM comment WHERE id = $1 AND soft_deleted = false`
+	query := `SELECT id, content, comment_date, user_id, post_id, soft_deleted, deletion_date FROM comment WHERE id = $1 AND soft_deleted = false`
 	rows, err := pd.db.QueryContext(ctx, query, ID)
 	if err != nil {
 		return nil, err
@@ -137,7 +137,7 @@ func (pd *PDao) GetAllPosts() (*[]*siogeneric.BlogPost, error) {
 }
 
 func (pd *PDao) GetAllCommentsByPostID(postID int64) (*[]*siogeneric.BlogComment, error) {
-	query := `SELECT id, content, comment_date, soft_deleted, deletion_date FROM comment WHERE post_id = $1 AND soft_deleted = false`
+	query := `SELECT id, content, comment_date, user_id, post_id, soft_deleted, deletion_date FROM comment WHERE post_id = $1 AND soft_deleted = false`
 	rows, err := pd.db.QueryContext(ctx, query, postID)
 	if err != nil {
 		return nil, err
@@ -239,6 +239,8 @@ func (pd *PDao) scanComment(rows *sql.Rows) (*siogeneric.BlogComment, error) {
 		&comment.ID,
 		&comment.Content,
 		&comment.CommentDate,
+		&comment.UserID,
+		&comment.PostID,
 		&comment.SoftDeleted,
 		&comment.DeletionDate,
 	)
