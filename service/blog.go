@@ -1,8 +1,11 @@
 package service
 
 import (
+	"time"
+
 	"gitea.slauson.io/blog/blog-ms/dao"
 	"gitea.slauson.io/blog/blog-ms/dto"
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/siodao"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
 )
@@ -17,13 +20,12 @@ type BlogService interface {
 	GetAllPosts() (*[]*dto.PostResponse, error)
 	CreatePost(req *dto.CreatePostRequest) (*dto.PostResponse, error)
 	AddComment(req *dto.AddCommentRequest) (*dto.CommentResponse, error)
-	UpdatePost(req *dto.UpdatePostRequest) (*dto.PostResponse, error)
-	UpdateComment(req *dto.UpdateCommentRequest) (*dto.CommentResponse, error)
-	SoftDeletePost(id int64) (*dto.PostResponse, error)
-	SoftDeleteComment(id int64) (*dto.CommentResponse, error)
+	UpdatePost(ID int64, req *dto.UpdatePostRequest) (*dto.PostResponse, error)
+	UpdateComment(ID int64, req *dto.UpdateCommentRequest) (*dto.CommentResponse, error)
+	SoftDeletePost(ID int64) (*siogeneric.SuccessResponse, error)
+	SoftDeleteComment(ID int64) (*siogeneric.SuccessResponse, error)
 }
 
-// Newbs function
 func NewBlogSvc() *BlogSvc {
 	return &BlogSvc{
 		dao: dao.NewPostDao(),
@@ -72,19 +74,72 @@ func (bs *BlogSvc) AddComment(req *dto.AddCommentRequest) (*dto.CommentResponse,
 	return buildCommentResponse(comment), nil
 }
 
-func (bs *BlogSvc) UpdatePost(req *dto.UpdatePostRequest) (*dto.PostResponse, error) {
-	panic("not implemented") // TODO: Implement
+func (bs *BlogSvc) UpdatePost(ID int64, req *dto.UpdatePostRequest) (*dto.PostResponse, error) {
+	if err := bs.postExistsByID(ID); err != nil {
+		return nil, err
+	}
+
+	post := buildUpdatePostEntity(req)
+	if err := bs.dao.UpdatePost(post); err != nil {
+		return nil, siodao.HandleDbErr(err, POST)
+	}
+
+	post, err := bs.dao.GetPostByID(ID)
+	if err != nil {
+		return nil, siodao.HandleDbErr(err, POST)
+	}
+
+	return buildPostResponse(post), nil
 }
 
 func (bs *BlogSvc) UpdateComment(
-	req *dto.UpdateCommentRequest,
+	ID int64, req *dto.UpdateCommentRequest,
 ) (*dto.CommentResponse, error) {
+	if err := bs.commentExistsByID(ID); err != nil {
+		return nil, err
+	}
+
+	comment := buildUpdateCommentEntity(req)
+	if err := bs.dao.UpdateComment(comment); err != nil {
+		return nil, siodao.HandleDbErr(err, COMMENT)
+	}
+
+	comment, err := bs.dao.GetCommentByID(ID)
+	if err != nil {
+		return nil, siodao.HandleDbErr(err, COMMENT)
+	}
+
+	return buildCommentResponse(comment), nil
 }
 
-func (bs *BlogSvc) SoftDeletePost(id int64) (*dto.PostResponse, error) {
+func (bs *BlogSvc) SoftDeletePost(ID int64) (*siogeneric.SuccessResponse, error) {
+	if err := bs.commentExistsByID(ID); err != nil {
+		return nil, err
+	}
+
+	comment := new(siogeneric.BlogComment)
+	comment.DeletionDate = siogeneric.NewSioNullTime(time.Now())
+
+	if err := bs.dao.SoftDeleteComment(comment); err != nil {
+		return nil, siodao.HandleDbErr(err, POST)
+	}
+
+	return &siogeneric.SuccessResponse{Success: true}, nil
 }
 
-func (bs *BlogSvc) SoftDeleteComment(id int64) (*dto.CommentResponse, error) {
+func (bs *BlogSvc) SoftDeleteComment(ID int64) (*siogeneric.SuccessResponse, error) {
+	if err := bs.commentExistsByID(ID); err != nil {
+		return nil, err
+	}
+
+	comment := new(siogeneric.BlogComment)
+	comment.DeletionDate = siogeneric.NewSioNullTime(time.Now())
+
+	if err := bs.dao.SoftDeleteComment(comment); err != nil {
+		return nil, siodao.HandleDbErr(err, COMMENT)
+	}
+
+	return &siogeneric.SuccessResponse{Success: true}, nil
 }
 
 func (bs *BlogSvc) postExistsByID(id int64) error {
