@@ -2,6 +2,7 @@ package testing
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -14,8 +15,6 @@ import (
 	"gitea.slauson.io/blog/blog-ms/testing/mockdata"
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -595,65 +594,67 @@ func TestUpdateComment(t *testing.T) {
 	}
 }
 
-func TestUpdateComment_Err(t *testing.T) {
+func TestGetPost(t *testing.T) {
 	ts := runTestServer()
 	defer ts.Close()
+	token, err := sioUtils.NewTokenClient().CreateToken()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	id := createdPosts[0].ID
 	errTests := []struct {
-		name   string
-		ID     string
-		req    *dto.UpdateCommentRequest
-		res    *dto.CommentResponse
-		status int
+		name    string
+		request string
+		status  int
+		err     string
 	}{
 		{
-			name: "success",
-			req: &dto.UpdateCommentRequest{
-				Content: "Test Content",
-			},
-			status: http.StatusOK,
-			ID:     "1",
+			name:    "Not Found",
+			request: "123",
+			status:  http.StatusNotFound,
+			err:     "asdf",
 		},
+
 		{
-			name: "success Bad ID",
-			req: &dto.UpdateCommentRequest{
-				Content: "Test Content",
-			},
-			status: http.StatusBadRequest,
-			ID:     "1asdf",
-		},
-		{
-			name: "success Bad Content",
-			req: &dto.UpdateCommentRequest{
-				Content: mockdata.LongComment,
-			},
-			status: http.StatusBadRequest,
-			ID:     "1",
-		},
-		{
-			name:   "success No Content",
-			req:    &dto.UpdateCommentRequest{},
-			status: http.StatusBadRequest,
-			ID:     "1",
+			name:    "BadId",
+			request: "1s23",
+			status:  http.StatusBadRequest,
+			err:     constants.INVALID_ID,
 		},
 	}
-	id := createdComments[0].ID
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			token, err := sioUtils.NewTokenClient().CreateToken()
-			if err != nil {
-				t.Fatal(err)
-			}
+	t.Run("Happy", func(t *testing.T) {
+		t.Parallel()
+		req, err := http.NewRequest("GET", ts.URL+"/api/blog/v1/post/"+strconv.Itoa(int(id)), nil)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-			rJSON, err := json.Marshal(tt.req)
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		defer func(Body io.ReadCloser) {
+			err := Body.Close()
 			if err != nil {
-				t.Fatal(err)
 			}
-			sr := strings.NewReader(string(rJSON))
+		}(resp.Body)
+
+		result := parsePostResponse(t, resp)
+		require.Equal(t, id, result)
+	})
+
+	for _, et := range errTests {
+		t.Run(et.name, func(t *testing.T) {
+			t.Parallel()
 			req, err := http.NewRequest(
-				"PATCH",
-				ts.URL+"/api/blog/v1/task/comment/"+strconv.Itoa(int(id)),
-				sr,
+				"GET",
+				ts.URL+"/api/blog/v1/post/"+strconv.Itoa(int(id)),
+				nil,
 			)
 			if err != nil {
 				t.Fatal(err)
@@ -666,52 +667,13 @@ func TestUpdateComment_Err(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			defer resp.Body.Close()
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+				}
+			}(resp.Body)
 
-			cr := parseCommentResponse(t, resp)
-			require.Equal(t, tt.req.Content, cr.Content)
-		})
-	}
-}
-
-func TestGetPost(t *testing.T) {
-	ts := runTestServer()
-	defer ts.Close()
-	tests := []struct {
-		name    string
-		request string
-		status  int
-		result  *dto.PostResponse
-	}{
-		{name: "happy", request: "123", status: http.StatusOK, result: mockdata.PostResponse},
-		{name: "BadId", request: "1s23", status: http.StatusBadRequest, result: nil},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ts := runTestServer()
-			defer ts.Close()
-			hdlr, mSvc := initEnv()
-			w := httptest.NewRecorder()
-			c, _ := gin.CreateTestContext(w)
-
-			c.Request = &http.Request{
-				Header: make(http.Header),
-			}
-
-			c.Params = gin.Params{gin.Param{Key: "id", Value: tt.request}}
-			if tt.status == http.StatusOK {
-				i, _ := strconv.ParseInt(tt.request, 10, 64)
-				mSvc.On("GetPost", i).
-					Return(tt.result, nil)
-			}
-
-			hdlr.GetPost(c)
-			if tt.status == http.StatusOK {
-				assert.Nilf(t, c.Errors, "c.Errors should be nil")
-			} else {
-				assert.NotNilf(t, c.Errors, "c.Errors shouldnt be nil")
-			}
+			checkIfCorrectError(t, resp, et.err, et.status)
 		})
 	}
 }
@@ -719,64 +681,125 @@ func TestGetPost(t *testing.T) {
 func TestGetAllPosts(t *testing.T) {
 	ts := runTestServer()
 	defer ts.Close()
-	hdlr, mSvc := initEnv()
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
+	token, err := sioUtils.NewTokenClient().CreateToken()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Parallel()
 
-	c.Request = &http.Request{
-		Header: make(http.Header),
+	req, err := http.NewRequest("GET", ts.URL+"/api/blog/v1/post", nil)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	mSvc.On("GetAllPosts").
-		Return(mockdata.PostResponses, nil)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	hdlr.GetAllPosts(c)
-	assert.Nilf(t, c.Errors, "c.Errors should be nil")
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}(resp.Body)
+
+	_ = parsePostResponse(t, resp)
 }
 
 func TestSoftDeleteComment(t *testing.T) {
 	ts := runTestServer()
 	defer ts.Close()
-	tests := []struct {
-		name    string
-		request string
-		status  int
-		result  *siogeneric.SuccessResponse
-	}{
-		{
-			name:    "happy",
-			request: "123",
-			status:  http.StatusOK,
-			result:  mockdata.SuccessResponseSuccess,
-		},
-		{name: "BadId", request: "1s23", status: http.StatusBadRequest, result: nil},
+	token, err := sioUtils.NewTokenClient().CreateToken()
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ts := runTestServer()
-			defer ts.Close()
-			hdlr, mSvc := initEnv()
-			w := httptest.NewRecorder()
-			c, _ := gin.CreateTestContext(w)
+	id := createdComments[0].ID
+	idStr := strconv.Itoa(int(id))
+	errTests := []struct {
+		name   string
+		id     string
+		status int
+		err    string
+	}{
+		{
+			name:   "Not Found - Already Deleted",
+			id:     idStr,
+			status: http.StatusNotFound,
+			err:    "asdf",
+		},
+		{
+			name:   "Not Found",
+			id:     "123",
+			status: http.StatusNotFound,
+			err:    "asdf",
+		},
 
-			c.Request = &http.Request{
-				Header: make(http.Header),
+		{
+			name:   "BadId",
+			id:     "1s23",
+			status: http.StatusBadRequest,
+			err:    constants.INVALID_ID,
+		},
+	}
+
+	t.Run("Happy", func(t *testing.T) {
+		t.Parallel()
+		req, err := http.NewRequest(
+			"DELETE",
+			ts.URL+"/api/blog/v1/post/comment/"+idStr,
+			nil,
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		defer func(Body io.ReadCloser) {
+			err := Body.Close()
+			if err != nil {
+			}
+		}(resp.Body)
+
+		result := parsePostResponse(t, resp)
+		require.Equal(t, id, result)
+	})
+
+	for _, et := range errTests {
+		t.Run(et.name, func(t *testing.T) {
+			t.Parallel()
+			req, err := http.NewRequest(
+				"DELETE",
+				ts.URL+"/api/blog/v1/post/comment/"+idStr,
+				nil,
+			)
+			if err != nil {
+				t.Fatal(err)
 			}
 
-			c.Params = gin.Params{gin.Param{Key: "id", Value: tt.request}}
-			if tt.status == http.StatusOK {
-				i, _ := strconv.ParseInt(tt.request, 10, 64)
-				mSvc.On("SoftDeleteComment", i).
-					Return(tt.result, nil)
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
 			}
 
-			hdlr.SoftDeleteComment(c)
-			if tt.status == http.StatusOK {
-				assert.Nilf(t, c.Errors, "c.Errors should be nil")
-			} else {
-				assert.NotNilf(t, c.Errors, "c.Errors shouldnt be nil")
-			}
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+				}
+			}(resp.Body)
+
+			checkIfCorrectError(t, resp, et.err, et.status)
 		})
 	}
 }
@@ -784,46 +807,94 @@ func TestSoftDeleteComment(t *testing.T) {
 func TestSoftDeletePost(t *testing.T) {
 	ts := runTestServer()
 	defer ts.Close()
-	tests := []struct {
-		name    string
-		request string
-		status  int
-		result  *siogeneric.SuccessResponse
-	}{
-		{
-			name:    "happy",
-			request: "123",
-			status:  http.StatusOK,
-			result:  mockdata.SuccessResponseSuccess,
-		},
-		{name: "BadId", request: "1s23", status: http.StatusBadRequest, result: nil},
+	token, err := sioUtils.NewTokenClient().CreateToken()
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ts := runTestServer()
-			defer ts.Close()
-			hdlr, mSvc := initEnv()
-			w := httptest.NewRecorder()
-			c, _ := gin.CreateTestContext(w)
+	id := createdPosts[0].ID
+	idStr := strconv.Itoa(int(id))
+	errTests := []struct {
+		name   string
+		id     string
+		status int
+		err    string
+	}{
+		{
+			name:   "Not Found - Already Deleted",
+			id:     idStr,
+			status: http.StatusNotFound,
+			err:    "asdf",
+		},
+		{
+			name:   "Not Found",
+			id:     "123",
+			status: http.StatusNotFound,
+			err:    "asdf",
+		},
 
-			c.Request = &http.Request{
-				Header: make(http.Header),
+		{
+			name:   "BadId",
+			id:     "1s23",
+			status: http.StatusBadRequest,
+			err:    constants.INVALID_ID,
+		},
+	}
+
+	t.Run("Happy", func(t *testing.T) {
+		t.Parallel()
+		req, err := http.NewRequest(
+			"DELETE",
+			ts.URL+"/api/blog/v1/post/comment/"+idStr,
+			nil,
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		defer func(Body io.ReadCloser) {
+			err := Body.Close()
+			if err != nil {
+			}
+		}(resp.Body)
+
+		result := parsePostResponse(t, resp)
+		require.Equal(t, id, result)
+	})
+
+	for _, et := range errTests {
+		t.Run(et.name, func(t *testing.T) {
+			t.Parallel()
+			req, err := http.NewRequest(
+				"DELETE",
+				ts.URL+"/api/blog/v1/post/comment/"+idStr,
+				nil,
+			)
+			if err != nil {
+				t.Fatal(err)
 			}
 
-			c.Params = gin.Params{gin.Param{Key: "id", Value: tt.request}}
-			if tt.status == http.StatusOK {
-				i, _ := strconv.ParseInt(tt.request, 10, 64)
-				mSvc.On("SoftDeletePost", i).
-					Return(tt.result, nil)
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
 			}
 
-			hdlr.SoftDeletePost(c)
-			if tt.status == http.StatusOK {
-				assert.Nilf(t, c.Errors, "c.Errors should be nil")
-			} else {
-				assert.NotNilf(t, c.Errors, "c.Errors shouldnt be nil")
-			}
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+				}
+			}(resp.Body)
+
+			checkIfCorrectError(t, resp, et.err, et.status)
 		})
 	}
 }
@@ -854,20 +925,6 @@ func parseCommentResponse(t *testing.T, resp *http.Response) *dto.CommentRespons
 	}
 
 	return commentResponse
-}
-
-func parseExistsResponse(t *testing.T, resp *http.Response) *siogeneric.ExistsResponse {
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("Expected status code %d, got %d", http.StatusOK, resp.StatusCode)
-	}
-
-	existsResponse := new(siogeneric.ExistsResponse)
-	err := json.NewDecoder(resp.Body).Decode(existsResponse)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return existsResponse
 }
 
 func checkIfCorrectError(

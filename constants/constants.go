@@ -7,6 +7,7 @@ const (
 	POST_EXISTS      = "post already exists"
 	NO_POST_FOUND    = "no post found"
 	NO_COMMENT_FOUND = "no comment found"
+	INVALID_ID       = "id must be numerical"
 
 	TITLE_TOO_LONG      = "title is too long.  please choose another title with no more than 100 characters."
 	BODY_TOO_LONG       = "post body is too long. please choose another post with no more than 10000 characters."
