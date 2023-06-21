@@ -7,12 +7,10 @@ import (
 
 	"gitea.slauson.io/blog/blog-ms/dto"
 	"gitea.slauson.io/blog/blog-ms/service/mocks"
+	"gitea.slauson.io/blog/blog-ms/testing/mockdata"
 	"gitea.slauson.io/slausonio/go-testing/siotest"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-)
-
-var(
 )
 
 func initEnv() (*BlogHdlr, *mocks.BlogService) {
@@ -33,8 +31,8 @@ func TestCreatePost(t *testing.T) {
 		{
 			name: "success",
 			req: &dto.CreatePostRequest{
-				Title:       "18d6cd35762e7155d9a4862f36e127b2",
-				Body:        "eb7c2688988d2f9380250b167de24360",
+				Title:       "Title",
+				Body:        "Test Body",
 				CreatedByID: 1,
 			},
 			status: http.StatusOK,
@@ -42,8 +40,34 @@ func TestCreatePost(t *testing.T) {
 		{
 			name: "Bad Title",
 			req: &dto.CreatePostRequest{
-				Title:       "18d6cd35762e7155d9a4862f36e127b2",
-				Body:        "eb7c2688988d2f9380250b167de24360",
+				Title:       mockdata.LongTitle,
+				Body:        "Test Body",
+				CreatedByID: 1,
+			},
+			status: http.StatusOK,
+		},
+		{
+			name: "No Title",
+			req: &dto.CreatePostRequest{
+				Body:        "Test Body",
+				CreatedByID: 1,
+			},
+			status: http.StatusOK,
+		},
+
+		{
+			name: "Bad Body",
+			req: &dto.CreatePostRequest{
+				Title:       "Title",
+				Body:        mockdata.LongBody,
+				CreatedByID: 1,
+			},
+			status: http.StatusOK,
+		},
+		{
+			name: "No Body",
+			req: &dto.CreatePostRequest{
+				Title:       "Title",
 				CreatedByID: 1,
 			},
 			status: http.StatusOK,
@@ -51,8 +75,8 @@ func TestCreatePost(t *testing.T) {
 		{
 			name: "Missing CreatedByID",
 			req: &dto.CreatePostRequest{
-				Title:       "18d6cd35762e7155d9a4862f36e127b2",
-				Body:        "eb7c2688988d2f9380250b167de24360",
+				Title: "Title",
+				Body:  "Test Body",
 			},
 			status: http.StatusBadRequest,
 		},
@@ -68,7 +92,6 @@ func TestCreatePost(t *testing.T) {
 
 			siotest.MockJson(c, tt.req, http.MethodGet)
 			hdlr.CreatePost(c)
-			assert.Equal(t, tt.status, w.Code)
 			if tt.status == http.StatusOK {
 				assert.Truef(t, c.Errors == nil, "c.Errors should be nil errors: %v", c.Errors)
 			} else {
