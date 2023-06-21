@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Define common data
 var post = &siogeneric.BlogPost{
 	ID:           siogeneric.NewSioNullInt64(1),
 	Title:        siogeneric.NewSioNullString("Test title"),
