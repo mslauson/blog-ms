@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"gitea.slauson.io/blog/blog-ms/constants"
 	"gitea.slauson.io/blog/blog-ms/dto"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
@@ -44,7 +45,7 @@ func (bv *BlogValidation) ValidateUpdatePostRequest(req *dto.UpdatePostRequest) 
 	}
 
 	if req.Title == "" && req.Body == "" {
-		return sioerror.NewSioBadRequestError(POST_UPDATE_INVALID)
+		return sioerror.NewSioBadRequestError(constants.POST_UPDATE_INVALID)
 	}
 
 	if req.Title != "" {
@@ -82,7 +83,7 @@ func (bv *BlogValidation) ValidateUpdateCommentRequest(req *dto.UpdateCommentReq
 
 func (bv *BlogValidation) validateTitle(title string) error {
 	if len(title) > 100 {
-		return sioerror.NewSioBadRequestError(TITLE_TOO_LONG)
+		return sioerror.NewSioBadRequestError(constants.TITLE_TOO_LONG)
 	}
 
 	return nil
@@ -90,7 +91,7 @@ func (bv *BlogValidation) validateTitle(title string) error {
 
 func (bv *BlogValidation) validateBody(body string) error {
 	if len(body) > 100000 {
-		return sioerror.NewSioBadRequestError(BODY_TOO_LONG)
+		return sioerror.NewSioBadRequestError(constants.BODY_TOO_LONG)
 	}
 
 	return nil
@@ -98,7 +99,7 @@ func (bv *BlogValidation) validateBody(body string) error {
 
 func (bv *BlogValidation) validateCommentContent(content string) error {
 	if len(content) > 100000 {
-		return sioerror.NewSioBadRequestError(COMMENT_TOO_LONG)
+		return sioerror.NewSioBadRequestError(constants.COMMENT_TOO_LONG)
 	}
 
 	return nil
