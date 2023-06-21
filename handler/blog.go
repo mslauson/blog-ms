@@ -192,10 +192,10 @@ func (ph *BlogHdlr) UpdatePost(c *gin.Context) {
 		return
 	}
 
-	if result, err := ph.svc.UpdatePost(iId, &request); result != nil {
-		c.JSON(http.StatusOK, result)
-	} else {
+	if result, err := ph.svc.UpdatePost(iId, &request); err != nil {
 		_ = c.Error(err)
+	} else {
+		c.JSON(http.StatusOK, result)
 	}
 }
 

@@ -11,6 +11,7 @@ import (
 	"gitea.slauson.io/slausonio/go-testing/siotest"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func initEnv() (*BlogHdlr, *mocks.BlogService) {
@@ -44,7 +45,7 @@ func TestCreatePost(t *testing.T) {
 				Body:        "Test Body",
 				CreatedByID: 1,
 			},
-			status: http.StatusOK,
+			status: http.StatusBadRequest,
 		},
 		{
 			name: "No Title",
@@ -52,7 +53,7 @@ func TestCreatePost(t *testing.T) {
 				Body:        "Test Body",
 				CreatedByID: 1,
 			},
-			status: http.StatusOK,
+			status: http.StatusBadRequest,
 		},
 
 		{
@@ -62,7 +63,7 @@ func TestCreatePost(t *testing.T) {
 				Body:        mockdata.LongBody,
 				CreatedByID: 1,
 			},
-			status: http.StatusOK,
+			status: http.StatusBadRequest,
 		},
 		{
 			name: "No Body",
@@ -70,7 +71,7 @@ func TestCreatePost(t *testing.T) {
 				Title:       "Title",
 				CreatedByID: 1,
 			},
-			status: http.StatusOK,
+			status: http.StatusBadRequest,
 		},
 		{
 			name: "Missing CreatedByID",
@@ -86,12 +87,126 @@ func TestCreatePost(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			hdlr, mSvc := initEnv()
 
-			mSvc.On("CreatePost", tt.req).Return(tt.res, nil)
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 
 			siotest.MockJson(c, tt.req, http.MethodGet)
+
+			if tt.status == http.StatusOK {
+				mSvc.On("CreatePost", mock.AnythingOfType("*dto.CreatePostRequest")).
+					Return(tt.res, nil)
+			}
+
 			hdlr.CreatePost(c)
+			if tt.status == http.StatusOK {
+				mSvc.On("CreatePost", tt.req).Return(tt.res, nil)
+				assert.Truef(t, c.Errors == nil, "c.Errors should be nil errors: %v", c.Errors)
+			} else {
+				assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil errors: %v", c.Errors)
+			}
+		})
+	}
+}
+
+func TestUpdatePost(t *testing.T) {
+	tests := []struct {
+		name   string
+		ID     string
+		req    *dto.UpdatePostRequest
+		res    *dto.PostResponse
+		status int
+	}{
+		{
+			name: "success Update Both",
+			req: &dto.UpdatePostRequest{
+				Title:       "Title",
+				Body:        "Test Body",
+				UpdatedByID: 1,
+			},
+			status: http.StatusOK,
+			ID:     "1",
+		},
+		{
+			name: "success Update Title",
+			req: &dto.UpdatePostRequest{
+				Title:       "Title",
+				UpdatedByID: 1,
+			},
+			status: http.StatusOK,
+			ID:     "1",
+		},
+		{
+			name: "success Update Body",
+			req: &dto.UpdatePostRequest{
+				Body:        "Test Body",
+				UpdatedByID: 1,
+			},
+			status: http.StatusOK,
+			ID:     "1",
+		},
+		{
+			name: "Bad ID",
+			req: &dto.UpdatePostRequest{
+				Body:        "Test Body",
+				UpdatedByID: 1,
+			},
+			status: http.StatusBadRequest,
+			ID:     "1sdfsdfe",
+		},
+		{
+			name: "Bad Title",
+			req: &dto.UpdatePostRequest{
+				Title:       mockdata.LongTitle,
+				Body:        "Test Body",
+				UpdatedByID: 1,
+			},
+			status: http.StatusBadRequest,
+			ID:     "1",
+		},
+		{
+			name: "Bad Body",
+			req: &dto.UpdatePostRequest{
+				Title:       "Title",
+				Body:        mockdata.LongBody,
+				UpdatedByID: 1,
+			},
+			status: http.StatusBadRequest,
+			ID:     "1",
+		},
+		{
+			name: "Bad - No updates passed",
+			req: &dto.UpdatePostRequest{
+				UpdatedByID: 1,
+			},
+			status: http.StatusBadRequest,
+			ID:     "1",
+		},
+		{
+			name: "Missing UpdatedByID",
+			req: &dto.UpdatePostRequest{
+				Title: "Title",
+				Body:  "Test Body",
+			},
+			status: http.StatusBadRequest,
+			ID:     "1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hdlr, mSvc := initEnv()
+
+			w := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(w)
+
+			siotest.MockJson(c, tt.req, http.MethodGet)
+			c.Params = gin.Params{gin.Param{Key: "id", Value: tt.ID}}
+			if tt.status == http.StatusOK {
+				mSvc.On("UpdatePost", mock.AnythingOfType("int64"), mock.AnythingOfType("*dto.UpdatePostRequest")).
+					Return(tt.res, nil)
+			}
+
+			hdlr.UpdatePost(c)
 			if tt.status == http.StatusOK {
 				assert.Truef(t, c.Errors == nil, "c.Errors should be nil errors: %v", c.Errors)
 			} else {
