@@ -114,7 +114,7 @@ func (ph *BlogHdlr) CreatePost(c *gin.Context) {
 		return
 	}
 
-	if result, err := ph.svc.CreatePost(&request); result == nil {
+	if result, err := ph.svc.CreatePost(&request); err != nil {
 		_ = c.Error(err)
 	} else {
 		c.JSON(http.StatusOK, result)
@@ -148,7 +148,7 @@ func (ph *BlogHdlr) AddComment(c *gin.Context) {
 		return
 	}
 
-	if result, err := ph.svc.AddComment(&request); result == nil {
+	if result, err := ph.svc.AddComment(&request); err != nil {
 		_ = c.Error(err)
 	} else {
 		c.JSON(http.StatusOK, result)
