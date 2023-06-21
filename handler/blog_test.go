@@ -12,6 +12,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var(
+)
+
 func initEnv() (*BlogHdlr, *mocks.BlogService) {
 	mSvc := &mocks.BlogService{}
 	hdlr := &BlogHdlr{
@@ -31,10 +34,27 @@ func TestCreatePost(t *testing.T) {
 			name: "success",
 			req: &dto.CreatePostRequest{
 				Title:       "18d6cd35762e7155d9a4862f36e127b2",
-				Body:        "40df6f20a48a0af47e72eec08dc622a",
+				Body:        "eb7c2688988d2f9380250b167de24360",
 				CreatedByID: 1,
 			},
 			status: http.StatusOK,
+		},
+		{
+			name: "Bad Title",
+			req: &dto.CreatePostRequest{
+				Title:       "18d6cd35762e7155d9a4862f36e127b2",
+				Body:        "eb7c2688988d2f9380250b167de24360",
+				CreatedByID: 1,
+			},
+			status: http.StatusOK,
+		},
+		{
+			name: "Missing CreatedByID",
+			req: &dto.CreatePostRequest{
+				Title:       "18d6cd35762e7155d9a4862f36e127b2",
+				Body:        "eb7c2688988d2f9380250b167de24360",
+			},
+			status: http.StatusBadRequest,
 		},
 	}
 
@@ -50,9 +70,9 @@ func TestCreatePost(t *testing.T) {
 			hdlr.CreatePost(c)
 			assert.Equal(t, tt.status, w.Code)
 			if tt.status == http.StatusOK {
-				assert.Truef(t, c.Errors == nil, "c.Errors should be nil")
+				assert.Truef(t, c.Errors == nil, "c.Errors should be nil errors: %v", c.Errors)
 			} else {
-				assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil")
+				assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil errors: %v", c.Errors)
 			}
 		})
 	}

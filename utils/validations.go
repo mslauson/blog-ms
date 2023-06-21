@@ -98,7 +98,7 @@ func (bv *BlogValidation) validateBody(body string) error {
 }
 
 func (bv *BlogValidation) validateCommentContent(content string) error {
-	if len(content) > 100000 {
+	if len(content) > 3000 {
 		return sioerror.NewSioBadRequestError(constants.COMMENT_TOO_LONG)
 	}
 
