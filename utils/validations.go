@@ -20,17 +20,11 @@ func NewValidator() *BlogValidation {
 }
 
 func (bv *BlogValidation) ValidateCreatePostRequest(req *dto.CreatePostRequest) error {
-	decryptedRequest := new(dto.CreatePostRequest)
-	*decryptedRequest = *req
-	if err := bv.enc.DecryptInterface(decryptedRequest); err != nil {
-		return sioerror.NewSioInternalServerError(sioUtils.DecryptionFailed)
-	}
-
-	if err := bv.validateTitle(decryptedRequest.Title); err != nil {
+	if err := bv.validateTitle(req.Title); err != nil {
 		return err
 	}
 
-	if err := bv.validateBody(decryptedRequest.Body); err != nil {
+	if err := bv.validateBody(req.Body); err != nil {
 		return err
 	}
 
@@ -38,24 +32,18 @@ func (bv *BlogValidation) ValidateCreatePostRequest(req *dto.CreatePostRequest) 
 }
 
 func (bv *BlogValidation) ValidateUpdatePostRequest(req *dto.UpdatePostRequest) error {
-	decryptedRequest := new(dto.UpdatePostRequest)
-	*decryptedRequest = *req
-	if err := bv.enc.DecryptInterface(decryptedRequest); err != nil {
-		return sioerror.NewSioInternalServerError(sioUtils.DecryptionFailed)
-	}
-
 	if req.Title == "" && req.Body == "" {
 		return sioerror.NewSioBadRequestError(constants.POST_UPDATE_INVALID)
 	}
 
 	if req.Title != "" {
-		if err := bv.validateTitle(decryptedRequest.Title); err != nil {
+		if err := bv.validateTitle(req.Title); err != nil {
 			return err
 		}
 	}
 
 	if req.Body != "" {
-		if err := bv.validateBody(decryptedRequest.Body); err != nil {
+		if err := bv.validateBody(req.Body); err != nil {
 			return err
 		}
 	}
@@ -73,12 +61,7 @@ func (bv *BlogValidation) ValidateAddCommentRequest(req *dto.AddCommentRequest) 
 }
 
 func (bv *BlogValidation) ValidateUpdateCommentRequest(req *dto.UpdateCommentRequest) error {
-	content, err := bv.enc.Decrypt(req.Content)
-	if err != nil {
-		return sioerror.NewSioInternalServerError(sioUtils.DecryptionFailed)
-	}
-
-	return bv.validateCommentContent(content)
+	return bv.validateCommentContent(req.Content)
 }
 
 func (bv *BlogValidation) validateTitle(title string) error {
