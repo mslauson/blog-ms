@@ -54,12 +54,7 @@ func (bv *BlogValidation) ValidateUpdatePostRequest(req *dto.UpdatePostRequest) 
 }
 
 func (bv *BlogValidation) ValidateAddCommentRequest(req *dto.AddCommentRequest) error {
-	content, err := bv.enc.Decrypt(req.Content)
-	if err != nil {
-		return sioerror.NewSioInternalServerError(sioUtils.DecryptionFailed)
-	}
-
-	return bv.validateCommentContent(content)
+	return bv.validateCommentContent(req.Content)
 }
 
 func (bv *BlogValidation) ValidateUpdateCommentRequest(req *dto.UpdateCommentRequest) error {

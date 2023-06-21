@@ -255,3 +255,180 @@ func TestUpdatePost_SvcErr(t *testing.T) {
 	hdlr.UpdatePost(c)
 	assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil errors: %v", c.Errors)
 }
+
+func TestAddComment(t *testing.T) {
+	tests := []struct {
+		name   string
+		req    *dto.AddCommentRequest
+		res    *dto.CommentResponse
+		status int
+	}{
+		{
+			name: "success",
+			req: &dto.AddCommentRequest{
+				Content: "Test Content",
+				UserID:  1,
+				PostID:  1,
+			},
+			status: http.StatusOK,
+		},
+		{
+			name: "Bad Content",
+			req: &dto.AddCommentRequest{
+				Content: mockdata.LongComment,
+				UserID:  1,
+				PostID:  1,
+			},
+			status: http.StatusBadRequest,
+		},
+		{
+			name: "Missing Content",
+			req: &dto.AddCommentRequest{
+				UserID: 1,
+				PostID: 1,
+			},
+			status: http.StatusBadRequest,
+		},
+		{
+			name: "Missing UserID",
+			req: &dto.AddCommentRequest{
+				Content: "Test Content",
+				PostID:  1,
+			},
+			status: http.StatusBadRequest,
+		},
+		{
+			name: "Missing PostID",
+			req: &dto.AddCommentRequest{
+				Content: "Test Content",
+				UserID:  1,
+			},
+			status: http.StatusBadRequest,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hdlr, mSvc := initEnv()
+
+			w := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(w)
+
+			siotest.MockJson(c, tt.req, http.MethodPost)
+
+			if tt.status == http.StatusOK {
+				mSvc.On("AddComment", mock.AnythingOfType("*dto.AddCommentRequest")).
+					Return(tt.res, nil)
+			}
+
+			hdlr.AddComment(c)
+			if tt.status == http.StatusOK {
+				mSvc.On("AddComment", tt.req).Return(tt.res, nil)
+				assert.Truef(t, c.Errors == nil, "c.Errors should be nil errors: %v", c.Errors)
+			} else {
+				assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil errors: %v", c.Errors)
+			}
+		})
+	}
+}
+
+func TestAddComment_SvcErr(t *testing.T) {
+	req := &dto.AddCommentRequest{
+		Content: "Test Content",
+		UserID:  1,
+		PostID:  1,
+	}
+
+	hdlr, mSvc := initEnv()
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	siotest.MockJson(c, req, http.MethodPost)
+	mSvc.On("AddComment", mock.AnythingOfType("*dto.AddCommentRequest")).
+		Return(nil, errors.New("error"))
+
+	hdlr.AddComment(c)
+	assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil errors: %v", c.Errors)
+}
+
+func TestUpdateComment(t *testing.T) {
+	tests := []struct {
+		name   string
+		ID     string
+		req    *dto.UpdateCommentRequest
+		res    *dto.CommentResponse
+		status int
+	}{
+		{
+			name: "success",
+			req: &dto.UpdateCommentRequest{
+				Content: "Test Content",
+			},
+			status: http.StatusOK,
+			ID:     "1",
+		},
+		{
+			name: "success Bad ID",
+			req: &dto.UpdateCommentRequest{
+				Content: "Test Content",
+			},
+			status: http.StatusBadRequest,
+			ID:     "1asdf",
+		},
+		{
+			name: "success Bad Content",
+			req: &dto.UpdateCommentRequest{
+				Content: mockdata.LongComment,
+			},
+			status: http.StatusBadRequest,
+			ID:     "1",
+		},
+		{
+			name:   "success No Content",
+			req:    &dto.UpdateCommentRequest{},
+			status: http.StatusBadRequest,
+			ID:     "1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hdlr, mSvc := initEnv()
+
+			w := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(w)
+
+			siotest.MockJson(c, tt.req, http.MethodPatch)
+			c.Params = gin.Params{gin.Param{Key: "id", Value: tt.ID}}
+			if tt.status == http.StatusOK {
+				mSvc.On("UpdateComment", mock.AnythingOfType("int64"), mock.AnythingOfType("*dto.UpdateCommentRequest")).
+					Return(tt.res, nil)
+			}
+
+			hdlr.UpdateComment(c)
+			if tt.status == http.StatusOK {
+				assert.Truef(t, c.Errors == nil, "c.Errors should be nil errors: %v", c.Errors)
+			} else {
+				assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil errors: %v", c.Errors)
+			}
+		})
+	}
+}
+
+func TestUpdateComment_SvcErr(t *testing.T) {
+	req := &dto.UpdateCommentRequest{
+		Content: "Title",
+	}
+	hdlr, mSvc := initEnv()
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	siotest.MockJson(c, req, http.MethodPatch)
+	c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+	mSvc.On("UpdateComment", mock.AnythingOfType("int64"), mock.AnythingOfType("*dto.UpdateCommentRequest")).
+		Return(nil, errors.New("error"))
+
+	hdlr.UpdateComment(c)
+	assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil errors: %v", c.Errors)
+}
