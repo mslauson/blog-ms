@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"gitea.slauson.io/blog/blog-ms/constants"
 	"gitea.slauson.io/blog/blog-ms/dto"
 	"gitea.slauson.io/blog/blog-ms/handler"
 	"gitea.slauson.io/blog/blog-ms/testing/mockdata"
@@ -74,6 +75,7 @@ func TestCreatePost(t *testing.T) {
 			createdPosts = append(createdPosts, pr)
 			require.Equal(t, tt.res.Title, pr.Title)
 			require.Equal(t, tt.res.Body, pr.Body)
+			require.Equal(t, tt.res.CreatedByID, pr.CreatedByID)
 		})
 	}
 }
@@ -242,9 +244,9 @@ func TestUpdatePost(t *testing.T) {
 
 			defer resp.Body.Close()
 			pr := parsePostResponse(t, resp)
-			createdPosts = append(createdPosts, pr)
 			require.Equal(t, tt.res.Title, pr.Title)
 			require.Equal(t, tt.res.Body, pr.Body)
+			require.Equal(t, tt.req.UpdatedByID, pr.UpdatedByID)
 		})
 	}
 }
@@ -254,10 +256,9 @@ func TestUpdatePost_Err(t *testing.T) {
 	defer ts.Close()
 	tests := []struct {
 		name   string
-		ID     string
 		req    *dto.UpdatePostRequest
-		res    *dto.PostResponse
 		status int
+		err    string
 	}{
 		{
 			name: "Bad ID",
@@ -266,7 +267,7 @@ func TestUpdatePost_Err(t *testing.T) {
 				UpdatedByID: 1,
 			},
 			status: http.StatusBadRequest,
-			ID:     "1sdfsdfe",
+			err:    "1sdfsdfe",
 		},
 		{
 			name: "Bad Title",
@@ -276,7 +277,7 @@ func TestUpdatePost_Err(t *testing.T) {
 				UpdatedByID: 1,
 			},
 			status: http.StatusBadRequest,
-			ID:     "1",
+			err:    "1",
 		},
 		{
 			name: "Bad Body",
@@ -286,7 +287,7 @@ func TestUpdatePost_Err(t *testing.T) {
 				UpdatedByID: 1,
 			},
 			status: http.StatusBadRequest,
-			ID:     "1",
+			err:    "1",
 		},
 		{
 			name: "Bad - No updates passed",
@@ -294,7 +295,7 @@ func TestUpdatePost_Err(t *testing.T) {
 				UpdatedByID: 1,
 			},
 			status: http.StatusBadRequest,
-			ID:     "1",
+			err:    "1",
 		},
 		{
 			name: "Missing UpdatedByID",
@@ -303,7 +304,7 @@ func TestUpdatePost_Err(t *testing.T) {
 				Body:  "Test Body",
 			},
 			status: http.StatusBadRequest,
-			ID:     "1",
+			err:    "1",
 		},
 	}
 	id := createdPosts[0].ID
@@ -337,14 +338,7 @@ func TestUpdatePost_Err(t *testing.T) {
 			}
 
 			defer resp.Body.Close()
-			if resp.StatusCode != http.StatusOK {
-				t.Fatalf("Expected status code %d, got %d", http.StatusOK, resp.StatusCode)
-			}
-
-			pr := parsePostResponse(t, resp)
-			createdPosts = append(createdPosts, pr)
-			require.Equal(t, tt.res.Title, pr.Title)
-			require.Equal(t, tt.res.Body, pr.Body)
+			checkIfCorrectError(t, resp, tt.err, tt.status)
 		})
 	}
 }
@@ -353,10 +347,8 @@ func TestAddComment(t *testing.T) {
 	ts := runTestServer()
 	defer ts.Close()
 	tests := []struct {
-		name   string
-		req    *dto.AddCommentRequest
-		res    *dto.CommentResponse
-		status int
+		name string
+		req  *dto.AddCommentRequest
 	}{
 		{
 			name: "success",
@@ -365,40 +357,6 @@ func TestAddComment(t *testing.T) {
 				UserID:  1,
 				PostID:  1,
 			},
-			status: http.StatusOK,
-		},
-		{
-			name: "Bad Content",
-			req: &dto.AddCommentRequest{
-				Content: mockdata.LongComment,
-				UserID:  1,
-				PostID:  1,
-			},
-			status: http.StatusBadRequest,
-		},
-		{
-			name: "Missing Content",
-			req: &dto.AddCommentRequest{
-				UserID: 1,
-				PostID: 1,
-			},
-			status: http.StatusBadRequest,
-		},
-		{
-			name: "Missing UserID",
-			req: &dto.AddCommentRequest{
-				Content: "Test Content",
-				PostID:  1,
-			},
-			status: http.StatusBadRequest,
-		},
-		{
-			name: "Missing PostID",
-			req: &dto.AddCommentRequest{
-				Content: "Test Content",
-				UserID:  1,
-			},
-			status: http.StatusBadRequest,
 		},
 	}
 
@@ -416,7 +374,7 @@ func TestAddComment(t *testing.T) {
 				t.Fatal(err)
 			}
 			sr := strings.NewReader(string(rJSON))
-			req, err := http.NewRequest("POST", ts.URL+"/api/blog/v1/task", sr)
+			req, err := http.NewRequest("POST", ts.URL+"/api/blog/v1/task/comment", sr)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -429,14 +387,92 @@ func TestAddComment(t *testing.T) {
 			}
 
 			defer resp.Body.Close()
-			if resp.StatusCode != http.StatusOK {
-				t.Fatalf("Expected status code %d, got %d", http.StatusOK, resp.StatusCode)
+
+			cr := parseCommentResponse(t, resp)
+			createdComments = append(createdComments, cr)
+			require.Equal(t, tt.req.Content, cr.Content)
+			require.Equal(t, tt.req.UserID, cr.UserID)
+			require.Equal(t, tt.req.PostID, cr.PostID)
+		})
+	}
+}
+
+func TestAddComment_Err(t *testing.T) {
+	ts := runTestServer()
+	defer ts.Close()
+	tests := []struct {
+		name   string
+		req    *dto.AddCommentRequest
+		status int
+		err    string
+	}{
+		{
+			name: "Bad Content",
+			req: &dto.AddCommentRequest{
+				Content: mockdata.LongComment,
+				UserID:  1,
+				PostID:  1,
+			},
+			status: http.StatusBadRequest,
+			err:    constants.COMMENT_TOO_LONG,
+		},
+		{
+			name: "Missing Content",
+			req: &dto.AddCommentRequest{
+				UserID: 1,
+				PostID: 1,
+			},
+			status: http.StatusBadRequest,
+			err:    constants.COMMENT_TOO_LONG,
+		},
+		{
+			name: "Missing UserID",
+			req: &dto.AddCommentRequest{
+				Content: "Test Content",
+				PostID:  1,
+			},
+			status: http.StatusBadRequest,
+			err:    constants.COMMENT_TOO_LONG,
+		},
+		{
+			name: "Missing PostID",
+			req: &dto.AddCommentRequest{
+				Content: "Test Content",
+				UserID:  1,
+			},
+			status: http.StatusBadRequest,
+			err:    constants.COMMENT_TOO_LONG,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			token, err := sioUtils.NewTokenClient().CreateToken()
+			if err != nil {
+				t.Fatal(err)
 			}
 
-			pr := parsePostResponse(t, resp)
-			createdPosts = append(createdPosts, pr)
-			require.Equal(t, tt.res.Title, pr.Title)
-			require.Equal(t, tt.res.Body, pr.Body)
+			defer ts.Close()
+
+			rJSON, err := json.Marshal(tt.req)
+			if err != nil {
+				t.Fatal(err)
+			}
+			sr := strings.NewReader(string(rJSON))
+			req, err := http.NewRequest("POST", ts.URL+"/api/blog/v1/task/comment", sr)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer resp.Body.Close()
+			checkIfCorrectError(t, resp, tt.err, tt.status)
 		})
 	}
 }
@@ -444,7 +480,125 @@ func TestAddComment(t *testing.T) {
 func TestUpdateComment(t *testing.T) {
 	ts := runTestServer()
 	defer ts.Close()
+	id := createdComments[0].ID
+
 	tests := []struct {
+		name string
+		req  *dto.UpdateCommentRequest
+		res  *dto.CommentResponse
+	}{
+		{
+			name: "success",
+			req: &dto.UpdateCommentRequest{
+				Content: "Test Content",
+			},
+		},
+	}
+
+	errTests := []struct {
+		name   string
+		req    *dto.UpdateCommentRequest
+		err    string
+		status int
+	}{
+		{
+			name: "Bad ID",
+			req: &dto.UpdateCommentRequest{
+				Content: "Test Content",
+			},
+			status: http.StatusBadRequest,
+			err:    "1asdf",
+		},
+		{
+			name: "Bad Content",
+			req: &dto.UpdateCommentRequest{
+				Content: mockdata.LongComment,
+			},
+			status: http.StatusBadRequest,
+			err:    constants.COMMENT_TOO_LONG,
+		},
+		{
+			name:   "No Content",
+			req:    &dto.UpdateCommentRequest{},
+			status: http.StatusBadRequest,
+			err:    "1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			token, err := sioUtils.NewTokenClient().CreateToken()
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			rJSON, err := json.Marshal(tt.req)
+			if err != nil {
+				t.Fatal(err)
+			}
+			sr := strings.NewReader(string(rJSON))
+			req, err := http.NewRequest(
+				"PATCH",
+				ts.URL+"/api/blog/v1/task/comment/"+strconv.Itoa(int(id)),
+				sr,
+			)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer resp.Body.Close()
+
+			cr := parseCommentResponse(t, resp)
+			require.Equal(t, tt.req.Content, cr.Content)
+		})
+	}
+
+	for _, et := range errTests {
+		t.Run(et.name, func(t *testing.T) {
+			t.Parallel()
+			token, err := sioUtils.NewTokenClient().CreateToken()
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			rJSON, err := json.Marshal(et.req)
+			if err != nil {
+				t.Fatal(err)
+			}
+			sr := strings.NewReader(string(rJSON))
+			req, err := http.NewRequest(
+				"PATCH",
+				ts.URL+"/api/blog/v1/task/comment/"+strconv.Itoa(int(id)),
+				sr,
+			)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			defer resp.Body.Close()
+			checkIfCorrectError(t, resp, et.err, et.status)
+		})
+	}
+}
+
+func TestUpdateComment_Err(t *testing.T) {
+	ts := runTestServer()
+	defer ts.Close()
+	errTests := []struct {
 		name   string
 		ID     string
 		req    *dto.UpdateCommentRequest
@@ -482,6 +636,7 @@ func TestUpdateComment(t *testing.T) {
 			ID:     "1",
 		},
 	}
+	id := createdComments[0].ID
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -490,14 +645,16 @@ func TestUpdateComment(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			defer ts.Close()
-
 			rJSON, err := json.Marshal(tt.req)
 			if err != nil {
 				t.Fatal(err)
 			}
 			sr := strings.NewReader(string(rJSON))
-			req, err := http.NewRequest("POST", ts.URL+"/api/blog/v1/task", sr)
+			req, err := http.NewRequest(
+				"PATCH",
+				ts.URL+"/api/blog/v1/task/comment/"+strconv.Itoa(int(id)),
+				sr,
+			)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -510,14 +667,9 @@ func TestUpdateComment(t *testing.T) {
 			}
 
 			defer resp.Body.Close()
-			if resp.StatusCode != http.StatusOK {
-				t.Fatalf("Expected status code %d, got %d", http.StatusOK, resp.StatusCode)
-			}
 
-			pr := parsePostResponse(t, resp)
-			createdPosts = append(createdPosts, pr)
-			require.Equal(t, tt.res.Title, pr.Title)
-			require.Equal(t, tt.res.Body, pr.Body)
+			cr := parseCommentResponse(t, resp)
+			require.Equal(t, tt.req.Content, cr.Content)
 		})
 	}
 }
