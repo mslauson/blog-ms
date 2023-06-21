@@ -1,8 +1,6 @@
 package utils
 
 import (
-	"fmt"
-
 	"gitea.slauson.io/blog/blog-ms/constants"
 	"gitea.slauson.io/blog/blog-ms/dto"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
@@ -70,7 +68,6 @@ func (bv *BlogValidation) validateTitle(title string) error {
 }
 
 func (bv *BlogValidation) validateBody(body string) error {
-	fmt.Println("body:", len(body))
 	if len(body) > 100000 {
 		return sioerror.NewSioBadRequestError(constants.BODY_TOO_LONG)
 	}

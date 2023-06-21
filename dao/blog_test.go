@@ -3,35 +3,11 @@ package dao
 import (
 	"errors"
 	"testing"
-	"time"
 
-	"gitea.slauson.io/slausonio/go-types/siogeneric"
+	"gitea.slauson.io/blog/blog-ms/testing/mockdata"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
 )
-
-var post = &siogeneric.BlogPost{
-	ID:           siogeneric.NewSioNullInt64(1),
-	Title:        siogeneric.NewSioNullString("Test title"),
-	Body:         siogeneric.NewSioNullString("Test body"),
-	PostedDate:   siogeneric.NewSioNullTime(time.Now()),
-	CreatedByID:  siogeneric.NewSioNullInt64(1),
-	UpdatedByID:  siogeneric.NewSioNullInt64(1),
-	SoftDeleted:  siogeneric.NewSioNullBool(false),
-	DeletionDate: siogeneric.NewSioNullTime(time.Now()),
-	UpdatedDate:  siogeneric.NewSioNullTime(time.Now()),
-}
-
-var comment = &siogeneric.BlogComment{
-	ID:           siogeneric.NewSioNullInt64(1),
-	Content:      siogeneric.NewSioNullString("Test comment"),
-	CommentDate:  siogeneric.NewSioNullTime(time.Now()),
-	PostID:       siogeneric.NewSioNullInt64(1),
-	UserID:       siogeneric.NewSioNullInt64(1),
-	SoftDeleted:  siogeneric.NewSioNullBool(false),
-	DeletionDate: siogeneric.NewSioNullTime(time.Now()),
-	UpdatedDate:  siogeneric.NewSioNullTime(time.Now()),
-}
 
 func TestCreatePost(t *testing.T) {
 	db, mock, err := sqlmock.New()
@@ -43,11 +19,11 @@ func TestCreatePost(t *testing.T) {
 
 	rows := sqlmock.NewRows([]string{"id"}).AddRow(1)
 	mock.ExpectQuery(`INSERT INTO post`).
-		WithArgs(post.Title.String, post.Body.String, post.PostedDate.Time, post.CreatedByID.Int64, false).
+		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.PostedDate.Time, mockdata.PostEntity.CreatedByID.Int64, false).
 		WillReturnRows(rows)
-	err = pd.CreatePost(post)
+	err = pd.CreatePost(mockdata.PostEntity)
 	require.NoError(t, err)
-	require.Equal(t, int64(1), post.ID.Int64)
+	require.Equal(t, int64(1), mockdata.PostEntity.ID.Int64)
 }
 
 func TestCreatePost_Error(t *testing.T) {
@@ -59,9 +35,9 @@ func TestCreatePost_Error(t *testing.T) {
 	pd := &BDao{db: db}
 
 	mock.ExpectQuery(`INSERT INTO post`).
-		WithArgs(post.Title.String, post.Body.String, post.PostedDate.Time, post.CreatedByID.Int64, false).
+		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.PostedDate.Time, mockdata.PostEntity.CreatedByID.Int64, false).
 		WillReturnError(errors.New("test error"))
-	err = pd.CreatePost(post)
+	err = pd.CreatePost(mockdata.PostEntity)
 	require.Error(t, err)
 }
 
@@ -75,9 +51,12 @@ func TestPostExists(t *testing.T) {
 
 	rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
 	mock.ExpectQuery(`SELECT EXISTS`).
-		WithArgs(post.Title.String, post.CreatedByID.Int64).
+		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.CreatedByID.Int64).
 		WillReturnRows(rows)
-	exists, err := pd.PostExists(post.Title.String, post.CreatedByID.Int64)
+	exists, err := pd.PostExists(
+		mockdata.PostEntity.Title.String,
+		mockdata.PostEntity.CreatedByID.Int64,
+	)
 	require.NoError(t, err)
 	require.True(t, exists)
 }
@@ -91,9 +70,12 @@ func TestPostExists_Error(t *testing.T) {
 	pd := &BDao{db: db}
 
 	mock.ExpectQuery(`SELECT EXISTS`).
-		WithArgs(post.Title.String, post.CreatedByID.Int64).
+		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.CreatedByID.Int64).
 		WillReturnError(errors.New("test error"))
-	exists, err := pd.PostExists(post.Title.String, post.CreatedByID.Int64)
+	exists, err := pd.PostExists(
+		mockdata.PostEntity.Title.String,
+		mockdata.PostEntity.CreatedByID.Int64,
+	)
 	require.Error(t, err)
 	require.False(t, exists)
 }
@@ -109,7 +91,7 @@ func TestPostExistsByID(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
 	mock.ExpectQuery(`SELECT EXISTS`).
 		WillReturnRows(rows)
-	exists, err := pd.PostExistsByID(post.ID.Int64)
+	exists, err := pd.PostExistsByID(mockdata.PostEntity.ID.Int64)
 	require.NoError(t, err)
 	require.True(t, exists)
 }
@@ -124,7 +106,7 @@ func TestPostExistsByID_Error(t *testing.T) {
 
 	mock.ExpectQuery(`SELECT EXISTS`).
 		WillReturnError(errors.New("test error"))
-	exists, err := pd.PostExistsByID(post.ID.Int64)
+	exists, err := pd.PostExistsByID(mockdata.PostEntity.ID.Int64)
 	require.Error(t, err)
 	require.False(t, exists)
 }
@@ -140,7 +122,7 @@ func TestCommentExistsByID(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
 	mock.ExpectQuery(`SELECT EXISTS`).
 		WillReturnRows(rows)
-	exists, err := pd.CommentExistsByID(comment.ID.Int64)
+	exists, err := pd.CommentExistsByID(mockdata.CommentEntity.ID.Int64)
 	require.NoError(t, err)
 	require.True(t, exists)
 }
@@ -155,7 +137,7 @@ func TestCommentExistsByID_Error(t *testing.T) {
 
 	mock.ExpectQuery(`SELECT EXISTS`).
 		WillReturnError(errors.New("test error"))
-	exists, err := pd.CommentExistsByID(comment.ID.Int64)
+	exists, err := pd.CommentExistsByID(mockdata.CommentEntity.ID.Int64)
 	require.Error(t, err)
 	require.False(t, exists)
 }
@@ -179,7 +161,7 @@ func TestGetPostByID(t *testing.T) {
 		"deletion_date",
 		"soft_deleted",
 	}).
-		AddRow(post.ID.Int64, post.Title.String, post.Body.String, post.CreatedByID, post.UpdatedByID, post.PostedDate.Time, post.UpdatedDate, post.DeletionDate, post.SoftDeleted.Bool)
+		AddRow(mockdata.PostEntity.ID.Int64, mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.CreatedByID, mockdata.PostEntity.UpdatedByID, mockdata.PostEntity.PostedDate.Time, mockdata.PostEntity.UpdatedDate, mockdata.PostEntity.DeletionDate, mockdata.PostEntity.SoftDeleted.Bool)
 	mock.ExpectQuery(`SELECT`).
 		WillReturnRows(rows)
 
@@ -193,19 +175,19 @@ func TestGetPostByID(t *testing.T) {
 		"deletion_date",
 	}).
 		AddRow(
-			comment.ID.Int64,
-			comment.Content.String,
-			comment.CommentDate.Time,
-			comment.PostID.Int64,
-			comment.UserID.Int64,
-			comment.SoftDeleted.Bool,
-			comment.DeletionDate,
+			mockdata.CommentEntity.ID.Int64,
+			mockdata.CommentEntity.Content.String,
+			mockdata.CommentEntity.CommentDate.Time,
+			mockdata.CommentEntity.PostID.Int64,
+			mockdata.CommentEntity.UserID.Int64,
+			mockdata.CommentEntity.SoftDeleted.Bool,
+			mockdata.CommentEntity.DeletionDate,
 		)
 
 	mock.ExpectQuery(`SELECT`).
 		WillReturnRows(cRows)
 
-	returnedPost, err := pd.GetPostByID(post.ID.Int64)
+	returnedPost, err := pd.GetPostByID(mockdata.PostEntity.ID.Int64)
 	require.NoError(t, err)
 	require.NotNil(t, returnedPost)
 }
@@ -224,7 +206,7 @@ func TestGetPostByID_ErrorPost(t *testing.T) {
 	mock.ExpectQuery(`SELECT`).
 		WillReturnError(errors.New("test error"))
 
-	returnedPost, err := pd.GetPostByID(post.ID.Int64)
+	returnedPost, err := pd.GetPostByID(mockdata.PostEntity.ID.Int64)
 	require.Error(t, err)
 	require.Nil(t, returnedPost)
 }
@@ -248,14 +230,14 @@ func TestGetPostByID_ErrorComment(t *testing.T) {
 		"deletion_date",
 		"soft_deleted",
 	}).
-		AddRow(post.ID.Int64, post.Title.String, post.Body.String, post.CreatedByID, post.UpdatedByID, post.PostedDate.Time, post.UpdatedDate, post.DeletionDate, post.SoftDeleted.Bool)
+		AddRow(mockdata.PostEntity.ID.Int64, mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.CreatedByID, mockdata.PostEntity.UpdatedByID, mockdata.PostEntity.PostedDate.Time, mockdata.PostEntity.UpdatedDate, mockdata.PostEntity.DeletionDate, mockdata.PostEntity.SoftDeleted.Bool)
 	mock.ExpectQuery(`SELECT`).
 		WillReturnRows(rows)
 
 	mock.ExpectQuery(`SELECT`).
 		WillReturnError(errors.New("test error"))
 
-	returnedPost, err := pd.GetPostByID(post.ID.Int64)
+	returnedPost, err := pd.GetPostByID(mockdata.PostEntity.ID.Int64)
 	require.Error(t, err)
 	require.Nil(t, returnedPost)
 }
@@ -278,17 +260,17 @@ func TestGetCommentByID(t *testing.T) {
 		"deletion_date",
 	}).
 		AddRow(
-			comment.ID.Int64,
-			comment.Content.String,
-			comment.CommentDate.Time,
-			comment.PostID.Int64,
-			comment.UserID.Int64,
-			comment.SoftDeleted.Bool,
-			comment.DeletionDate,
+			mockdata.CommentEntity.ID.Int64,
+			mockdata.CommentEntity.Content.String,
+			mockdata.CommentEntity.CommentDate.Time,
+			mockdata.CommentEntity.PostID.Int64,
+			mockdata.CommentEntity.UserID.Int64,
+			mockdata.CommentEntity.SoftDeleted.Bool,
+			mockdata.CommentEntity.DeletionDate,
 		)
 	mock.ExpectQuery(`SELECT`).
 		WillReturnRows(rows)
-	returnedComment, err := pd.GetCommentByID(comment.ID.Int64)
+	returnedComment, err := pd.GetCommentByID(mockdata.CommentEntity.ID.Int64)
 	require.NoError(t, err)
 	require.NotNil(t, returnedComment)
 }
@@ -303,7 +285,7 @@ func TestGetCommentByID_Err(t *testing.T) {
 
 	mock.ExpectQuery(`SELECT`).
 		WillReturnError(errors.New("test error"))
-	returnedComment, err := pd.GetCommentByID(comment.ID.Int64)
+	returnedComment, err := pd.GetCommentByID(mockdata.CommentEntity.ID.Int64)
 	require.Error(t, err)
 	require.Nil(t, returnedComment)
 }
@@ -327,15 +309,15 @@ func TestGetAllPosts(t *testing.T) {
 		"deletion_date",
 		"soft_deleted",
 	}).
-		AddRow(post.ID.Int64,
-			post.Title.String,
-			post.Body.String,
-			post.CreatedByID,
-			post.UpdatedByID,
-			post.PostedDate.Time,
-			post.UpdatedDate,
-			post.DeletionDate,
-			post.SoftDeleted.Bool)
+		AddRow(mockdata.PostEntity.ID.Int64,
+			mockdata.PostEntity.Title.String,
+			mockdata.PostEntity.Body.String,
+			mockdata.PostEntity.CreatedByID,
+			mockdata.PostEntity.UpdatedByID,
+			mockdata.PostEntity.PostedDate.Time,
+			mockdata.PostEntity.UpdatedDate,
+			mockdata.PostEntity.DeletionDate,
+			mockdata.PostEntity.SoftDeleted.Bool)
 	mock.ExpectQuery(`SELECT`).
 		WillReturnRows(rows)
 
@@ -349,13 +331,13 @@ func TestGetAllPosts(t *testing.T) {
 		"deletion_date",
 	}).
 		AddRow(
-			comment.ID.Int64,
-			comment.Content.String,
-			comment.CommentDate.Time,
-			comment.PostID.Int64,
-			comment.UserID.Int64,
-			comment.SoftDeleted.Bool,
-			comment.DeletionDate,
+			mockdata.CommentEntity.ID.Int64,
+			mockdata.CommentEntity.Content.String,
+			mockdata.CommentEntity.CommentDate.Time,
+			mockdata.CommentEntity.PostID.Int64,
+			mockdata.CommentEntity.UserID.Int64,
+			mockdata.CommentEntity.SoftDeleted.Bool,
+			mockdata.CommentEntity.DeletionDate,
 		)
 
 	mock.ExpectQuery(`SELECT`).
@@ -401,15 +383,15 @@ func TestGetAllPosts_ErrComments(t *testing.T) {
 		"deletion_date",
 		"soft_deleted",
 	}).
-		AddRow(post.ID.Int64,
-			post.Title.String,
-			post.Body.String,
-			post.CreatedByID,
-			post.UpdatedByID,
-			post.PostedDate.Time,
-			post.UpdatedDate,
-			post.DeletionDate,
-			post.SoftDeleted.Bool)
+		AddRow(mockdata.PostEntity.ID.Int64,
+			mockdata.PostEntity.Title.String,
+			mockdata.PostEntity.Body.String,
+			mockdata.PostEntity.CreatedByID,
+			mockdata.PostEntity.UpdatedByID,
+			mockdata.PostEntity.PostedDate.Time,
+			mockdata.PostEntity.UpdatedDate,
+			mockdata.PostEntity.DeletionDate,
+			mockdata.PostEntity.SoftDeleted.Bool)
 	mock.ExpectQuery(`SELECT`).
 		WillReturnRows(rows)
 
@@ -439,18 +421,18 @@ func TestGetAllCommentsByPostID(t *testing.T) {
 		"deletion_date",
 	}).
 		AddRow(
-			comment.ID.Int64,
-			comment.Content.String,
-			comment.CommentDate.Time,
-			comment.PostID.Int64,
-			comment.UserID.Int64,
-			comment.SoftDeleted.Bool,
-			comment.DeletionDate,
+			mockdata.CommentEntity.ID.Int64,
+			mockdata.CommentEntity.Content.String,
+			mockdata.CommentEntity.CommentDate.Time,
+			mockdata.CommentEntity.PostID.Int64,
+			mockdata.CommentEntity.UserID.Int64,
+			mockdata.CommentEntity.SoftDeleted.Bool,
+			mockdata.CommentEntity.DeletionDate,
 		)
 
 	mock.ExpectQuery(`SELECT`).
 		WillReturnRows(rows)
-	comments, err := pd.GetAllCommentsByPostID(post.ID.Int64)
+	comments, err := pd.GetAllCommentsByPostID(mockdata.PostEntity.ID.Int64)
 	require.NoError(t, err)
 	require.NotNil(t, comments)
 }
@@ -466,7 +448,7 @@ func TestGetAllCommentsByPostID_Err(t *testing.T) {
 	mock.ExpectQuery(`SELECT`).
 		WillReturnError(errors.New("test error"))
 
-	comments, err := pd.GetAllCommentsByPostID(post.ID.Int64)
+	comments, err := pd.GetAllCommentsByPostID(mockdata.PostEntity.ID.Int64)
 	require.Error(t, err)
 	require.Nil(t, comments)
 }
@@ -480,9 +462,9 @@ func TestUpdatePost(t *testing.T) {
 	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE post`).
-		WithArgs(post.Title.String, post.Body.String, post.UpdatedDate.Time, post.UpdatedByID.Int64).
+		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.UpdatedDate.Time, mockdata.PostEntity.UpdatedByID.Int64).
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	err = pd.UpdatePost(post)
+	err = pd.UpdatePost(mockdata.PostEntity)
 	require.NoError(t, err)
 }
 
@@ -495,9 +477,9 @@ func TestUpdatePost_Err(t *testing.T) {
 	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE post`).
-		WithArgs(post.Title.String, post.Body.String, post.UpdatedDate.Time, post.UpdatedByID.Int64).
+		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.UpdatedDate.Time, mockdata.PostEntity.UpdatedByID.Int64).
 		WillReturnError(errors.New("test error"))
-	err = pd.UpdatePost(post)
+	err = pd.UpdatePost(mockdata.PostEntity)
 	require.Error(t, err)
 }
 
@@ -511,11 +493,11 @@ func TestAddComment(t *testing.T) {
 
 	rows := sqlmock.NewRows([]string{"id"}).AddRow(1)
 	mock.ExpectQuery(`INSERT INTO comment`).
-		WithArgs(comment.Content.String, comment.CommentDate.Time, comment.PostID.Int64, comment.UserID.Int64, false).
+		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.CommentDate.Time, mockdata.CommentEntity.PostID.Int64, mockdata.CommentEntity.UserID.Int64, false).
 		WillReturnRows(rows)
-	err = pd.AddComment(comment)
+	err = pd.AddComment(mockdata.CommentEntity)
 	require.NoError(t, err)
-	require.Equal(t, int64(1), comment.ID.Int64)
+	require.Equal(t, int64(1), mockdata.CommentEntity.ID.Int64)
 }
 
 func TestAddComment_Err(t *testing.T) {
@@ -527,10 +509,10 @@ func TestAddComment_Err(t *testing.T) {
 	pd := &BDao{db: db}
 
 	mock.ExpectQuery(`INSERT INTO comment`).
-		WithArgs(comment.Content.String, comment.CommentDate.Time, comment.PostID.Int64, comment.UserID.Int64, false).
+		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.CommentDate.Time, mockdata.CommentEntity.PostID.Int64, mockdata.CommentEntity.UserID.Int64, false).
 		WillReturnError(errors.New("test error"))
 
-	err = pd.AddComment(comment)
+	err = pd.AddComment(mockdata.CommentEntity)
 	require.Error(t, err)
 }
 
@@ -543,9 +525,9 @@ func TestUpdateComment(t *testing.T) {
 	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE comment`).
-		WithArgs(comment.Content.String, comment.UpdatedDate.Time).
+		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.UpdatedDate.Time).
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	err = pd.UpdateComment(comment)
+	err = pd.UpdateComment(mockdata.CommentEntity)
 	require.NoError(t, err)
 }
 
@@ -558,10 +540,10 @@ func TestUpdateComment_Err(t *testing.T) {
 	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE comment`).
-		WithArgs(comment.Content.String, comment.UpdatedDate.Time).
+		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.UpdatedDate.Time).
 		WillReturnError(errors.New("test error"))
 
-	err = pd.UpdateComment(comment)
+	err = pd.UpdateComment(mockdata.CommentEntity)
 	require.Error(t, err)
 }
 
@@ -574,9 +556,9 @@ func TestSoftDeletePost(t *testing.T) {
 	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE post`).
-		WithArgs(true, post.DeletionDate.Time, post.ID.Int64).
+		WithArgs(true, mockdata.PostEntity.DeletionDate.Time, mockdata.PostEntity.ID.Int64).
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	err = pd.SoftDeletePost(post)
+	err = pd.SoftDeletePost(mockdata.PostEntity)
 	require.NoError(t, err)
 }
 
@@ -589,10 +571,10 @@ func TestSoftDeletePost_Err(t *testing.T) {
 	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE post`).
-		WithArgs(true, post.DeletionDate.Time, post.ID.Int64).
+		WithArgs(true, mockdata.PostEntity.DeletionDate.Time, mockdata.PostEntity.ID.Int64).
 		WillReturnError(errors.New("test error"))
 
-	err = pd.SoftDeletePost(post)
+	err = pd.SoftDeletePost(mockdata.PostEntity)
 	require.Error(t, err)
 }
 
@@ -605,9 +587,9 @@ func TestSoftDeleteComment(t *testing.T) {
 	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE comment`).
-		WithArgs(true, comment.DeletionDate.Time, comment.ID.Int64).
+		WithArgs(true, mockdata.CommentEntity.DeletionDate.Time, mockdata.CommentEntity.ID.Int64).
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	err = pd.SoftDeleteComment(comment)
+	err = pd.SoftDeleteComment(mockdata.CommentEntity)
 	require.NoError(t, err)
 }
 
@@ -619,10 +601,10 @@ func TestSoftDeleteComment_Err(t *testing.T) {
 	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE comment`).
-		WithArgs(true, comment.DeletionDate.Time, comment.ID.Int64).
+		WithArgs(true, mockdata.CommentEntity.DeletionDate.Time, mockdata.CommentEntity.ID.Int64).
 		WillReturnError(errors.New("test error"))
 
-	err = pd.SoftDeleteComment(comment)
+	err = pd.SoftDeleteComment(mockdata.CommentEntity)
 	require.Error(t, err)
 }
 
