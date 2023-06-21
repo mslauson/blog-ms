@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -90,7 +91,7 @@ func TestCreatePost(t *testing.T) {
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 
-			siotest.MockJson(c, tt.req, http.MethodGet)
+			siotest.MockJson(c, tt.req, http.MethodPost)
 
 			if tt.status == http.StatusOK {
 				mSvc.On("CreatePost", mock.AnythingOfType("*dto.CreatePostRequest")).
@@ -106,6 +107,25 @@ func TestCreatePost(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCreatePost_SvcErr(t *testing.T) {
+	req := &dto.CreatePostRequest{
+		Title:       "Title",
+		Body:        "Test Body",
+		CreatedByID: 1,
+	}
+	hdlr, mSvc := initEnv()
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	siotest.MockJson(c, req, http.MethodPost)
+	mSvc.On("CreatePost", mock.AnythingOfType("*dto.CreatePostRequest")).
+		Return(nil, errors.New("error"))
+
+	hdlr.CreatePost(c)
+	assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil errors: %v", c.Errors)
 }
 
 func TestUpdatePost(t *testing.T) {
@@ -199,7 +219,7 @@ func TestUpdatePost(t *testing.T) {
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 
-			siotest.MockJson(c, tt.req, http.MethodGet)
+			siotest.MockJson(c, tt.req, http.MethodPatch)
 			c.Params = gin.Params{gin.Param{Key: "id", Value: tt.ID}}
 			if tt.status == http.StatusOK {
 				mSvc.On("UpdatePost", mock.AnythingOfType("int64"), mock.AnythingOfType("*dto.UpdatePostRequest")).
@@ -214,4 +234,24 @@ func TestUpdatePost(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestUpdatePost_SvcErr(t *testing.T) {
+	req := &dto.UpdatePostRequest{
+		Title:       "Title",
+		Body:        "Test Body",
+		UpdatedByID: 1,
+	}
+	hdlr, mSvc := initEnv()
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	siotest.MockJson(c, req, http.MethodPatch)
+	c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+	mSvc.On("UpdatePost", mock.AnythingOfType("int64"), mock.AnythingOfType("*dto.UpdatePostRequest")).
+		Return(nil, errors.New("error"))
+
+	hdlr.UpdatePost(c)
+	assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil errors: %v", c.Errors)
 }
