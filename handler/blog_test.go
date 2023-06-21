@@ -4,12 +4,14 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"gitea.slauson.io/blog/blog-ms/dto"
 	"gitea.slauson.io/blog/blog-ms/service/mocks"
 	"gitea.slauson.io/blog/blog-ms/testing/mockdata"
 	"gitea.slauson.io/slausonio/go-testing/siotest"
+	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -431,4 +433,214 @@ func TestUpdateComment_SvcErr(t *testing.T) {
 
 	hdlr.UpdateComment(c)
 	assert.Truef(t, c.Errors != nil, "c.Errors shouldnt be nil errors: %v", c.Errors)
+}
+
+func TestGetPost(t *testing.T) {
+	tests := []struct {
+		name    string
+		request string
+		status  int
+		result  *dto.PostResponse
+	}{
+		{name: "happy", request: "123", status: http.StatusOK, result: mockdata.PostResponse},
+		{name: "BadId", request: "1s23", status: http.StatusBadRequest, result: nil},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hdlr, mSvc := initEnv()
+			w := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(w)
+
+			c.Request = &http.Request{
+				Header: make(http.Header),
+			}
+
+			c.Params = gin.Params{gin.Param{Key: "id", Value: tt.request}}
+			if tt.status == http.StatusOK {
+				i, _ := strconv.ParseInt(tt.request, 10, 64)
+				mSvc.On("GetPost", i).
+					Return(tt.result, nil)
+			}
+
+			hdlr.GetPost(c)
+			if tt.status == http.StatusOK {
+				assert.Nilf(t, c.Errors, "c.Errors should be nil")
+			} else {
+				assert.NotNilf(t, c.Errors, "c.Errors shouldnt be nil")
+			}
+		})
+	}
+}
+
+func TestGetPost_SvcErr(t *testing.T) {
+	hdlr, mSvc := initEnv()
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+
+	c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+	i, _ := strconv.ParseInt("1", 10, 64)
+	mSvc.On("GetPost", i).
+		Return(nil, errors.New("error"))
+
+	hdlr.GetPost(c)
+	assert.NotNilf(t, c.Errors, "c.Errors shouldnt be nil")
+}
+
+func TestGetAllPosts(t *testing.T) {
+	hdlr, mSvc := initEnv()
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+
+	mSvc.On("GetAllPosts").
+		Return(mockdata.PostResponses, nil)
+
+	hdlr.GetAllPosts(c)
+	assert.Nilf(t, c.Errors, "c.Errors should be nil")
+}
+
+func TestGetAllPosts_SvcErr(t *testing.T) {
+	hdlr, mSvc := initEnv()
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+
+	mSvc.On("GetAllPosts").
+		Return(nil, errors.New("error"))
+
+	hdlr.GetAllPosts(c)
+	assert.NotNilf(t, c.Errors, "c.Errors shouldnt be nil")
+}
+
+func TestSoftDeletePost(t *testing.T) {
+	tests := []struct {
+		name    string
+		request string
+		status  int
+		result  *siogeneric.SuccessResponse
+	}{
+		{
+			name:    "happy",
+			request: "123",
+			status:  http.StatusOK,
+			result:  mockdata.SuccessResponseSuccess,
+		},
+		{name: "BadId", request: "1s23", status: http.StatusBadRequest, result: nil},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hdlr, mSvc := initEnv()
+			w := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(w)
+
+			c.Request = &http.Request{
+				Header: make(http.Header),
+			}
+
+			c.Params = gin.Params{gin.Param{Key: "id", Value: tt.request}}
+			if tt.status == http.StatusOK {
+				i, _ := strconv.ParseInt(tt.request, 10, 64)
+				mSvc.On("SoftDeletePost", i).
+					Return(tt.result, nil)
+			}
+
+			hdlr.SoftDeletePost(c)
+			if tt.status == http.StatusOK {
+				assert.Nilf(t, c.Errors, "c.Errors should be nil")
+			} else {
+				assert.NotNilf(t, c.Errors, "c.Errors shouldnt be nil")
+			}
+		})
+	}
+}
+
+func TestSoftDeletePost_SvcErr(t *testing.T) {
+	hdlr, mSvc := initEnv()
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+
+	c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+	i, _ := strconv.ParseInt("1", 10, 64)
+	mSvc.On("SoftDeletePost", i).
+		Return(nil, errors.New("error"))
+
+	hdlr.SoftDeletePost(c)
+	assert.NotNilf(t, c.Errors, "c.Errors shouldnt be nil")
+}
+
+func TestSoftDeleteComment(t *testing.T) {
+	tests := []struct {
+		name    string
+		request string
+		status  int
+		result  *siogeneric.SuccessResponse
+	}{
+		{
+			name:    "happy",
+			request: "123",
+			status:  http.StatusOK,
+			result:  mockdata.SuccessResponseSuccess,
+		},
+		{name: "BadId", request: "1s23", status: http.StatusBadRequest, result: nil},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hdlr, mSvc := initEnv()
+			w := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(w)
+
+			c.Request = &http.Request{
+				Header: make(http.Header),
+			}
+
+			c.Params = gin.Params{gin.Param{Key: "id", Value: tt.request}}
+			if tt.status == http.StatusOK {
+				i, _ := strconv.ParseInt(tt.request, 10, 64)
+				mSvc.On("SoftDeleteComment", i).
+					Return(tt.result, nil)
+			}
+
+			hdlr.SoftDeleteComment(c)
+			if tt.status == http.StatusOK {
+				assert.Nilf(t, c.Errors, "c.Errors should be nil")
+			} else {
+				assert.NotNilf(t, c.Errors, "c.Errors shouldnt be nil")
+			}
+		})
+	}
+}
+
+func TestSoftDeleteComment_SvcErr(t *testing.T) {
+	hdlr, mSvc := initEnv()
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+
+	c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+	i, _ := strconv.ParseInt("1", 10, 64)
+	mSvc.On("SoftDeleteComment", i).
+		Return(nil, errors.New("error"))
+
+	hdlr.SoftDeleteComment(c)
+	assert.NotNilf(t, c.Errors, "c.Errors shouldnt be nil")
 }

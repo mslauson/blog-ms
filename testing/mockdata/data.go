@@ -40,4 +40,17 @@ var (
 	AddCommentRequest    = &dto.AddCommentRequest{PostID: 1, UserID: 1, Content: "test"}
 	UpdatePostRequest    = &dto.UpdatePostRequest{Title: "test"}
 	UpdateCommentRequest = &dto.UpdateCommentRequest{Content: "test"}
+
+	PostResponse = &dto.PostResponse{
+		Title: "test", Body: "test", CreatedByID: 1, UpdatedByID: 1, ID: 1,
+	}
+
+	PostResponses = &[]*dto.PostResponse{PostResponse, PostResponse}
+
+	CommentResponse = &dto.CommentResponse{
+		ID: 1, Content: "test", PostID: 1, UserID: 1,
+	}
+
+	SuccessResponseSuccess = &siogeneric.SuccessResponse{Success: true}
+	SuccesResponseFail     = &siogeneric.SuccessResponse{Success: false}
 )
