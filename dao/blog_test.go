@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"gitea.slauson.io/blog/blog-ms/testing/mockdata"
+	"gitea.slauson.io/blog/blog-ms/integration/mockdata"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
 )

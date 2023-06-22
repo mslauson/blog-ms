@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"gitea.slauson.io/blog/blog-ms/dto"
+	"gitea.slauson.io/blog/blog-ms/integration/mockdata"
 	"gitea.slauson.io/blog/blog-ms/service/mocks"
-	"gitea.slauson.io/blog/blog-ms/testing/mockdata"
 	"gitea.slauson.io/slausonio/go-testing/siotest"
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"github.com/gin-gonic/gin"

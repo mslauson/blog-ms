@@ -1,4 +1,4 @@
-package testing
+package integration
 
 import (
 	"encoding/json"
@@ -12,7 +12,7 @@ import (
 	"gitea.slauson.io/blog/blog-ms/constants"
 	"gitea.slauson.io/blog/blog-ms/dto"
 	"gitea.slauson.io/blog/blog-ms/handler"
-	"gitea.slauson.io/blog/blog-ms/testing/mockdata"
+	"gitea.slauson.io/blog/blog-ms/integration/mockdata"
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"github.com/stretchr/testify/require"
