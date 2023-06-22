@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"gitea.slauson.io/blog/blog-ms/constants"
 	"gitea.slauson.io/blog/blog-ms/dto"
 	"gitea.slauson.io/blog/blog-ms/service"
 	"gitea.slauson.io/blog/blog-ms/utils"
@@ -50,7 +51,7 @@ func (ph *BlogHdlr) GetPost(c *gin.Context) {
 
 	iId, err := sioUtils.ConvertToInt64(id)
 	if err != nil {
-		_ = c.Error(sioerror.NewSioBadRequestError(err.Error()))
+		_ = c.Error(sioerror.NewSioBadRequestError(constants.INVALID_ID))
 		return
 	}
 	if result, err := ph.svc.GetPost(iId); result != nil {
@@ -232,7 +233,7 @@ func (ph *BlogHdlr) UpdateComment(c *gin.Context) {
 
 	iId, err := sioUtils.ConvertToInt64(id)
 	if err != nil {
-		_ = c.Error(sioerror.NewSioBadRequestError(err.Error()))
+		_ = c.Error(sioerror.NewSioBadRequestError(constants.INVALID_ID))
 		return
 	}
 
@@ -261,7 +262,7 @@ func (ph *BlogHdlr) SoftDeletePost(c *gin.Context) {
 
 	iId, err := sioUtils.ConvertToInt64(id)
 	if err != nil {
-		_ = c.Error(sioerror.NewSioBadRequestError(err.Error()))
+		_ = c.Error(sioerror.NewSioBadRequestError(constants.INVALID_ID))
 		return
 	}
 	if result, err := ph.svc.SoftDeletePost(iId); result != nil {
@@ -289,7 +290,7 @@ func (ph *BlogHdlr) SoftDeleteComment(c *gin.Context) {
 
 	iId, err := sioUtils.ConvertToInt64(id)
 	if err != nil {
-		_ = c.Error(sioerror.NewSioBadRequestError(err.Error()))
+		_ = c.Error(sioerror.NewSioBadRequestError(constants.INVALID_ID))
 		return
 	}
 	if result, err := ph.svc.SoftDeleteComment(iId); result != nil {
