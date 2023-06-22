@@ -6,8 +6,8 @@ import (
 	"gitea.slauson.io/slausonio/go-utils/siomw"
 
 	"github.com/gin-gonic/gin"
-	// swaggerFiles "github.com/swaggo/files"
-	// ginSwagger "github.com/swaggo/gin-swagger"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func CreateRouter() *gin.Engine {
@@ -48,6 +48,6 @@ func CreateRouter() *gin.Engine {
 		}
 	}
 
-	// r.GET("/api/blog/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/api/blog/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return r
 }

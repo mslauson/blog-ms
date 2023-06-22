@@ -9,6 +9,7 @@ import (
 	"gitea.slauson.io/slausonio/sio-loki/hooks"
 
 	// _ "gitea.slauson.io/slausonio/customer-ms/docs"
+	_ "gitea.slauson.io/blog/blog-ms/docs"
 
 	_ "gitea.slauson.io/slausonio/go-types/siogeneric"
 	log "github.com/sirupsen/logrus"

@@ -1,0 +1,409 @@
+definitions:
+  dto.AddCommentRequest:
+    properties:
+      content:
+        type: string
+      postId:
+        type: integer
+      userId:
+        type: integer
+    required:
+    - content
+    - postId
+    - userId
+    type: object
+  dto.CommentResponse:
+    properties:
+      commentDate:
+        type: string
+      content:
+        type: string
+      deletionDate:
+        type: string
+      id:
+        type: integer
+      postId:
+        type: integer
+      softDeleted:
+        type: boolean
+      updatedDate:
+        type: string
+      userId:
+        type: integer
+    type: object
+  dto.CreatePostRequest:
+    properties:
+      body:
+        type: string
+      createdById:
+        type: integer
+      title:
+        type: string
+    required:
+    - body
+    - createdById
+    - title
+    type: object
+  dto.PostResponse:
+    properties:
+      body:
+        type: string
+      comments:
+        items:
+          $ref: '#/definitions/dto.CommentResponse'
+        type: array
+      createdById:
+        type: integer
+      deletionDate:
+        type: string
+      id:
+        type: integer
+      postedDate:
+        type: string
+      softDeleted:
+        type: boolean
+      title:
+        type: string
+      updatedById:
+        type: integer
+      updatedDate:
+        type: string
+    type: object
+  dto.UpdateCommentRequest:
+    properties:
+      content:
+        type: string
+    required:
+    - content
+    type: object
+  dto.UpdatePostRequest:
+    properties:
+      body:
+        type: string
+      title:
+        type: string
+      updatedById:
+        type: integer
+    required:
+    - updatedById
+    type: object
+  siogeneric.ErrorResponse:
+    properties:
+      error:
+        type: string
+      method:
+        type: string
+      path:
+        type: string
+    type: object
+info:
+  contact:
+    email: matthew@slauson.io
+    name: Matthew Slauson
+  description: This MS handles blog posts and comments
+  title: Blog Microservice
+  version: "1.0"
+paths:
+  /api/blog/v1/post/:
+    get:
+      consumes:
+      - application/json
+      description: Get all posts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.PostResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Get all posts
+      tags:
+      - post
+    post:
+      consumes:
+      - application/json
+      description: Create Post
+      parameters:
+      - description: Create Post request
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Create Post
+      tags:
+      - post
+  /api/blog/v1/post/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Post
+      parameters:
+      - description: Post id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Delete Post
+      tags:
+      - post
+    get:
+      consumes:
+      - application/json
+      description: Get post by ID
+      parameters:
+      - description: Post id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Get post by ID
+      tags:
+      - post
+    patch:
+      consumes:
+      - application/json
+      description: Update Post
+      parameters:
+      - description: Post id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Post request
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Update Post
+      tags:
+      - post
+  /api/blog/v1/post/comment:
+    post:
+      consumes:
+      - application/json
+      description: Add Comment
+      parameters:
+      - description: Add Comment request
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CommentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Add Comment
+      tags:
+      - comment
+  /api/blog/v1/post/comment/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Comment
+      parameters:
+      - description: Comment id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CommentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Delete Comment
+      tags:
+      - comment
+    patch:
+      consumes:
+      - application/json
+      description: Update Comment
+      parameters:
+      - description: Comment id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Comment request
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CommentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/siogeneric.ErrorResponse'
+      summary: Update Comment
+      tags:
+      - comment
+swagger: "2.0"
