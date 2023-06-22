@@ -9,6 +9,7 @@ import (
 	"gitea.slauson.io/slausonio/sio-loki/hooks"
 
 	// _ "gitea.slauson.io/slausonio/customer-ms/docs"
+
 	_ "gitea.slauson.io/slausonio/go-types/siogeneric"
 	log "github.com/sirupsen/logrus"
 )
@@ -33,8 +34,8 @@ func init() {
 	log.AddHook(lh)
 }
 
-// @title Customer Microservice
-// @description This MS handles customer account operations
+// @title Blog Microservice
+// @description This MS handles blog posts and comments
 // @version 1.0
 
 // @contact.name Matthew Slauson
