@@ -13,6 +13,7 @@ import (
 
 func CreateRouter() *gin.Engine {
 	r := gin.Default()
+	r.Use(siomw.PrometheusMiddleware())
 	r.Use(siomw.ErrorHandler)
 
 	uc := controller.NewUserController()
