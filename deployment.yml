@@ -1,8 +1,9 @@
+---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: iam-ms
-  namespace: nd-tasks
+  namespace: blog
 spec:
   replicas: 2
   revisionHistoryLimit: 3
@@ -19,29 +20,29 @@ spec:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/role: "chore"
         vault.hashicorp.com/agent-pre-populate-only: "true"
-        vault.hashicorp.com/agent-inject-secret-encryption: "ndt/data/encryption"
+        vault.hashicorp.com/agent-inject-secret-encryption: "blog/data/encryption"
         vault.hashicorp.com/agent-inject-template-encryption: |
-          {{ with secret "ndt/data/encryption" -}}
+          {{ with secret "blog/data/encryption" -}}
             export KEY="{{ .Data.data.key }}"
             export IV="{{ .Data.data.iv }}" {{- end }}
-        vault.hashicorp.com/agent-inject-secret-oauth: "ndt/data/oauth"
+        vault.hashicorp.com/agent-inject-secret-oauth: "blog/data/oauth"
         vault.hashicorp.com/agent-inject-template-oauth: |
-          {{ with secret "ndt/data/oauth" -}}
+          {{ with secret "blog/data/oauth" -}}
             export OAUTH_ADMIN_BASE="{{ .Data.data.authHost }}"
             export OAUTH_ISSUER_BASE="{{ .Data.data.oauthIssuerBase }}"
             export OAUTH_CLIENT_ID="{{ .Data.data.oauthClientId }}"
             export OAUTH_CLIENT_SECRET="{{ .Data.data.oauthClientSecret }}"
           {{- end }}
-        vault.hashicorp.com/agent-inject-secret-appwrite: "ndt/data/appwrite"
+        vault.hashicorp.com/agent-inject-secret-appwrite: "blog/data/appwrite"
         vault.hashicorp.com/agent-inject-template-appwrite: |
-          {{ with secret "ndt/data/appwrite" -}}
+          {{ with secret "blog/data/appwrite" -}}
             export IAM_HOST="{{ .Data.data.host }}"
             export IAM_KEY="{{ .Data.data.key }}"
             export IAM_PROJECT="{{ .Data.data.project }}"
           {{- end }}
-        vault.hashicorp.com/agent-inject-secret-host: "ndt/data/host"
+        vault.hashicorp.com/agent-inject-secret-host: "blog/data/host"
         vault.hashicorp.com/agent-inject-template-host: |
-          {{ with secret "ndt/data/host" -}}
+          {{ with secret "blog/data/host" -}}
             export LOKI_URL="{{ .Data.data.loki }}"
           {{- end }}
 
