@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	siotest "gitea.slauson.io/slausonio/go-testing/sio_test"
+	"gitea.slauson.io/slausonio/go-testing/siotest"
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 )
 
