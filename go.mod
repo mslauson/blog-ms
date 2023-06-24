@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	gitea.slauson.io/slausonio/go-prom v0.0.4
-	gitea.slauson.io/slausonio/go-testing v0.0.11
+	gitea.slauson.io/slausonio/go-testing v0.0.13
 	gitea.slauson.io/slausonio/go-types v0.1.7
 	gitea.slauson.io/slausonio/go-utils v0.1.0
 	gitea.slauson.io/slausonio/sio-loki v0.0.6
