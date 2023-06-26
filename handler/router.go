@@ -26,7 +26,7 @@ func CreateRouter() *gin.Engine {
 	})
 
 	// App
-	v1 := r.Group("/api/v1/post", siomw.AuthMiddleware)
+	v1 := r.Group("/api/post/v1", siomw.AuthMiddleware)
 	{
 		v1.POST("", h.CreatePost)
 		v1.GET("", h.GetAllPosts)
