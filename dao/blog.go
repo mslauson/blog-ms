@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"gitea.slauson.io/slausonio/go-types/siogeneric"
+	"gitea.slauson.io/slausonio/go-types/sioblog"
 	"gitea.slauson.io/slausonio/go-utils/siodao"
 )
 
@@ -16,19 +16,19 @@ type BDao struct {
 
 //go:generate mockery --name BlogDao
 type BlogDao interface {
-	CreatePost(post *siogeneric.BlogPost) error
+	CreatePost(post *sioblog.BlogPost) error
 	PostExists(title string, createdByID int64) (bool, error)
 	PostExistsByID(ID int64) (bool, error)
 	CommentExistsByID(ID int64) (bool, error)
-	GetPostByID(ID int64) (*siogeneric.BlogPost, error)
-	GetCommentByID(ID int64) (*siogeneric.BlogComment, error)
-	GetAllPosts() (*[]*siogeneric.BlogPost, error)
-	GetAllCommentsByPostID(postID int64) (*[]*siogeneric.BlogComment, error)
-	UpdatePost(post *siogeneric.BlogPost) error
-	AddComment(comment *siogeneric.BlogComment) error
-	UpdateComment(comment *siogeneric.BlogComment) error
-	SoftDeletePost(post *siogeneric.BlogPost) error
-	SoftDeleteComment(comment *siogeneric.BlogComment) error
+	GetPostByID(ID int64) (*sioblog.BlogPost, error)
+	GetCommentByID(ID int64) (*sioblog.BlogComment, error)
+	GetAllPosts() (*[]*sioblog.BlogPost, error)
+	GetAllCommentsByPostID(postID int64) (*[]*sioblog.BlogComment, error)
+	UpdatePost(post *sioblog.BlogPost) error
+	AddComment(comment *sioblog.BlogComment) error
+	UpdateComment(comment *sioblog.BlogComment) error
+	SoftDeletePost(post *sioblog.BlogPost) error
+	SoftDeleteComment(comment *sioblog.BlogComment) error
 }
 
 func NewBlogDao() *BDao {
@@ -37,7 +37,7 @@ func NewBlogDao() *BDao {
 	}
 }
 
-func (bd *BDao) CreatePost(post *siogeneric.BlogPost) error {
+func (bd *BDao) CreatePost(post *sioblog.BlogPost) error {
 	query := `INSERT INTO post (title, body, posted_date, created_by_id, soft_deleted) VALUES ($1, $2, $3, $4, $5) RETURNING id`
 	err := bd.db.QueryRowContext(
 		ctx,
@@ -73,7 +73,7 @@ func (bd *BDao) CommentExistsByID(ID int64) (bool, error) {
 	return exists, err
 }
 
-func (bd *BDao) GetPostByID(ID int64) (*siogeneric.BlogPost, error) {
+func (bd *BDao) GetPostByID(ID int64) (*sioblog.BlogPost, error) {
 	query := `SELECT id, title, body, created_by_id, updated_by_id, posted_date, updated_date, deletion_date, soft_deleted FROM post WHERE id = $1 AND soft_deleted = false`
 	rows, err := bd.db.QueryContext(ctx, query, ID)
 	if err != nil {
@@ -99,7 +99,7 @@ func (bd *BDao) GetPostByID(ID int64) (*siogeneric.BlogPost, error) {
 	return nil, sql.ErrNoRows
 }
 
-func (bd *BDao) GetCommentByID(ID int64) (*siogeneric.BlogComment, error) {
+func (bd *BDao) GetCommentByID(ID int64) (*sioblog.BlogComment, error) {
 	query := `SELECT id, content, comment_date, user_id, post_id, soft_deleted, deletion_date FROM comment WHERE id = $1 AND soft_deleted = false`
 	rows, err := bd.db.QueryContext(ctx, query, ID)
 	if err != nil {
@@ -114,14 +114,14 @@ func (bd *BDao) GetCommentByID(ID int64) (*siogeneric.BlogComment, error) {
 	return nil, sql.ErrNoRows
 }
 
-func (bd *BDao) GetAllPosts() (*[]*siogeneric.BlogPost, error) {
+func (bd *BDao) GetAllPosts() (*[]*sioblog.BlogPost, error) {
 	query := `SELECT id, title, body, created_by_id, updated_by_id, posted_date, updated_date, deletion_date, soft_deleted FROM post WHERE soft_deleted = false`
 	rows, err := bd.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	posts := make([]*siogeneric.BlogPost, 0)
+	posts := make([]*sioblog.BlogPost, 0)
 	for rows.Next() {
 		post, err := bd.scanPost(rows)
 		if err != nil {
@@ -138,7 +138,7 @@ func (bd *BDao) GetAllPosts() (*[]*siogeneric.BlogPost, error) {
 	return &posts, nil
 }
 
-func (bd *BDao) GetAllCommentsByPostID(postID int64) (*[]*siogeneric.BlogComment, error) {
+func (bd *BDao) GetAllCommentsByPostID(postID int64) (*[]*sioblog.BlogComment, error) {
 	query := `SELECT id, content, comment_date, user_id, post_id, soft_deleted, deletion_date FROM comment WHERE post_id = $1 AND soft_deleted = false`
 	rows, err := bd.db.QueryContext(ctx, query, postID)
 	if err != nil {
@@ -148,7 +148,7 @@ func (bd *BDao) GetAllCommentsByPostID(postID int64) (*[]*siogeneric.BlogComment
 	return bd.scanComments(rows)
 }
 
-func (bd *BDao) UpdatePost(post *siogeneric.BlogPost) error {
+func (bd *BDao) UpdatePost(post *sioblog.BlogPost) error {
 	query := `UPDATE post
 		SET 
 		title = COALESCE($1, title),
@@ -162,7 +162,7 @@ func (bd *BDao) UpdatePost(post *siogeneric.BlogPost) error {
 	return nil
 }
 
-func (bd *BDao) AddComment(comment *siogeneric.BlogComment) error {
+func (bd *BDao) AddComment(comment *sioblog.BlogComment) error {
 	query := `INSERT INTO comment (content, comment_date, post_id, user_id, soft_deleted) VALUES ($1, $2, $3, $4, $5) RETURNING id`
 	err := bd.db.QueryRowContext(
 		ctx,
@@ -176,7 +176,7 @@ func (bd *BDao) AddComment(comment *siogeneric.BlogComment) error {
 	return err
 }
 
-func (bd *BDao) UpdateComment(comment *siogeneric.BlogComment) error {
+func (bd *BDao) UpdateComment(comment *sioblog.BlogComment) error {
 	query := `UPDATE comment
 		SET 
 		content = COALESCE($1, content),
@@ -188,7 +188,7 @@ func (bd *BDao) UpdateComment(comment *siogeneric.BlogComment) error {
 	return nil
 }
 
-func (bd *BDao) SoftDeletePost(post *siogeneric.BlogPost) error {
+func (bd *BDao) SoftDeletePost(post *sioblog.BlogPost) error {
 	query := `UPDATE post 
 	SET
 	soft_deleted = $1,
@@ -202,7 +202,7 @@ func (bd *BDao) SoftDeletePost(post *siogeneric.BlogPost) error {
 	return nil
 }
 
-func (bd *BDao) SoftDeleteComment(comment *siogeneric.BlogComment) error {
+func (bd *BDao) SoftDeleteComment(comment *sioblog.BlogComment) error {
 	query := `UPDATE comment
 		SET 
 		soft_deleted = $1,
@@ -215,8 +215,8 @@ func (bd *BDao) SoftDeleteComment(comment *siogeneric.BlogComment) error {
 	return nil
 }
 
-func (bd *BDao) scanPost(rows *sql.Rows) (*siogeneric.BlogPost, error) {
-	post := &siogeneric.BlogPost{}
+func (bd *BDao) scanPost(rows *sql.Rows) (*sioblog.BlogPost, error) {
+	post := &sioblog.BlogPost{}
 	err := rows.Scan(
 		&post.ID,
 		&post.Title,
@@ -235,8 +235,8 @@ func (bd *BDao) scanPost(rows *sql.Rows) (*siogeneric.BlogPost, error) {
 	return post, nil
 }
 
-func (bd *BDao) scanComment(rows *sql.Rows) (*siogeneric.BlogComment, error) {
-	comment := &siogeneric.BlogComment{}
+func (bd *BDao) scanComment(rows *sql.Rows) (*sioblog.BlogComment, error) {
+	comment := &sioblog.BlogComment{}
 	err := rows.Scan(
 		&comment.ID,
 		&comment.Content,
@@ -253,8 +253,8 @@ func (bd *BDao) scanComment(rows *sql.Rows) (*siogeneric.BlogComment, error) {
 	return comment, nil
 }
 
-func (bd *BDao) scanComments(rows *sql.Rows) (*[]*siogeneric.BlogComment, error) {
-	comments := &[]*siogeneric.BlogComment{}
+func (bd *BDao) scanComments(rows *sql.Rows) (*[]*sioblog.BlogComment, error) {
+	comments := &[]*sioblog.BlogComment{}
 	for rows.Next() {
 		comment, err := bd.scanComment(rows)
 		if err != nil {

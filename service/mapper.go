@@ -4,11 +4,12 @@ import (
 	"time"
 
 	"gitea.slauson.io/blog/blog-ms/dto"
+	"gitea.slauson.io/slausonio/go-types/sioblog"
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 )
 
-func buildCreatePostEntity(req *dto.CreatePostRequest) *siogeneric.BlogPost {
-	return &siogeneric.BlogPost{
+func buildCreatePostEntity(req *dto.CreatePostRequest) *sioblog.BlogPost {
+	return &sioblog.BlogPost{
 		Title:       siogeneric.NewSioNullString(req.Title),
 		Body:        siogeneric.NewSioNullString(req.Body),
 		CreatedByID: siogeneric.NewSioNullInt64(req.CreatedByID),
@@ -16,8 +17,8 @@ func buildCreatePostEntity(req *dto.CreatePostRequest) *siogeneric.BlogPost {
 	}
 }
 
-func buildAddCommentEntity(req *dto.AddCommentRequest) *siogeneric.BlogComment {
-	return &siogeneric.BlogComment{
+func buildAddCommentEntity(req *dto.AddCommentRequest) *sioblog.BlogComment {
+	return &sioblog.BlogComment{
 		Content:     siogeneric.NewSioNullString(req.Content),
 		CommentDate: siogeneric.NewSioNullTime(time.Now()),
 		PostID:      siogeneric.NewSioNullInt64(req.PostID),
@@ -25,8 +26,8 @@ func buildAddCommentEntity(req *dto.AddCommentRequest) *siogeneric.BlogComment {
 	}
 }
 
-func buildUpdatePostEntity(req *dto.UpdatePostRequest) *siogeneric.BlogPost {
-	return &siogeneric.BlogPost{
+func buildUpdatePostEntity(req *dto.UpdatePostRequest) *sioblog.BlogPost {
+	return &sioblog.BlogPost{
 		Title:       siogeneric.NewSioNullString(req.Title),
 		Body:        siogeneric.NewSioNullString(req.Body),
 		UpdatedByID: siogeneric.NewSioNullInt64(req.UpdatedByID),
@@ -34,14 +35,14 @@ func buildUpdatePostEntity(req *dto.UpdatePostRequest) *siogeneric.BlogPost {
 	}
 }
 
-func buildUpdateCommentEntity(req *dto.UpdateCommentRequest) *siogeneric.BlogComment {
-	return &siogeneric.BlogComment{
+func buildUpdateCommentEntity(req *dto.UpdateCommentRequest) *sioblog.BlogComment {
+	return &sioblog.BlogComment{
 		Content:     siogeneric.NewSioNullString(req.Content),
 		UpdatedDate: siogeneric.NewSioNullTime(time.Now()),
 	}
 }
 
-func buildPostResponse(entity *siogeneric.BlogPost) *dto.PostResponse {
+func buildPostResponse(entity *sioblog.BlogPost) *dto.PostResponse {
 	return &dto.PostResponse{
 		ID:           entity.ID.Int64,
 		Title:        entity.Title.String,
@@ -56,7 +57,7 @@ func buildPostResponse(entity *siogeneric.BlogPost) *dto.PostResponse {
 	}
 }
 
-func buildAllPostsResponse(entities *[]*siogeneric.BlogPost) *[]*dto.PostResponse {
+func buildAllPostsResponse(entities *[]*sioblog.BlogPost) *[]*dto.PostResponse {
 	var postResponses []*dto.PostResponse
 	for _, entity := range *entities {
 		postResponses = append(postResponses, buildPostResponse(entity))
@@ -64,7 +65,7 @@ func buildAllPostsResponse(entities *[]*siogeneric.BlogPost) *[]*dto.PostRespons
 	return &postResponses
 }
 
-func buildCommentResponse(entity *siogeneric.BlogComment) *dto.CommentResponse {
+func buildCommentResponse(entity *sioblog.BlogComment) *dto.CommentResponse {
 	return &dto.CommentResponse{
 		ID:           entity.ID.Int64,
 		Content:      entity.Content.String,
@@ -77,7 +78,7 @@ func buildCommentResponse(entity *siogeneric.BlogComment) *dto.CommentResponse {
 	}
 }
 
-func buildCommentResponses(entities *[]*siogeneric.BlogComment) *[]*dto.CommentResponse {
+func buildCommentResponses(entities *[]*sioblog.BlogComment) *[]*dto.CommentResponse {
 	if entities == nil {
 		return nil
 	}

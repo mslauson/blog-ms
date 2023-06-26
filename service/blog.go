@@ -6,6 +6,7 @@ import (
 	"gitea.slauson.io/blog/blog-ms/constants"
 	"gitea.slauson.io/blog/blog-ms/dao"
 	"gitea.slauson.io/blog/blog-ms/dto"
+	"gitea.slauson.io/slausonio/go-types/sioblog"
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/siodao"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
@@ -124,7 +125,7 @@ func (bs *BlogSvc) SoftDeletePost(ID int64) (*siogeneric.SuccessResponse, error)
 		return nil, err
 	}
 
-	post := new(siogeneric.BlogPost)
+	post := new(sioblog.BlogPost)
 	post.DeletionDate = siogeneric.NewSioNullTime(time.Now())
 
 	if err := bs.dao.SoftDeletePost(post); err != nil {
@@ -139,7 +140,7 @@ func (bs *BlogSvc) SoftDeleteComment(ID int64) (*siogeneric.SuccessResponse, err
 		return nil, err
 	}
 
-	comment := new(siogeneric.BlogComment)
+	comment := new(sioblog.BlogComment)
 	comment.DeletionDate = siogeneric.NewSioNullTime(time.Now())
 
 	if err := bs.dao.SoftDeleteComment(comment); err != nil {
