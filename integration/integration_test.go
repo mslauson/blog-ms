@@ -562,7 +562,6 @@ func TestUpdateComment(t *testing.T) {
 
 	for _, et := range errTests {
 		t.Run(et.name, func(t *testing.T) {
-			t.Parallel()
 			token, err := sioUtils.NewTokenClient().CreateToken()
 			if err != nil {
 				t.Fatal(err)
@@ -626,7 +625,6 @@ func TestGetPost(t *testing.T) {
 	}
 
 	t.Run("Happy", func(t *testing.T) {
-		t.Parallel()
 		req, err := http.NewRequest("GET", ts.URL+"/api/blog/v1/post/"+strconv.Itoa(int(id)), nil)
 		if err != nil {
 			t.Fatal(err)
@@ -651,7 +649,6 @@ func TestGetPost(t *testing.T) {
 
 	for _, et := range errTests {
 		t.Run(et.name, func(t *testing.T) {
-			t.Parallel()
 			req, err := http.NewRequest(
 				"GET",
 				ts.URL+"/api/blog/v1/post/"+strconv.Itoa(int(id)),
@@ -686,7 +683,6 @@ func TestGetAllPosts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Parallel()
 
 	req, err := http.NewRequest("GET", ts.URL+"/api/blog/v1/post", nil)
 	if err != nil {
@@ -748,7 +744,6 @@ func TestSoftDeleteComment(t *testing.T) {
 	}
 
 	t.Run("Happy", func(t *testing.T) {
-		t.Parallel()
 		req, err := http.NewRequest(
 			"DELETE",
 			ts.URL+"/api/blog/v1/post/comment/"+idStr,
@@ -777,7 +772,6 @@ func TestSoftDeleteComment(t *testing.T) {
 
 	for _, et := range errTests {
 		t.Run(et.name, func(t *testing.T) {
-			t.Parallel()
 			req, err := http.NewRequest(
 				"DELETE",
 				ts.URL+"/api/blog/v1/post/comment/"+idStr,
@@ -843,7 +837,6 @@ func TestSoftDeletePost(t *testing.T) {
 	}
 
 	t.Run("Happy", func(t *testing.T) {
-		t.Parallel()
 		req, err := http.NewRequest(
 			"DELETE",
 			ts.URL+"/api/blog/v1/post/comment/"+idStr,
@@ -872,7 +865,6 @@ func TestSoftDeletePost(t *testing.T) {
 
 	for _, et := range errTests {
 		t.Run(et.name, func(t *testing.T) {
-			t.Parallel()
 			req, err := http.NewRequest(
 				"DELETE",
 				ts.URL+"/api/blog/v1/post/comment/"+idStr,
