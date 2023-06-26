@@ -52,7 +52,7 @@ func (bd *BDao) CreatePost(post *sioblog.BlogPost) error {
 }
 
 func (bd *BDao) PostExists(title string, createdByID int64) (bool, error) {
-	query := `SELECT EXISTS(SELECT 1 FROM post WHERE title = $1 created_by_id = $2)`
+	query := `SELECT EXISTS(SELECT 1 FROM post WHERE title = $1 AND created_by_id = $2)`
 	var exists bool
 	err := bd.db.QueryRowContext(ctx, query, title, createdByID).
 		Scan(&exists)

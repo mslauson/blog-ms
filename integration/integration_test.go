@@ -40,7 +40,7 @@ func TestCreatePost(t *testing.T) {
 			req: &dto.CreatePostRequest{
 				Title:       "Title",
 				Body:        "Test Body",
-				CreatedByID: 1000011,
+				CreatedByID: 100000011,
 			},
 		},
 	}
@@ -94,7 +94,7 @@ func TestCreatePost_Err(t *testing.T) {
 			req: &dto.CreatePostRequest{
 				Title:       "Title",
 				Body:        "Test Body",
-				CreatedByID: 1000011,
+				CreatedByID: 10000011,
 			},
 			status: http.StatusOK,
 			err:    "Post already exists",
@@ -104,7 +104,7 @@ func TestCreatePost_Err(t *testing.T) {
 			req: &dto.CreatePostRequest{
 				Title:       mockdata.LongTitle,
 				Body:        "Test Body",
-				CreatedByID: 1000011,
+				CreatedByID: 10000011,
 			},
 			status: http.StatusBadRequest,
 			err:    "Post already exists",
@@ -113,7 +113,7 @@ func TestCreatePost_Err(t *testing.T) {
 			name: "No Title",
 			req: &dto.CreatePostRequest{
 				Body:        "Test Body",
-				CreatedByID: 1000011,
+				CreatedByID: 10000011,
 			},
 			status: http.StatusBadRequest,
 			err:    "Post already exists",
@@ -123,7 +123,7 @@ func TestCreatePost_Err(t *testing.T) {
 			req: &dto.CreatePostRequest{
 				Title:       "Title",
 				Body:        mockdata.LongBody,
-				CreatedByID: 1000011,
+				CreatedByID: 10000011,
 			},
 			status: http.StatusBadRequest,
 			err:    "Post already exists",
@@ -132,7 +132,7 @@ func TestCreatePost_Err(t *testing.T) {
 			name: "No Body",
 			req: &dto.CreatePostRequest{
 				Title:       "Title",
-				CreatedByID: 1000011,
+				CreatedByID: 10000011,
 			},
 			status: http.StatusBadRequest,
 			err:    "Post already exists",
@@ -193,21 +193,21 @@ func TestUpdatePost(t *testing.T) {
 			req: &dto.UpdatePostRequest{
 				Title:       "Title",
 				Body:        "Test Body",
-				UpdatedByID: 1000011,
+				UpdatedByID: 10000011,
 			},
 		},
 		{
 			name: "success Update Title",
 			req: &dto.UpdatePostRequest{
 				Title:       "Title",
-				UpdatedByID: 1000011,
+				UpdatedByID: 10000011,
 			},
 		},
 		{
 			name: "success Update Body",
 			req: &dto.UpdatePostRequest{
 				Body:        "Test Body",
-				UpdatedByID: 1000011,
+				UpdatedByID: 10000011,
 			},
 		},
 	}
@@ -263,7 +263,7 @@ func TestUpdatePost_Err(t *testing.T) {
 			name: "Bad ID",
 			req: &dto.UpdatePostRequest{
 				Body:        "Test Body",
-				UpdatedByID: 1000011,
+				UpdatedByID: 10000011,
 			},
 			status: http.StatusBadRequest,
 			err:    "1sdfsdfe",
@@ -273,7 +273,7 @@ func TestUpdatePost_Err(t *testing.T) {
 			req: &dto.UpdatePostRequest{
 				Title:       mockdata.LongTitle,
 				Body:        "Test Body",
-				UpdatedByID: 1000011,
+				UpdatedByID: 10000011,
 			},
 			status: http.StatusBadRequest,
 			err:    "1",
@@ -283,7 +283,7 @@ func TestUpdatePost_Err(t *testing.T) {
 			req: &dto.UpdatePostRequest{
 				Title:       "Title",
 				Body:        mockdata.LongBody,
-				UpdatedByID: 1000011,
+				UpdatedByID: 10000011,
 			},
 			status: http.StatusBadRequest,
 			err:    "1",
@@ -291,7 +291,7 @@ func TestUpdatePost_Err(t *testing.T) {
 		{
 			name: "Bad - No updates passed",
 			req: &dto.UpdatePostRequest{
-				UpdatedByID: 1000011,
+				UpdatedByID: 10000011,
 			},
 			status: http.StatusBadRequest,
 			err:    "1",
@@ -353,8 +353,8 @@ func TestAddComment(t *testing.T) {
 			name: "success",
 			req: &dto.AddCommentRequest{
 				Content: "Test Content",
-				UserID:  1000011,
-				PostID:  1000011,
+				UserID:  10000011,
+				PostID:  10000011,
 			},
 		},
 	}
@@ -409,8 +409,8 @@ func TestAddComment_Err(t *testing.T) {
 			name: "Bad Content",
 			req: &dto.AddCommentRequest{
 				Content: mockdata.LongComment,
-				UserID:  1000011,
-				PostID:  1000011,
+				UserID:  10000011,
+				PostID:  10000011,
 			},
 			status: http.StatusBadRequest,
 			err:    constants.COMMENT_TOO_LONG,
@@ -418,8 +418,8 @@ func TestAddComment_Err(t *testing.T) {
 		{
 			name: "Missing Content",
 			req: &dto.AddCommentRequest{
-				UserID: 1000011,
-				PostID: 1000011,
+				UserID: 10000011,
+				PostID: 10000011,
 			},
 			status: http.StatusBadRequest,
 			err:    constants.COMMENT_TOO_LONG,
@@ -428,7 +428,7 @@ func TestAddComment_Err(t *testing.T) {
 			name: "Missing UserID",
 			req: &dto.AddCommentRequest{
 				Content: "Test Content",
-				PostID:  1000011,
+				PostID:  10000011,
 			},
 			status: http.StatusBadRequest,
 			err:    constants.COMMENT_TOO_LONG,
@@ -437,7 +437,7 @@ func TestAddComment_Err(t *testing.T) {
 			name: "Missing PostID",
 			req: &dto.AddCommentRequest{
 				Content: "Test Content",
-				UserID:  1000011,
+				UserID:  10000011,
 			},
 			status: http.StatusBadRequest,
 			err:    constants.COMMENT_TOO_LONG,
