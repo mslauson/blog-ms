@@ -38,7 +38,7 @@ func TestHealthCheckContextPath(t *testing.T) {
 	ts, _ := siotest.RunTestServer(t, handler.CreateRouter())
 	defer ts.Close()
 
-	req, err := http.NewRequest("GET", ts.URL+"/api/task", nil)
+	req, err := http.NewRequest("GET", ts.URL+"/api/post", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

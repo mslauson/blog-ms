@@ -21,12 +21,12 @@ func CreateRouter() *gin.Engine {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
-	r.GET("/api/blog", func(c *gin.Context) {
+	r.GET("/api/post", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
 	// App
-	v1 := r.Group("/api/blog/v1/post", siomw.AuthMiddleware)
+	v1 := r.Group("/api/v1/post", siomw.AuthMiddleware)
 	{
 		v1.POST("", h.CreatePost)
 		v1.GET("", h.GetAllPosts)

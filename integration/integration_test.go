@@ -57,7 +57,7 @@ func TestCreatePost(t *testing.T) {
 				t.Fatal(err)
 			}
 			sr := strings.NewReader(string(rJSON))
-			req, err := http.NewRequest("POST", ts.URL+"/api/blog/v1/task", sr)
+			req, err := http.NewRequest("POST", ts.URL+"/api/post/v1", sr)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -162,7 +162,7 @@ func TestCreatePost_Err(t *testing.T) {
 				t.Fatal(err)
 			}
 			sr := strings.NewReader(string(rJSON))
-			req, err := http.NewRequest("POST", ts.URL+"/api/blog/v1/task", sr)
+			req, err := http.NewRequest("POST", ts.URL+"/api/post/v1", sr)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -227,7 +227,7 @@ func TestUpdatePost(t *testing.T) {
 			sr := strings.NewReader(string(rJSON))
 			req, err := http.NewRequest(
 				"PATCH",
-				ts.URL+"/api/blog/v1/task/"+strconv.Itoa(int(id)),
+				ts.URL+"/api/post/v1/"+strconv.Itoa(int(id)),
 				sr,
 			)
 			if err != nil {
@@ -322,7 +322,7 @@ func TestUpdatePost_Err(t *testing.T) {
 			sr := strings.NewReader(string(rJSON))
 			req, err := http.NewRequest(
 				"PATCH",
-				ts.URL+"/api/blog/v1/task/"+strconv.Itoa(int(id)),
+				ts.URL+"/api/post/v1/"+strconv.Itoa(int(id)),
 				sr,
 			)
 			if err != nil {
@@ -373,7 +373,7 @@ func TestAddComment(t *testing.T) {
 				t.Fatal(err)
 			}
 			sr := strings.NewReader(string(rJSON))
-			req, err := http.NewRequest("POST", ts.URL+"/api/blog/v1/task/comment", sr)
+			req, err := http.NewRequest("POST", ts.URL+"/api/post/v1/comment", sr)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -458,7 +458,7 @@ func TestAddComment_Err(t *testing.T) {
 				t.Fatal(err)
 			}
 			sr := strings.NewReader(string(rJSON))
-			req, err := http.NewRequest("POST", ts.URL+"/api/blog/v1/task/comment", sr)
+			req, err := http.NewRequest("POST", ts.URL+"/api/post/v1/comment", sr)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -538,7 +538,7 @@ func TestUpdateComment(t *testing.T) {
 			sr := strings.NewReader(string(rJSON))
 			req, err := http.NewRequest(
 				"PATCH",
-				ts.URL+"/api/blog/v1/task/comment/"+strconv.Itoa(int(id)),
+				ts.URL+"/api/post/v1/comment/"+strconv.Itoa(int(id)),
 				sr,
 			)
 			if err != nil {
@@ -574,7 +574,7 @@ func TestUpdateComment(t *testing.T) {
 			sr := strings.NewReader(string(rJSON))
 			req, err := http.NewRequest(
 				"PATCH",
-				ts.URL+"/api/blog/v1/task/comment/"+strconv.Itoa(int(id)),
+				ts.URL+"/api/post/v1/comment/"+strconv.Itoa(int(id)),
 				sr,
 			)
 			if err != nil {
