@@ -35,10 +35,14 @@ var (
 		UpdatedDate:  siogeneric.NewSioNullTime(time.Now()),
 	}
 
-	Posts                = &[]*sioblog.BlogPost{PostEntity, PostEntity}
-	Comments             = &[]*sioblog.BlogComment{CommentEntity, CommentEntity}
-	CreatePostRequest    = &dto.CreatePostRequest{Title: "test", Body: "test", CreatedByID: 1}
-	AddCommentRequest    = &dto.AddCommentRequest{PostID: 1, UserID: 1, Content: "test"}
+	Posts             = &[]*sioblog.BlogPost{PostEntity, PostEntity}
+	Comments          = &[]*sioblog.BlogComment{CommentEntity, CommentEntity}
+	CreatePostRequest = &dto.CreatePostRequest{
+		Title:       "Test title",
+		Body:        "Test body",
+		CreatedByID: 1,
+	}
+	AddCommentRequest    = &dto.AddCommentRequest{PostID: 1, UserID: 1, Content: "Test comment"}
 	UpdatePostRequest    = &dto.UpdatePostRequest{Title: "test"}
 	UpdateCommentRequest = &dto.UpdateCommentRequest{Content: "test"}
 

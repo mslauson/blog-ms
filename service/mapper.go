@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"time"
 
 	"gitea.slauson.io/blog/blog-ms/dto"
@@ -9,6 +10,7 @@ import (
 )
 
 func buildCreatePostEntity(req *dto.CreatePostRequest) *sioblog.BlogPost {
+	fmt.Println(req)
 	return &sioblog.BlogPost{
 		Title:       siogeneric.NewSioNullString(req.Title),
 		Body:        siogeneric.NewSioNullString(req.Body),

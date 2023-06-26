@@ -52,7 +52,7 @@ func (bd *BDao) CreatePost(post *sioblog.BlogPost) error {
 }
 
 func (bd *BDao) PostExists(title string, createdByID int64) (bool, error) {
-	query := `SELECT EXISTS(SELECT 1 FROM post WHERE title = $1 AND created_by_id = $2)`
+	query := `SELECT EXISTS(SELECT 1 FROM post WHERE title = $1 AND created_by_id = $2 AND soft_deleted = false)`
 	var exists bool
 	err := bd.db.QueryRowContext(ctx, query, title, createdByID).
 		Scan(&exists)
@@ -60,7 +60,7 @@ func (bd *BDao) PostExists(title string, createdByID int64) (bool, error) {
 }
 
 func (bd *BDao) PostExistsByID(ID int64) (bool, error) {
-	query := `SELECT EXISTS(SELECT 1 FROM post WHERE id = $1)`
+	query := `SELECT EXISTS(SELECT 1 FROM post WHERE id = $1 AND soft_deleted = false)`
 	var exists bool
 	err := bd.db.QueryRowContext(ctx, query, ID).Scan(&exists)
 	return exists, err
@@ -153,7 +153,7 @@ func (bd *BDao) UpdatePost(post *sioblog.BlogPost) error {
 		SET 
 		title = COALESCE($1, title),
 		body = COALESCE($2,body),
-		updated_date = COALESCE($3, updated_date)
+		updated_date = COALESCE($3, updated_date),
 		updated_by_id = COALESCE($4, updated_by_id)
 	`
 	if _, err := bd.db.ExecContext(ctx, query, post.Title, post.Body, post.UpdatedDate, post.UpdatedByID); err != nil {
