@@ -4,10 +4,16 @@ gitea.slauson.io/slausonio/go-testing v0.0.11 h1:UrrLZvLhBGkVgX4lcbclRkYrjbCcUKC
 gitea.slauson.io/slausonio/go-testing v0.0.11/go.mod h1:6xmM6tRhF5q1ZY3PYY/ezFkeJddzQ1l8jD5T0SpD7B0=
 gitea.slauson.io/slausonio/go-testing v0.0.13 h1:uIbChdfe9iVSHUujRjZbTXPYn91pQMJYGVGPqOC9j+s=
 gitea.slauson.io/slausonio/go-testing v0.0.13/go.mod h1:6xmM6tRhF5q1ZY3PYY/ezFkeJddzQ1l8jD5T0SpD7B0=
+gitea.slauson.io/slausonio/go-testing v0.0.21 h1:c/SOLkYtUrwjTlJWimxWhISTPjITfKQgP0mveVDTNzM=
+gitea.slauson.io/slausonio/go-testing v0.0.21/go.mod h1:wV1BhqgWicfb/HvGhbyHBiv9EmrubBY94Cw0DzmGOaI=
 gitea.slauson.io/slausonio/go-types v0.1.7 h1:KSuwdTxWI5iOefY7qU3wrjyRUJWKBp2iELOrS03WCSo=
 gitea.slauson.io/slausonio/go-types v0.1.7/go.mod h1:nNHEtpd+MQosQgVJY8c9JyW0cO/Bd6D4B+yzxutegHE=
+gitea.slauson.io/slausonio/go-types v0.1.9 h1:vqeTspnQ5gxk0SmaC6xACA2aAZI01Ej/Dl87pvfM4js=
+gitea.slauson.io/slausonio/go-types v0.1.9/go.mod h1:nNHEtpd+MQosQgVJY8c9JyW0cO/Bd6D4B+yzxutegHE=
 gitea.slauson.io/slausonio/go-utils v0.1.0 h1:91wyfa0Vg07H2iOtNjoie6GuAiC0A1XRY9arPyJwdzQ=
 gitea.slauson.io/slausonio/go-utils v0.1.0/go.mod h1:X0R5+aclKRfaNVPYDwDvxF2JxDR3RBZ/9fpozx6Hwag=
+gitea.slauson.io/slausonio/go-utils v0.1.5 h1:PY0M5ZjQuHGTIP5CKg1g5gcxhVxzd43uRY5HnU1UjKQ=
+gitea.slauson.io/slausonio/go-utils v0.1.5/go.mod h1:X0R5+aclKRfaNVPYDwDvxF2JxDR3RBZ/9fpozx6Hwag=
 gitea.slauson.io/slausonio/sio-loki v0.0.6 h1:YxgqY9v+RBtUr3/0JaxV6uFJ4XZyiyT7gRn4OaYb2Ps=
 gitea.slauson.io/slausonio/sio-loki v0.0.6/go.mod h1:P5sPqmajSpV6wHO6mKLulbds2HGI6z+vhbK9Ln0D1uU=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
@@ -23,6 +29,8 @@ github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6r
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
 github.com/bytedance/sonic v1.9.1 h1:6iJ6NqdoxCDr6mbY8h18oSO+cShGSMRGCEo7F2h0x8s=
 github.com/bytedance/sonic v1.9.1/go.mod h1:i736AoUSYt75HyZLoJW9ERYxcy6eaN6h4BZXU064P/U=
+github.com/bytedance/sonic v1.9.2 h1:GDaNjuWSGu09guE9Oql0MSTNhNCLlWwO8y/xM5BzcbM=
+github.com/bytedance/sonic v1.9.2/go.mod h1:i736AoUSYt75HyZLoJW9ERYxcy6eaN6h4BZXU064P/U=
 github.com/cespare/xxhash/v2 v2.2.0 h1:DC2CZ1Ep5Y4k3ZQ899DldepgrayRUGE6BBZ/cd9Cj44=
 github.com/cespare/xxhash/v2 v2.2.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/chenzhuoyu/base64x v0.0.0-20211019084208-fb5309c8db06/go.mod h1:DH46F32mSOjUmXrMHnKwZdA8wcEefY7UVqBKYGjpdQY=
@@ -192,6 +200,8 @@ google.golang.org/protobuf v1.26.0-rc.1/go.mod h1:jlhhOSvTdKEhbULTjvd4ARK9grFBp0
 google.golang.org/protobuf v1.26.0/go.mod h1:9q0QmTI4eRPtz6boOQmLYwt+qCgq0jsYwAQnmE0givc=
 google.golang.org/protobuf v1.30.0 h1:kPPoIgf3TsEvrm0PFe15JQ+570QVxYzEvvHqChK+cng=
 google.golang.org/protobuf v1.30.0/go.mod h1:HV8QOd/L58Z+nl8r43ehVNZIU/HEI6OcFqwMG9pJV4I=
+google.golang.org/protobuf v1.31.0 h1:g0LDEJHgrBl9N9r17Ru3sqWhkIx2NB67okBHPwC7hs8=
+google.golang.org/protobuf v1.31.0/go.mod h1:HV8QOd/L58Z+nl8r43ehVNZIU/HEI6OcFqwMG9pJV4I=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
