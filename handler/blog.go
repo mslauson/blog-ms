@@ -3,10 +3,10 @@ package handler
 import (
 	"net/http"
 
-	"gitea.slauson.io/blog/blog-ms/constants"
-	"gitea.slauson.io/blog/blog-ms/dto"
-	"gitea.slauson.io/blog/blog-ms/service"
-	"gitea.slauson.io/blog/blog-ms/utils"
+	"gitea.slauson.io/blog/post-ms/constants"
+	"gitea.slauson.io/blog/post-ms/dto"
+	"gitea.slauson.io/blog/post-ms/service"
+	"gitea.slauson.io/blog/post-ms/utils"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
 	"github.com/gin-gonic/gin"

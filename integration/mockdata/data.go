@@ -3,7 +3,7 @@ package mockdata
 import (
 	"time"
 
-	"gitea.slauson.io/blog/blog-ms/dto"
+	"gitea.slauson.io/blog/post-ms/dto"
 	"gitea.slauson.io/slausonio/go-types/sioblog"
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 )

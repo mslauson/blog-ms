@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"gitea.slauson.io/blog/blog-ms/constants"
-	"gitea.slauson.io/blog/blog-ms/dto"
+	"gitea.slauson.io/blog/post-ms/constants"
+	"gitea.slauson.io/blog/post-ms/dto"
 	"gitea.slauson.io/slausonio/go-utils/sioUtils"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
 )

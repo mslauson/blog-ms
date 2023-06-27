@@ -4,12 +4,12 @@ import (
 	"net/http"
 	"os"
 
-	"gitea.slauson.io/post/post-ms/handler"
+	"gitea.slauson.io/blog/post-ms/handler"
 	"gitea.slauson.io/slausonio/go-prom/sioprom"
 	"gitea.slauson.io/slausonio/sio-loki/hooks"
 
 	// _ "gitea.slauson.io/slausonio/customer-ms/docs"
-	_ "gitea.slauson.io/post/post-ms/docs"
+	_ "gitea.slauson.io/blog/post-ms/docs"
 
 	_ "gitea.slauson.io/slausonio/go-types/siogeneric"
 	log "github.com/sirupsen/logrus"

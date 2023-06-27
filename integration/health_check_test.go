@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"gitea.slauson.io/blog/blog-ms/handler"
+	"gitea.slauson.io/blog/post-ms/handler"
 	"gitea.slauson.io/slausonio/go-testing/siotest"
 	"github.com/stretchr/testify/assert"
 )

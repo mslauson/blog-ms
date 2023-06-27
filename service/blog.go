@@ -3,9 +3,9 @@ package service
 import (
 	"time"
 
-	"gitea.slauson.io/blog/blog-ms/constants"
-	"gitea.slauson.io/blog/blog-ms/dao"
-	"gitea.slauson.io/blog/blog-ms/dto"
+	"gitea.slauson.io/blog/post-ms/constants"
+	"gitea.slauson.io/blog/post-ms/dao"
+	"gitea.slauson.io/blog/post-ms/dto"
 	"gitea.slauson.io/slausonio/go-types/sioblog"
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/siodao"

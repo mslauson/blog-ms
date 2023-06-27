@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"gitea.slauson.io/blog/blog-ms/dao/mocks"
-	"gitea.slauson.io/blog/blog-ms/integration/mockdata"
+	"gitea.slauson.io/blog/post-ms/dao/mocks"
+	"gitea.slauson.io/blog/post-ms/integration/mockdata"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
 )
 

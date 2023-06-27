@@ -1,4 +1,4 @@
-module gitea.slauson.io/blog/blog-ms
+module gitea.slauson.io/blog/post-ms
 
 go 1.20
 
