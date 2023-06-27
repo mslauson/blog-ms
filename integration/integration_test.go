@@ -31,58 +31,44 @@ func runTestServer() *httptest.Server {
 func TestCreatePost(t *testing.T) {
 	ts := runTestServer()
 	defer ts.Close()
-	tests := []struct {
-		name string
-		req  *dto.CreatePostRequest
-		res  *dto.PostResponse
-	}{
-		{
-			name: "success",
-			req: &dto.CreatePostRequest{
-				Title:       "Title",
-				Body:        "Test Body",
-				CreatedByID: userID,
-			},
-		},
+
+	cr := &dto.CreatePostRequest{
+		Title:       "Title",
+		Body:        "Test Body",
+		CreatedByID: userID,
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			token, err := sioUtils.NewTokenClient().CreateToken()
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			rJSON, err := json.Marshal(tt.req)
-			if err != nil {
-				t.Fatal(err)
-			}
-			sr := strings.NewReader(string(rJSON))
-			req, err := http.NewRequest("POST", ts.URL+"/api/post/v1", sr)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Authorization", "Bearer "+token.AccessToken)
-			resp, err := http.DefaultClient.Do(req)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			defer resp.Body.Close()
-			pr := parsePostResponse(t, resp)
-			createdPosts = append(createdPosts, pr)
-			require.Equal(t, tt.req.Title, pr.Title)
-			require.Equal(t, tt.req.Body, pr.Body)
-			require.Equal(t, tt.req.CreatedByID, pr.CreatedByID)
-		})
+	token, err := sioUtils.NewTokenClient().CreateToken()
+	if err != nil {
+		t.Fatal(err)
 	}
+
+	rJSON, err := json.Marshal(cr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sr := strings.NewReader(string(rJSON))
+	req, err := http.NewRequest("POST", ts.URL+"/api/post/v1", sr)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer resp.Body.Close()
+	pr := parsePostResponse(t, resp)
+	createdPosts = append(createdPosts, pr)
+	require.Equal(t, cr.Title, pr.Title)
+	require.Equal(t, cr.Body, pr.Body)
+	require.Equal(t, cr.CreatedByID, pr.CreatedByID)
 }
 
 func TestCreatePost_Err(t *testing.T) {
-	ts := runTestServer()
-	defer ts.Close()
 	tests := []struct {
 		name   string
 		req    *dto.CreatePostRequest
@@ -97,7 +83,7 @@ func TestCreatePost_Err(t *testing.T) {
 				Body:        "Test Body",
 				CreatedByID: userID,
 			},
-			status: http.StatusOK,
+			status: http.StatusBadRequest,
 			err:    "post already exists",
 		},
 		{
@@ -108,7 +94,7 @@ func TestCreatePost_Err(t *testing.T) {
 				CreatedByID: userID,
 			},
 			status: http.StatusBadRequest,
-			err:    "Post already exists",
+			err:    constants.TITLE_TOO_LONG,
 		},
 		{
 			name: "No Title",
@@ -117,7 +103,7 @@ func TestCreatePost_Err(t *testing.T) {
 				CreatedByID: userID,
 			},
 			status: http.StatusBadRequest,
-			err:    "Post already exists",
+			err:    "Key: 'CreatePostRequest.Title' Error:Field validation for 'Title' failed on the 'required' tag",
 		},
 		{
 			name: "Bad Body",
@@ -127,7 +113,7 @@ func TestCreatePost_Err(t *testing.T) {
 				CreatedByID: userID,
 			},
 			status: http.StatusBadRequest,
-			err:    "Post already exists",
+			err:    constants.BODY_TOO_LONG,
 		},
 		{
 			name: "No Body",
@@ -136,7 +122,7 @@ func TestCreatePost_Err(t *testing.T) {
 				CreatedByID: userID,
 			},
 			status: http.StatusBadRequest,
-			err:    "Post already exists",
+			err:    "Key: 'CreatePostRequest.Body' Error:Field validation for 'Body' failed on the 'required' tag",
 		},
 		{
 			name: "Missing CreatedByID",
@@ -145,12 +131,14 @@ func TestCreatePost_Err(t *testing.T) {
 				Body:  "Test Body",
 			},
 			status: http.StatusBadRequest,
-			err:    "Post already exists",
+			err:    "Key: 'CreatePostRequest.CreatedByID' Error:Field validation for 'CreatedByID' failed on the 'required' tag",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ts := runTestServer()
+			defer ts.Close()
 			token, err := sioUtils.NewTokenClient().CreateToken()
 			if err != nil {
 				t.Fatal(err)
@@ -244,8 +232,8 @@ func TestUpdatePost(t *testing.T) {
 
 			defer resp.Body.Close()
 			pr := parsePostResponse(t, resp)
-			require.Equal(t, tt.res.Title, pr.Title)
-			require.Equal(t, tt.res.Body, pr.Body)
+			require.Equal(t, tt.req.Title, pr.Title)
+			require.Equal(t, tt.req.Body, pr.Body)
 			require.Equal(t, tt.req.UpdatedByID, pr.UpdatedByID)
 		})
 	}
@@ -261,15 +249,6 @@ func TestUpdatePost_Err(t *testing.T) {
 		err    string
 	}{
 		{
-			name: "Bad ID",
-			req: &dto.UpdatePostRequest{
-				Body:        "Test Body",
-				UpdatedByID: userID,
-			},
-			status: http.StatusBadRequest,
-			err:    "1sdfsdfe",
-		},
-		{
 			name: "Bad Title",
 			req: &dto.UpdatePostRequest{
 				Title:       mockdata.LongTitle,
@@ -277,7 +256,7 @@ func TestUpdatePost_Err(t *testing.T) {
 				UpdatedByID: userID,
 			},
 			status: http.StatusBadRequest,
-			err:    "1",
+			err:    constants.TITLE_TOO_LONG,
 		},
 		{
 			name: "Bad Body",
@@ -287,7 +266,7 @@ func TestUpdatePost_Err(t *testing.T) {
 				UpdatedByID: userID,
 			},
 			status: http.StatusBadRequest,
-			err:    "1",
+			err:    constants.BODY_TOO_LONG,
 		},
 		{
 			name: "Bad - No updates passed",
@@ -295,7 +274,7 @@ func TestUpdatePost_Err(t *testing.T) {
 				UpdatedByID: userID,
 			},
 			status: http.StatusBadRequest,
-			err:    "1",
+			err:    constants.POST_UPDATE_INVALID,
 		},
 		{
 			name: "Missing UpdatedByID",
@@ -304,7 +283,7 @@ func TestUpdatePost_Err(t *testing.T) {
 				Body:  "Test Body",
 			},
 			status: http.StatusBadRequest,
-			err:    "1",
+			err:    "Key: 'UpdatePostRequest.UpdatedByID' Error:Field validation for 'UpdatedByID' failed on the 'required' tag",
 		},
 	}
 	id := createdPosts[0].ID
@@ -343,63 +322,90 @@ func TestUpdatePost_Err(t *testing.T) {
 	}
 }
 
-func TestAddComment(t *testing.T) {
+func TestUpdatePost_ErrIDNotNumerical(t *testing.T) {
 	ts := runTestServer()
 	defer ts.Close()
-	tests := []struct {
-		name string
-		req  *dto.AddCommentRequest
-	}{
-		{
-			name: "success",
-			req: &dto.AddCommentRequest{
-				Content: "Test Content",
-				UserID:  userID,
-				PostID:  userID,
-			},
-		},
+
+	ur := &dto.UpdatePostRequest{
+		Title:       "asdf",
+		UpdatedByID: userID,
+	}
+	token, err := sioUtils.NewTokenClient().CreateToken()
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			token, err := sioUtils.NewTokenClient().CreateToken()
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			defer ts.Close()
-
-			rJSON, err := json.Marshal(tt.req)
-			if err != nil {
-				t.Fatal(err)
-			}
-			sr := strings.NewReader(string(rJSON))
-			req, err := http.NewRequest("POST", ts.URL+"/api/post/v1/comment", sr)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Authorization", "Bearer "+token.AccessToken)
-			resp, err := http.DefaultClient.Do(req)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			defer resp.Body.Close()
-
-			cr := parseCommentResponse(t, resp)
-			createdComments = append(createdComments, cr)
-			require.Equal(t, tt.req.Content, cr.Content)
-			require.Equal(t, tt.req.UserID, cr.UserID)
-			require.Equal(t, tt.req.PostID, cr.PostID)
-		})
+	rJSON, err := json.Marshal(ur)
+	if err != nil {
+		t.Fatal(err)
 	}
+	sr := strings.NewReader(string(rJSON))
+	req, err := http.NewRequest(
+		"PATCH",
+		ts.URL+"/api/post/v1/asdf8",
+		sr,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer resp.Body.Close()
+	checkIfCorrectError(t, resp, "asdfj", http.StatusBadRequest)
+}
+
+func TestAddComment(t *testing.T) {
+	postID := createdPosts[0].ID
+
+	ts := runTestServer()
+	defer ts.Close()
+	acr := &dto.AddCommentRequest{
+		Content: "Test Content",
+		UserID:  userID,
+		PostID:  postID,
+	}
+
+	token, err := sioUtils.NewTokenClient().CreateToken()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer ts.Close()
+
+	rJSON, err := json.Marshal(acr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sr := strings.NewReader(string(rJSON))
+	req, err := http.NewRequest("POST", ts.URL+"/api/post/v1/comment", sr)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer resp.Body.Close()
+
+	cr := parseCommentResponse(t, resp)
+	createdComments = append(createdComments, cr)
+	require.Equal(t, acr.Content, cr.Content)
+	require.Equal(t, acr.UserID, cr.UserID)
+	require.Equal(t, acr.PostID, cr.PostID)
 }
 
 func TestAddComment_Err(t *testing.T) {
-	ts := runTestServer()
-	defer ts.Close()
+	postID := createdPosts[0].ID
 	tests := []struct {
 		name   string
 		req    *dto.AddCommentRequest
@@ -411,7 +417,7 @@ func TestAddComment_Err(t *testing.T) {
 			req: &dto.AddCommentRequest{
 				Content: mockdata.LongComment,
 				UserID:  userID,
-				PostID:  userID,
+				PostID:  postID,
 			},
 			status: http.StatusBadRequest,
 			err:    constants.COMMENT_TOO_LONG,
@@ -420,10 +426,10 @@ func TestAddComment_Err(t *testing.T) {
 			name: "Missing Content",
 			req: &dto.AddCommentRequest{
 				UserID: userID,
-				PostID: userID,
+				PostID: postID,
 			},
 			status: http.StatusBadRequest,
-			err:    constants.COMMENT_TOO_LONG,
+			err:    "Key: 'AddCommentRequest.Content' Error:Field validation for 'Content' failed on the 'required' tag",
 		},
 		{
 			name: "Missing UserID",
@@ -432,7 +438,7 @@ func TestAddComment_Err(t *testing.T) {
 				PostID:  userID,
 			},
 			status: http.StatusBadRequest,
-			err:    constants.COMMENT_TOO_LONG,
+			err:    "Key: 'AddCommentRequest.UserID' Error:Field validation for 'UserID' failed on the 'required' tag",
 		},
 		{
 			name: "Missing PostID",
@@ -441,7 +447,7 @@ func TestAddComment_Err(t *testing.T) {
 				UserID:  userID,
 			},
 			status: http.StatusBadRequest,
-			err:    constants.COMMENT_TOO_LONG,
+			err:    "Key: 'AddCommentRequest.PostID' Error:Field validation for 'PostID' failed on the 'required' tag",
 		},
 	}
 
@@ -452,6 +458,7 @@ func TestAddComment_Err(t *testing.T) {
 				t.Fatal(err)
 			}
 
+			ts := runTestServer()
 			defer ts.Close()
 
 			rJSON, err := json.Marshal(tt.req)
