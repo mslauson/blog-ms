@@ -29,17 +29,22 @@ func buildAddCommentEntity(req *dto.AddCommentRequest) *sioblog.BlogComment {
 }
 
 func buildUpdatePostEntity(req *dto.UpdatePostRequest) *sioblog.BlogPost {
+	title := handleStringForUpdates(req.Title)
+	body := handleStringForUpdates(req.Body)
+
 	return &sioblog.BlogPost{
-		Title:       siogeneric.NewSioNullString(req.Title),
-		Body:        siogeneric.NewSioNullString(req.Body),
+		Title:       title,
+		Body:        body,
 		UpdatedByID: siogeneric.NewSioNullInt64(req.UpdatedByID),
 		UpdatedDate: siogeneric.NewSioNullTime(time.Now()),
 	}
 }
 
 func buildUpdateCommentEntity(req *dto.UpdateCommentRequest) *sioblog.BlogComment {
+	content := handleStringForUpdates(req.Content)
+
 	return &sioblog.BlogComment{
-		Content:     siogeneric.NewSioNullString(req.Content),
+		Content:     content,
 		UpdatedDate: siogeneric.NewSioNullTime(time.Now()),
 	}
 }
@@ -90,4 +95,11 @@ func buildCommentResponses(entities *[]*sioblog.BlogComment) *[]*dto.CommentResp
 		commentReponses = append(commentReponses, buildCommentResponse(entity))
 	}
 	return &commentReponses
+}
+
+func handleStringForUpdates(s string) siogeneric.SioNullString {
+	if s == "" {
+		return siogeneric.NewSioInvalidNullString()
+	}
+	return siogeneric.NewSioNullString(s)
 }
