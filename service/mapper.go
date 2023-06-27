@@ -12,19 +12,19 @@ import (
 func buildCreatePostEntity(req *dto.CreatePostRequest) *sioblog.BlogPost {
 	fmt.Println(req)
 	return &sioblog.BlogPost{
-		Title:       siogeneric.NewSioNullString(req.Title),
-		Body:        siogeneric.NewSioNullString(req.Body),
-		CreatedByID: siogeneric.NewSioNullInt64(req.CreatedByID),
-		PostedDate:  siogeneric.NewSioNullTime(time.Now()),
+		Title:       req.Title,
+		Body:        req.Body,
+		CreatedByID: req.CreatedByID,
+		PostedDate:  time.Now(),
 	}
 }
 
 func buildAddCommentEntity(req *dto.AddCommentRequest) *sioblog.BlogComment {
 	return &sioblog.BlogComment{
-		Content:     siogeneric.NewSioNullString(req.Content),
-		CommentDate: siogeneric.NewSioNullTime(time.Now()),
-		PostID:      siogeneric.NewSioNullInt64(req.PostID),
-		UserID:      siogeneric.NewSioNullInt64(req.UserID),
+		Content:     req.Content,
+		CommentDate: time.Now(),
+		PostID:      req.PostID,
+		UserID:      req.UserID,
 	}
 }
 
@@ -35,8 +35,8 @@ func buildUpdatePostEntity(req *dto.UpdatePostRequest) *sioblog.BlogPost {
 	return &sioblog.BlogPost{
 		Title:       title,
 		Body:        body,
-		UpdatedByID: siogeneric.NewSioNullInt64(req.UpdatedByID),
-		UpdatedDate: siogeneric.NewSioNullTime(time.Now()),
+		UpdatedByID: req.UpdatedByID,
+		UpdatedDate: time.Now(),
 	}
 }
 
@@ -45,7 +45,7 @@ func buildUpdateCommentEntity(req *dto.UpdateCommentRequest) *sioblog.BlogCommen
 
 	return &sioblog.BlogComment{
 		Content:     content,
-		UpdatedDate: siogeneric.NewSioNullTime(time.Now()),
+		UpdatedDate: time.Now(),
 	}
 }
 
@@ -101,5 +101,5 @@ func handleStringForUpdates(s string) siogeneric.SioNullString {
 	if s == "" {
 		return siogeneric.NewSioInvalidNullString()
 	}
-	return siogeneric.NewSioNullString(s)
+	return s)
 }

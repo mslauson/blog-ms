@@ -5,7 +5,7 @@ go 1.20
 require (
 	gitea.slauson.io/slausonio/go-prom v0.0.4
 	gitea.slauson.io/slausonio/go-testing v0.0.21
-	gitea.slauson.io/slausonio/go-types v0.1.10
+	gitea.slauson.io/slausonio/go-types v0.1.11
 	gitea.slauson.io/slausonio/go-utils v0.1.5
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/gin-gonic/gin v1.9.1
