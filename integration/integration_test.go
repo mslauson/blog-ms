@@ -489,17 +489,8 @@ func TestUpdateComment(t *testing.T) {
 	defer ts.Close()
 	id := createdComments[0].ID
 
-	tests := []struct {
-		name string
-		req  *dto.UpdateCommentRequest
-		res  *dto.CommentResponse
-	}{
-		{
-			name: "success",
-			req: &dto.UpdateCommentRequest{
-				Content: "Test Content",
-			},
-		},
+	ucr := &dto.UpdateCommentRequest{
+		Content: "Test Content",
 	}
 
 	errTests := []struct {
@@ -508,14 +499,6 @@ func TestUpdateComment(t *testing.T) {
 		err    string
 		status int
 	}{
-		{
-			name: "Bad ID",
-			req: &dto.UpdateCommentRequest{
-				Content: "Test Content",
-			},
-			status: http.StatusBadRequest,
-			err:    "1asdf",
-		},
 		{
 			name: "Bad Content",
 			req: &dto.UpdateCommentRequest{
@@ -528,44 +511,43 @@ func TestUpdateComment(t *testing.T) {
 			name:   "No Content",
 			req:    &dto.UpdateCommentRequest{},
 			status: http.StatusBadRequest,
-			err:    "1",
+			err:    "Key: 'UpdateCommentRequest.Content' Error:Field validation for 'Content' failed on the 'required' tag",
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			token, err := sioUtils.NewTokenClient().CreateToken()
-			if err != nil {
-				t.Fatal(err)
-			}
+	t.Run("Happy", func(t *testing.T) {
+		token, err := sioUtils.NewTokenClient().CreateToken()
+		if err != nil {
+			t.Fatal(err)
+		}
 
-			rJSON, err := json.Marshal(tt.req)
-			if err != nil {
-				t.Fatal(err)
-			}
-			sr := strings.NewReader(string(rJSON))
-			req, err := http.NewRequest(
-				"PATCH",
-				ts.URL+"/api/post/v1/comment/"+strconv.Itoa(int(id)),
-				sr,
-			)
-			if err != nil {
-				t.Fatal(err)
-			}
+		rJSON, err := json.Marshal(ucr)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Authorization", "Bearer "+token.AccessToken)
-			resp, err := http.DefaultClient.Do(req)
-			if err != nil {
-				t.Fatal(err)
-			}
+		sr := strings.NewReader(string(rJSON))
+		req, err := http.NewRequest(
+			"PATCH",
+			ts.URL+"/api/post/v1/comment/"+strconv.Itoa(int(id)),
+			sr,
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-			defer resp.Body.Close()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-			cr := parseCommentResponse(t, resp)
-			require.Equal(t, tt.req.Content, cr.Content)
-		})
-	}
+		defer resp.Body.Close()
+
+		cr := parseCommentResponse(t, resp)
+		require.Equal(t, ucr.Content, cr.Content)
+	})
 
 	for _, et := range errTests {
 		t.Run(et.name, func(t *testing.T) {
@@ -599,6 +581,39 @@ func TestUpdateComment(t *testing.T) {
 			checkIfCorrectError(t, resp, et.err, et.status)
 		})
 	}
+
+	t.Run("badID", func(t *testing.T) {
+		token, err := sioUtils.NewTokenClient().CreateToken()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rJSON, err := json.Marshal(ucr)
+		if err != nil {
+			t.Fatal(err)
+		}
+		sr := strings.NewReader(string(rJSON))
+		req, err := http.NewRequest(
+			"PATCH",
+			ts.URL+"/api/post/v1/comment/"+strconv.Itoa(int(id)),
+			sr,
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		defer resp.Body.Close()
+
+		cr := parseCommentResponse(t, resp)
+		require.Equal(t, ucr.Content, cr.Content)
+	})
 }
 
 func TestGetPost(t *testing.T) {
