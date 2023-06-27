@@ -462,7 +462,7 @@ func TestUpdatePost(t *testing.T) {
 	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE post`).
-		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.UpdatedDate.Time, mockdata.PostEntity.UpdatedByID.Int64).
+		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.UpdatedDate.Time, mockdata.PostEntity.UpdatedByID.Int64, mockdata.PostEntity.ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	err = pd.UpdatePost(mockdata.PostEntity)
 	require.NoError(t, err)
@@ -477,7 +477,7 @@ func TestUpdatePost_Err(t *testing.T) {
 	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE post`).
-		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.UpdatedDate.Time, mockdata.PostEntity.UpdatedByID.Int64).
+		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.UpdatedDate.Time, mockdata.PostEntity.UpdatedByID.Int64, mockdata.PostEntity.ID).
 		WillReturnError(errors.New("test error"))
 	err = pd.UpdatePost(mockdata.PostEntity)
 	require.Error(t, err)
@@ -525,7 +525,7 @@ func TestUpdateComment(t *testing.T) {
 	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE comment`).
-		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.UpdatedDate.Time).
+		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.UpdatedDate.Time, mockdata.CommentEntity.ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	err = pd.UpdateComment(mockdata.CommentEntity)
 	require.NoError(t, err)
@@ -540,7 +540,7 @@ func TestUpdateComment_Err(t *testing.T) {
 	pd := &BDao{db: db}
 
 	mock.ExpectExec(`UPDATE comment`).
-		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.UpdatedDate.Time).
+		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.UpdatedDate.Time, mockdata.CommentEntity.ID).
 		WillReturnError(errors.New("test error"))
 
 	err = pd.UpdateComment(mockdata.CommentEntity)
