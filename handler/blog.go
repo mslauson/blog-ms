@@ -265,10 +265,10 @@ func (ph *BlogHdlr) SoftDeletePost(c *gin.Context) {
 		_ = c.Error(sioerror.NewSioBadRequestError(constants.INVALID_ID))
 		return
 	}
-	if result, err := ph.svc.SoftDeletePost(iId); result != nil {
-		c.JSON(http.StatusOK, result)
-	} else {
+	if result, err := ph.svc.SoftDeletePost(iId); err != nil {
 		_ = c.Error(err)
+	} else {
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -293,9 +293,10 @@ func (ph *BlogHdlr) SoftDeleteComment(c *gin.Context) {
 		_ = c.Error(sioerror.NewSioBadRequestError(constants.INVALID_ID))
 		return
 	}
-	if result, err := ph.svc.SoftDeleteComment(iId); result != nil {
-		c.JSON(http.StatusOK, result)
-	} else {
+
+	if result, err := ph.svc.SoftDeleteComment(iId); err != nil {
 		_ = c.Error(err)
+	} else {
+		c.JSON(http.StatusOK, result)
 	}
 }

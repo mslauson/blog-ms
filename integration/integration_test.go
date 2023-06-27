@@ -633,14 +633,14 @@ func TestGetPost(t *testing.T) {
 			name:    "Not Found",
 			request: "123",
 			status:  http.StatusNotFound,
-			err:     "asdf",
+			err:     "post not found",
 		},
 
 		{
 			name:    "BadId",
 			request: "1s23",
 			status:  http.StatusBadRequest,
-			err:     `strconv.ParseInt: parsing "asdf8": invalid syntax`,
+			err:     constants.INVALID_ID,
 		},
 	}
 
@@ -667,7 +667,7 @@ func TestGetPost(t *testing.T) {
 		}(resp.Body)
 
 		result := parsePostResponse(t, resp)
-		require.Equal(t, id, result)
+		require.Equal(t, id, result.ID)
 	})
 
 	for _, et := range errTests {
@@ -794,7 +794,7 @@ func TestSoftDeleteComment(t *testing.T) {
 		}(resp.Body)
 
 		result := parseSuccessResponse(t, resp)
-		require.Equal(t, true, result)
+		require.Equal(t, true, result.Success)
 	})
 
 	for _, et := range errTests {
@@ -890,7 +890,7 @@ func TestSoftDeletePost(t *testing.T) {
 		}(resp.Body)
 
 		result := parseSuccessResponse(t, resp)
-		require.Equal(t, true, result)
+		require.Equal(t, true, result.Success)
 	})
 
 	for _, et := range errTests {

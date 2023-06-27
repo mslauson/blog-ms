@@ -153,8 +153,8 @@ func (bd *BDao) UpdatePost(post *sioblog.BlogPost) error {
 		SET 
 		title = COALESCE($1, title),
 		body = COALESCE($2,body),
-		updated_date = COALESCE($3, updated_date),
-		updated_by_id = COALESCE($4, updated_by_id)
+		updated_date = $3,
+		updated_by_id = $4
 		WHERE id = $5
 	`
 	if _, err := bd.db.ExecContext(ctx, query, post.Title, post.Body, post.UpdatedDate, post.UpdatedByID, post.ID); err != nil {

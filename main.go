@@ -4,12 +4,12 @@ import (
 	"net/http"
 	"os"
 
-	"gitea.slauson.io/blog/blog-ms/handler"
+	"gitea.slauson.io/post/post-ms/handler"
 	"gitea.slauson.io/slausonio/go-prom/sioprom"
 	"gitea.slauson.io/slausonio/sio-loki/hooks"
 
 	// _ "gitea.slauson.io/slausonio/customer-ms/docs"
-	_ "gitea.slauson.io/blog/blog-ms/docs"
+	_ "gitea.slauson.io/post/post-ms/docs"
 
 	_ "gitea.slauson.io/slausonio/go-types/siogeneric"
 	log "github.com/sirupsen/logrus"
@@ -29,14 +29,14 @@ func init() {
 	lh := hooks.NewLokiHook(
 		10,
 		5,
-		map[string]string{"app": "customer-ms", "environment": os.Getenv("ENV")},
+		map[string]string{"app": "post-ms", "environment": os.Getenv("ENV")},
 	)
 
 	log.AddHook(lh)
 }
 
-// @title Blog Microservice
-// @description This MS handles blog posts and comments
+// @title Post Microservice
+// @description This MS handles posts and comments
 // @version 1.0
 
 // @contact.name Matthew Slauson
