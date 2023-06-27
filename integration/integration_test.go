@@ -647,7 +647,7 @@ func TestGetPost(t *testing.T) {
 	t.Run("Happy", func(t *testing.T) {
 		ts := runTestServer()
 		defer ts.Close()
-		req, err := http.NewRequest("GET", ts.URL+"/api/blog/v1/post/"+strconv.Itoa(int(id)), nil)
+		req, err := http.NewRequest("GET", ts.URL+"/api/post/v1/"+strconv.Itoa(int(id)), nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -676,7 +676,7 @@ func TestGetPost(t *testing.T) {
 			defer ts.Close()
 			req, err := http.NewRequest(
 				"GET",
-				ts.URL+"/api/blog/v1/post/"+strconv.Itoa(int(id)),
+				ts.URL+"/api/post/v1/"+strconv.Itoa(int(id)),
 				nil,
 			)
 			if err != nil {
@@ -710,7 +710,7 @@ func TestGetAllPosts(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	req, err := http.NewRequest("GET", ts.URL+"/api/blog/v1/post", nil)
+	req, err := http.NewRequest("GET", ts.URL+"/api/post/v1", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -868,7 +868,7 @@ func TestSoftDeletePost(t *testing.T) {
 
 		req, err := http.NewRequest(
 			"DELETE",
-			ts.URL+"/api/post/v1/comment/"+idStr,
+			ts.URL+"/api/post/v1/"+idStr,
 			nil,
 		)
 		if err != nil {
@@ -899,7 +899,7 @@ func TestSoftDeletePost(t *testing.T) {
 			defer ts.Close()
 			req, err := http.NewRequest(
 				"DELETE",
-				ts.URL+"/api/post/v1/comment/"+idStr,
+				ts.URL+"/api/post/v1/"+idStr,
 				nil,
 			)
 			if err != nil {

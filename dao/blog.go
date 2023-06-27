@@ -155,8 +155,9 @@ func (bd *BDao) UpdatePost(post *sioblog.BlogPost) error {
 		body = COALESCE($2,body),
 		updated_date = COALESCE($3, updated_date),
 		updated_by_id = COALESCE($4, updated_by_id)
+		WHERE id = $5
 	`
-	if _, err := bd.db.ExecContext(ctx, query, post.Title, post.Body, post.UpdatedDate, post.UpdatedByID); err != nil {
+	if _, err := bd.db.ExecContext(ctx, query, post.Title, post.Body, post.UpdatedDate, post.UpdatedByID, post.ID); err != nil {
 		return err
 	}
 	return nil
@@ -181,8 +182,9 @@ func (bd *BDao) UpdateComment(comment *sioblog.BlogComment) error {
 		SET 
 		content = COALESCE($1, content),
 		updated_date = COALESCE($2, updated_date)
+		WHERE id = $3
 	`
-	if _, err := bd.db.ExecContext(ctx, query, comment.Content, comment.UpdatedDate); err != nil {
+	if _, err := bd.db.ExecContext(ctx, query, comment.Content, comment.UpdatedDate, comment.ID); err != nil {
 		return err
 	}
 	return nil
@@ -192,7 +194,7 @@ func (bd *BDao) SoftDeletePost(post *sioblog.BlogPost) error {
 	query := `UPDATE post 
 	SET
 	soft_deleted = $1,
-	delation_date = $2,
+	delation_date = $2
 	where id = $3
 	`
 
@@ -206,7 +208,7 @@ func (bd *BDao) SoftDeleteComment(comment *sioblog.BlogComment) error {
 	query := `UPDATE comment
 		SET 
 		soft_deleted = $1,
-		deletion_date = $2,
+		deletion_date = $2
 		WHERE id = $3
 	`
 	if _, err := bd.db.ExecContext(ctx, query, true, comment.DeletionDate, comment.ID); err != nil {
