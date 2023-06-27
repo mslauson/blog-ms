@@ -194,7 +194,7 @@ func (bd *BDao) SoftDeletePost(post *sioblog.BlogPost) error {
 	query := `UPDATE post 
 	SET
 	soft_deleted = $1,
-	delation_date = $2
+	deletion_date = $2
 	where id = $3
 	`
 

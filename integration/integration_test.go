@@ -640,7 +640,7 @@ func TestGetPost(t *testing.T) {
 			name:    "BadId",
 			request: "1s23",
 			status:  http.StatusBadRequest,
-			err:     constants.INVALID_ID,
+			err:     `strconv.ParseInt: parsing "asdf8": invalid syntax`,
 		},
 	}
 
@@ -676,7 +676,7 @@ func TestGetPost(t *testing.T) {
 			defer ts.Close()
 			req, err := http.NewRequest(
 				"GET",
-				ts.URL+"/api/post/v1/"+strconv.Itoa(int(id)),
+				ts.URL+"/api/post/v1/"+et.request,
 				nil,
 			)
 			if err != nil {
@@ -729,7 +729,7 @@ func TestGetAllPosts(t *testing.T) {
 		}
 	}(resp.Body)
 
-	_ = parsePostResponse(t, resp)
+	_ = parsePostResponses(t, resp)
 }
 
 func TestSoftDeleteComment(t *testing.T) {
@@ -793,8 +793,8 @@ func TestSoftDeleteComment(t *testing.T) {
 			}
 		}(resp.Body)
 
-		result := parsePostResponse(t, resp)
-		require.Equal(t, id, result)
+		result := parseSuccessResponse(t, resp)
+		require.Equal(t, true, result)
 	})
 
 	for _, et := range errTests {
@@ -889,8 +889,8 @@ func TestSoftDeletePost(t *testing.T) {
 			}
 		}(resp.Body)
 
-		result := parsePostResponse(t, resp)
-		require.Equal(t, id, result)
+		result := parseSuccessResponse(t, resp)
+		require.Equal(t, true, result)
 	})
 
 	for _, et := range errTests {
@@ -939,6 +939,20 @@ func parsePostResponse(t *testing.T, resp *http.Response) *dto.PostResponse {
 	return postResponse
 }
 
+func parsePostResponses(t *testing.T, resp *http.Response) []*dto.PostResponse {
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("Expected status code %d, got %d", http.StatusOK, resp.StatusCode)
+	}
+
+	postResponses := make([]*dto.PostResponse, 0)
+	err := json.NewDecoder(resp.Body).Decode(&postResponses)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return postResponses
+}
+
 func parseCommentResponse(t *testing.T, resp *http.Response) *dto.CommentResponse {
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("Expected status code %d, got %d", http.StatusOK, resp.StatusCode)
@@ -951,6 +965,20 @@ func parseCommentResponse(t *testing.T, resp *http.Response) *dto.CommentRespons
 	}
 
 	return commentResponse
+}
+
+func parseSuccessResponse(t *testing.T, resp *http.Response) *siogeneric.SuccessResponse {
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("Expected status code %d, got %d", http.StatusOK, resp.StatusCode)
+	}
+
+	successResponse := new(siogeneric.SuccessResponse)
+	err := json.NewDecoder(resp.Body).Decode(successResponse)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return successResponse
 }
 
 func checkIfCorrectError(
