@@ -87,7 +87,7 @@ func (bs *BlogSvc) UpdatePost(ID int64, req *dto.UpdatePostRequest) (*dto.PostRe
 		return nil, err
 	}
 
-	post := buildUpdatePostEntity(req)
+	post := buildUpdatePostEntity(ID, req)
 	if err := bs.dao.UpdatePost(post); err != nil {
 		return nil, siodao.HandleDbErr(err, constants.POST)
 	}
@@ -107,7 +107,7 @@ func (bs *BlogSvc) UpdateComment(
 		return nil, err
 	}
 
-	comment := buildUpdateCommentEntity(req)
+	comment := buildUpdateCommentEntity(ID, req)
 	if err := bs.dao.UpdateComment(comment); err != nil {
 		return nil, siodao.HandleDbErr(err, constants.COMMENT)
 	}

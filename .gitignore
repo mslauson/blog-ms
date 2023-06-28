@@ -1,3 +1,4 @@
 .idea
 .vscode
 **/mocks/**
+__debug_bin

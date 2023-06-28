@@ -28,8 +28,9 @@ func buildAddCommentEntity(req *dto.AddCommentRequest) *sioblog.BlogComment {
 	}
 }
 
-func buildUpdatePostEntity(req *dto.UpdatePostRequest) *sioblog.BlogPost {
+func buildUpdatePostEntity(ID int64, req *dto.UpdatePostRequest) *sioblog.BlogPost {
 	return &sioblog.BlogPost{
+		ID:          ID,
 		Title:       siodao.BuildNullString(req.Title),
 		Body:        siodao.BuildNullString(req.Body),
 		UpdatedByID: siodao.BuildNullInt64(req.UpdatedByID),
@@ -37,7 +38,7 @@ func buildUpdatePostEntity(req *dto.UpdatePostRequest) *sioblog.BlogPost {
 	}
 }
 
-func buildUpdateCommentEntity(req *dto.UpdateCommentRequest) *sioblog.BlogComment {
+func buildUpdateCommentEntity(ID int64, req *dto.UpdateCommentRequest) *sioblog.BlogComment {
 	return &sioblog.BlogComment{
 		Content:     siodao.BuildNullString(req.Content),
 		UpdatedDate: siodao.BuildNullTime(time.Now()),
