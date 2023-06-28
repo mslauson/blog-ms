@@ -180,23 +180,35 @@ func TestUpdatePost(t *testing.T) {
 		{
 			name: "success Update Both",
 			req: &dto.UpdatePostRequest{
-				Title:       "Title",
-				Body:        "Test Body",
+				Title:       "Titeele",
+				Body:        "Test sBody",
 				UpdatedByID: userID,
+			},
+			res: &dto.PostResponse{
+				Title: "Titeele",
+				Body:  "Test sBody",
 			},
 		},
 		{
 			name: "success Update Title",
 			req: &dto.UpdatePostRequest{
-				Title:       "Title",
+				Title:       "afTitle",
 				UpdatedByID: userID,
+			},
+			res: &dto.PostResponse{
+				Title: "afTitle",
+				Body:  "Test sBody",
 			},
 		},
 		{
 			name: "success Update Body",
 			req: &dto.UpdatePostRequest{
-				Body:        "Test Body",
+				Body:        "Test Bodsy",
 				UpdatedByID: userID,
+			},
+			res: &dto.PostResponse{
+				Title: "afTitle",
+				Body:  "Test Bodsy",
 			},
 		},
 	}
@@ -232,9 +244,9 @@ func TestUpdatePost(t *testing.T) {
 
 			defer resp.Body.Close()
 			pr := parsePostResponse(t, resp)
-			require.Equal(t, tt.req.Title, pr.Title)
-			require.Equal(t, tt.req.Body, pr.Body)
-			require.Equal(t, tt.req.UpdatedByID, pr.UpdatedByID)
+			require.Equal(t, tt.res.Title, pr.Title)
+			require.Equal(t, tt.res.Body, pr.Body)
+			require.Equal(t, tt.res.UpdatedByID, pr.UpdatedByID)
 		})
 	}
 }
