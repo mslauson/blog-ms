@@ -1,20 +1,21 @@
+---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: blog-ms
+  name: post-ms
   namespace: blog
 spec:
   replicas: 2
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      deploy: blog-ms
-      app: blog-ms
+      deploy: post-ms
+      app: post-ms
   template:
     metadata:
       labels:
-        deploy: blog-ms
-        app: blog-ms
+        deploy: post-ms
+        app: post-ms
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "2112"
@@ -53,13 +54,13 @@ spec:
     spec:
       serviceAccountName: vault-auth
       containers:
-        - name: blog-ms
-          image: registry.slauson.io/slausonio/blog-ms:dev-543c8a5c764758bb445c159fc13c85460675e5e2
+        - name: post-ms
+          image: registry.slauson.io/slausonio/post-ms:dev-543c8a5c764758bb445c159fc13c85460675e5e2
           args:
             [
               "sh",
               "-c",
-              ". /vault/secrets/encryption && . /vault/secrets/oauth && . /vault/secrets/postgres && . /vault/secrets/host && ./blog-ms",
+              ". /vault/secrets/encryption && . /vault/secrets/oauth && . /vault/secrets/postgres && . /vault/secrets/host && ./post-ms",
             ]
           readinessProbe:
             failureThreshold: 10
@@ -83,7 +84,7 @@ spec:
               cpu: 50m
               memory: 100Mi
           envFrom:
-          - configMapRef:
-               name: general-config
+            - configMapRef:
+                name: general-config
       imagePullSecrets:
         - name: regcred

@@ -13,10 +13,10 @@ COPY . ./
 RUN go mod download
 
 # compile application
-RUN go build -o blog-ms -buildvcs=false
+RUN go build -o post-ms -buildvcs=false
 
 # tells Docker that the container listens on specified network ports at runtime
 EXPOSE 8080
 
 # command to be used to execute when the image is used to start a container
-CMD [ "./blog-ms" ]
+CMD [ "./post-ms" ]
