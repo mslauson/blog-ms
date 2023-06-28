@@ -32,15 +32,15 @@ func buildUpdatePostEntity(req *dto.UpdatePostRequest) *sioblog.BlogPost {
 	return &sioblog.BlogPost{
 		Title:       siodao.BuildNullString(req.Title),
 		Body:        siodao.BuildNullString(req.Body),
-		UpdatedByID: req.UpdatedByID,
-		UpdatedDate: time.Now(),
+		UpdatedByID: siodao.BuildNullInt64(req.UpdatedByID),
+		UpdatedDate: siodao.BuildNullTime(time.Now()),
 	}
 }
 
 func buildUpdateCommentEntity(req *dto.UpdateCommentRequest) *sioblog.BlogComment {
 	return &sioblog.BlogComment{
 		Content:     siodao.BuildNullString(req.Content),
-		UpdatedDate: time.Now(),
+		UpdatedDate: siodao.BuildNullTime(time.Now()),
 	}
 }
 
@@ -50,11 +50,11 @@ func buildPostResponse(entity *sioblog.BlogPost) *dto.PostResponse {
 		Title:        entity.Title.String,
 		Body:         entity.Body.String,
 		PostedDate:   entity.PostedDate,
-		UpdatedDate:  entity.UpdatedDate,
-		DeletionDate: entity.DeletionDate,
+		UpdatedDate:  entity.UpdatedDate.Time,
+		DeletionDate: entity.DeletionDate.Time,
 		SoftDeleted:  entity.SoftDeleted,
 		CreatedByID:  entity.CreatedByID,
-		UpdatedByID:  entity.UpdatedByID,
+		UpdatedByID:  entity.UpdatedByID.Int64,
 		Comments:     buildCommentResponses(entity.Comments),
 	}
 }
@@ -72,9 +72,9 @@ func buildCommentResponse(entity *sioblog.BlogComment) *dto.CommentResponse {
 		ID:           entity.ID,
 		Content:      entity.Content.String,
 		CommentDate:  entity.CommentDate,
-		UpdatedDate:  entity.UpdatedDate,
+		UpdatedDate:  entity.UpdatedDate.Time,
 		SoftDeleted:  entity.SoftDeleted,
-		DeletionDate: entity.DeletionDate,
+		DeletionDate: entity.DeletionDate.Time,
 		PostID:       entity.PostID,
 		UserID:       entity.UserID,
 	}

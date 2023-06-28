@@ -19,10 +19,10 @@ var (
 		Body:         siodao.BuildNullString("Test body"),
 		PostedDate:   time.Now(),
 		CreatedByID:  1,
-		UpdatedByID:  1,
+		UpdatedByID:  siodao.BuildNullInt64(1),
 		SoftDeleted:  false,
-		DeletionDate: time.Now(),
-		UpdatedDate:  time.Now(),
+		DeletionDate: siodao.BuildNullTime(time.Now()),
+		UpdatedDate:  siodao.BuildNullTime(time.Now()),
 	}
 
 	CommentEntity = &sioblog.BlogComment{
@@ -32,8 +32,8 @@ var (
 		PostID:       1,
 		UserID:       1,
 		SoftDeleted:  false,
-		DeletionDate: time.Now(),
-		UpdatedDate:  time.Now(),
+		DeletionDate: siodao.BuildNullTime(time.Now()),
+		UpdatedDate:  siodao.BuildNullTime(time.Now()),
 	}
 
 	Posts             = &[]*sioblog.BlogPost{PostEntity, PostEntity}

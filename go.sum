@@ -2,12 +2,12 @@ gitea.slauson.io/slausonio/go-prom v0.0.4 h1:kO3S+fIrQLv2vURNlJ1v8X9MI1SepDEizAa
 gitea.slauson.io/slausonio/go-prom v0.0.4/go.mod h1:+Z6x5chbl4wOX7zi8BdrRK5pVRt9tlDBpfJEOh69EIc=
 gitea.slauson.io/slausonio/go-testing v0.0.21 h1:c/SOLkYtUrwjTlJWimxWhISTPjITfKQgP0mveVDTNzM=
 gitea.slauson.io/slausonio/go-testing v0.0.21/go.mod h1:wV1BhqgWicfb/HvGhbyHBiv9EmrubBY94Cw0DzmGOaI=
-gitea.slauson.io/slausonio/go-types v0.1.10 h1:yiE8L3pbHH4KWW9dELq2BANQ+wZopP0vihLl47yyWUs=
-gitea.slauson.io/slausonio/go-types v0.1.10/go.mod h1:nNHEtpd+MQosQgVJY8c9JyW0cO/Bd6D4B+yzxutegHE=
 gitea.slauson.io/slausonio/go-types v0.1.11 h1:JE/JIRT3IUjQacbVjLmQ20pt2IUMTdgzfoG9MLuV0R0=
 gitea.slauson.io/slausonio/go-types v0.1.11/go.mod h1:nNHEtpd+MQosQgVJY8c9JyW0cO/Bd6D4B+yzxutegHE=
-gitea.slauson.io/slausonio/go-utils v0.1.5 h1:PY0M5ZjQuHGTIP5CKg1g5gcxhVxzd43uRY5HnU1UjKQ=
-gitea.slauson.io/slausonio/go-utils v0.1.5/go.mod h1:X0R5+aclKRfaNVPYDwDvxF2JxDR3RBZ/9fpozx6Hwag=
+gitea.slauson.io/slausonio/go-types v0.1.12 h1:yGLtmHfodUyI9+1w2eW1TDpGS2Nz4xzqQLX1lho5f1w=
+gitea.slauson.io/slausonio/go-types v0.1.12/go.mod h1:nNHEtpd+MQosQgVJY8c9JyW0cO/Bd6D4B+yzxutegHE=
+gitea.slauson.io/slausonio/go-types v0.1.13 h1:Vn7pjGJD8byB1jabsfWOwCgAoCUlb07UN3pQpY2S5bw=
+gitea.slauson.io/slausonio/go-types v0.1.13/go.mod h1:nNHEtpd+MQosQgVJY8c9JyW0cO/Bd6D4B+yzxutegHE=
 gitea.slauson.io/slausonio/go-utils v0.1.7 h1:H7Rbbh+Euw4qvCT+0tpv2PJlTfevB2/BqOmtdsQLPHc=
 gitea.slauson.io/slausonio/go-utils v0.1.7/go.mod h1:oPJAjApJTrJb4p/t3lcRKLzPQFaNWcfLKItNafYGTOQ=
 gitea.slauson.io/slausonio/sio-loki v0.0.6 h1:YxgqY9v+RBtUr3/0JaxV6uFJ4XZyiyT7gRn4OaYb2Ps=

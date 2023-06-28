@@ -126,7 +126,7 @@ func (bs *BlogSvc) SoftDeletePost(ID int64) (*siogeneric.SuccessResponse, error)
 	}
 
 	post := new(sioblog.BlogPost)
-	post.DeletionDate = time.Now()
+	post.DeletionDate = siodao.BuildNullTime(time.Now())
 
 	if err := bs.dao.SoftDeletePost(post); err != nil {
 		return nil, siodao.HandleDbErr(err, constants.POST)
@@ -141,7 +141,7 @@ func (bs *BlogSvc) SoftDeleteComment(ID int64) (*siogeneric.SuccessResponse, err
 	}
 
 	comment := new(sioblog.BlogComment)
-	comment.DeletionDate = time.Now()
+	comment.DeletionDate = siodao.BuildNullTime(time.Now())
 
 	if err := bs.dao.SoftDeleteComment(comment); err != nil {
 		return nil, siodao.HandleDbErr(err, constants.COMMENT)
