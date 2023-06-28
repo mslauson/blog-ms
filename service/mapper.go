@@ -1,20 +1,19 @@
 package service
 
 import (
-	"database/sql"
 	"fmt"
 	"time"
 
 	"gitea.slauson.io/blog/post-ms/dto"
 	"gitea.slauson.io/slausonio/go-types/sioblog"
-	"gitea.slauson.io/slausonio/go-types/siogeneric"
+	"gitea.slauson.io/slausonio/go-utils/siodao"
 )
 
 func buildCreatePostEntity(req *dto.CreatePostRequest) *sioblog.BlogPost {
 	fmt.Println(req)
 	return &sioblog.BlogPost{
-		Title:       handleStringForUpdates(req.Title),
-		Body:        handleStringForUpdates(req.Body),
+		Title:       siodao.BuildNullString(req.Title),
+		Body:        siodao.BuildNullString(req.Body),
 		CreatedByID: req.CreatedByID,
 		PostedDate:  time.Now(),
 	}
@@ -22,7 +21,7 @@ func buildCreatePostEntity(req *dto.CreatePostRequest) *sioblog.BlogPost {
 
 func buildAddCommentEntity(req *dto.AddCommentRequest) *sioblog.BlogComment {
 	return &sioblog.BlogComment{
-		Content:     handleStringForUpdates(req.Content),
+		Content:     siodao.BuildNullString(req.Content),
 		CommentDate: time.Now(),
 		PostID:      req.PostID,
 		UserID:      req.UserID,
@@ -31,8 +30,8 @@ func buildAddCommentEntity(req *dto.AddCommentRequest) *sioblog.BlogComment {
 
 func buildUpdatePostEntity(req *dto.UpdatePostRequest) *sioblog.BlogPost {
 	return &sioblog.BlogPost{
-		Title:       handleStringForUpdates(req.Title),
-		Body:        handleStringForUpdates(req.Body),
+		Title:       siodao.BuildNullString(req.Title),
+		Body:        siodao.BuildNullString(req.Body),
 		UpdatedByID: req.UpdatedByID,
 		UpdatedDate: time.Now(),
 	}
@@ -40,7 +39,7 @@ func buildUpdatePostEntity(req *dto.UpdatePostRequest) *sioblog.BlogPost {
 
 func buildUpdateCommentEntity(req *dto.UpdateCommentRequest) *sioblog.BlogComment {
 	return &sioblog.BlogComment{
-		Content:     handleStringForUpdates(req.Content),
+		Content:     siodao.BuildNullString(req.Content),
 		UpdatedDate: time.Now(),
 	}
 }
@@ -91,16 +90,4 @@ func buildCommentResponses(entities *[]*sioblog.BlogComment) *[]*dto.CommentResp
 		commentReponses = append(commentReponses, buildCommentResponse(entity))
 	}
 	return &commentReponses
-}
-
-func handleStringForUpdates(s string) sql.NullString {
-	if s == "" {
-		return sql.NullString{
-			Valid: false,
-		}
-	}
-	return sql.NullString{
-		Valid:  true,
-		String: s,
-	}
 }

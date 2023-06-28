@@ -127,7 +127,7 @@ func (bd *BDao) GetAllPosts() (*[]*sioblog.BlogPost, error) {
 		if err != nil {
 			return nil, err
 		}
-		comments, err := bd.GetAllCommentsByPostID(post.ID.Int64)
+		comments, err := bd.GetAllCommentsByPostID(post.ID)
 		if err != nil {
 			return nil, err
 		}
