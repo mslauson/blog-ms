@@ -216,7 +216,7 @@ func TestUpdatePost(t *testing.T) {
 	dao.On("UpdatePost", mock.AnythingOfType("*sioblog.BlogPost")).Return(nil)
 	dao.On("GetPostByID", mock.AnythingOfType("int64")).Return(mockdata.PostEntity, nil)
 
-	resp, err := bs.UpdatePost(mockdata.PostEntity.ID.Int64, mockdata.UpdatePostRequest)
+	resp, err := bs.UpdatePost(mockdata.PostEntity.ID, mockdata.UpdatePostRequest)
 	assert.NoError(t, err)
 	assert.Equal(t, mockdata.PostEntity.Title.String, resp.Title)
 	dao.AssertExpectations(t)
@@ -229,7 +229,7 @@ func TestUpdatePost_ErrNotFound(t *testing.T) {
 
 	dao.On("PostExistsByID", mock.AnythingOfType("int64")).Return(false, nil)
 
-	resp, err := bs.UpdatePost(mockdata.PostEntity.ID.Int64, mockdata.UpdatePostRequest)
+	resp, err := bs.UpdatePost(mockdata.PostEntity.ID, mockdata.UpdatePostRequest)
 	assert.Error(t, err)
 	assert.Equal(t, testError.Error(), err.Error())
 	assert.Nil(t, resp)
@@ -245,7 +245,7 @@ func TestUpdatePost_ErrExistsCheckUnexpectedErr(t *testing.T) {
 
 	dao.On("PostExistsByID", mock.AnythingOfType("int64")).Return(false, sql.ErrConnDone)
 
-	resp, err := bs.UpdatePost(mockdata.PostEntity.ID.Int64, mockdata.UpdatePostRequest)
+	resp, err := bs.UpdatePost(mockdata.PostEntity.ID, mockdata.UpdatePostRequest)
 	assert.Error(t, err)
 	assert.Equal(t, testError.Error(), err.Error())
 	assert.Nil(t, resp)
@@ -262,7 +262,7 @@ func TestUpdatePost_UpdateErr(t *testing.T) {
 	dao.On("PostExistsByID", mock.AnythingOfType("int64")).Return(true, nil)
 	dao.On("UpdatePost", mock.AnythingOfType("*sioblog.BlogPost")).Return(sql.ErrConnDone)
 
-	resp, err := bs.UpdatePost(mockdata.PostEntity.ID.Int64, mockdata.UpdatePostRequest)
+	resp, err := bs.UpdatePost(mockdata.PostEntity.ID, mockdata.UpdatePostRequest)
 	assert.Error(t, err)
 	assert.Equal(t, testError.Error(), err.Error())
 	assert.Nil(t, resp)
@@ -280,7 +280,7 @@ func TestUpdatePost_GetErr(t *testing.T) {
 	dao.On("UpdatePost", mock.AnythingOfType("*sioblog.BlogPost")).Return(nil)
 	dao.On("GetPostByID", mock.AnythingOfType("int64")).Return(nil, sql.ErrConnDone)
 
-	resp, err := bs.UpdatePost(mockdata.PostEntity.ID.Int64, mockdata.UpdatePostRequest)
+	resp, err := bs.UpdatePost(mockdata.PostEntity.ID, mockdata.UpdatePostRequest)
 	assert.Error(t, err)
 	assert.Equal(t, testError.Error(), err.Error())
 	assert.Nil(t, resp)
@@ -294,7 +294,7 @@ func TestUpdateComment(t *testing.T) {
 	dao.On("UpdateComment", mock.AnythingOfType("*sioblog.BlogComment")).Return(nil)
 	dao.On("GetCommentByID", mock.AnythingOfType("int64")).Return(mockdata.CommentEntity, nil)
 
-	resp, err := bs.UpdateComment(mockdata.CommentEntity.ID.Int64, mockdata.UpdateCommentRequest)
+	resp, err := bs.UpdateComment(mockdata.CommentEntity.ID, mockdata.UpdateCommentRequest)
 	assert.NoError(t, err)
 	assert.Equal(t, mockdata.CommentEntity.Content.String, resp.Content)
 	dao.AssertExpectations(t)
@@ -307,7 +307,7 @@ func TestUpdateComment_ErrNotFound(t *testing.T) {
 
 	dao.On("CommentExistsByID", mock.AnythingOfType("int64")).Return(false, nil)
 
-	resp, err := bs.UpdateComment(mockdata.CommentEntity.ID.Int64, mockdata.UpdateCommentRequest)
+	resp, err := bs.UpdateComment(mockdata.CommentEntity.ID, mockdata.UpdateCommentRequest)
 	assert.Error(t, err)
 	assert.Equal(t, testError.Error(), err.Error())
 	assert.Nil(t, resp)
@@ -323,7 +323,7 @@ func TestUpdateComment_ErrExistsCheckUnexpectedErr(t *testing.T) {
 
 	dao.On("CommentExistsByID", mock.AnythingOfType("int64")).Return(false, sql.ErrConnDone)
 
-	resp, err := bs.UpdateComment(mockdata.CommentEntity.ID.Int64, mockdata.UpdateCommentRequest)
+	resp, err := bs.UpdateComment(mockdata.CommentEntity.ID, mockdata.UpdateCommentRequest)
 	assert.Error(t, err)
 	assert.Equal(t, testError.Error(), err.Error())
 	assert.Nil(t, resp)
@@ -340,7 +340,7 @@ func TestUpdateComment_UpdateErr(t *testing.T) {
 	dao.On("CommentExistsByID", mock.AnythingOfType("int64")).Return(true, nil)
 	dao.On("UpdateComment", mock.AnythingOfType("*sioblog.BlogComment")).Return(sql.ErrConnDone)
 
-	resp, err := bs.UpdateComment(mockdata.CommentEntity.ID.Int64, mockdata.UpdateCommentRequest)
+	resp, err := bs.UpdateComment(mockdata.CommentEntity.ID, mockdata.UpdateCommentRequest)
 	assert.Error(t, err)
 	assert.Equal(t, testError.Error(), err.Error())
 	assert.Nil(t, resp)
@@ -358,7 +358,7 @@ func TestUpdateComment_GetErr(t *testing.T) {
 	dao.On("UpdateComment", mock.AnythingOfType("*sioblog.BlogComment")).Return(nil)
 	dao.On("GetCommentByID", mock.AnythingOfType("int64")).Return(nil, sql.ErrConnDone)
 
-	resp, err := bs.UpdateComment(mockdata.CommentEntity.ID.Int64, mockdata.UpdateCommentRequest)
+	resp, err := bs.UpdateComment(mockdata.CommentEntity.ID, mockdata.UpdateCommentRequest)
 	assert.Error(t, err)
 	assert.Equal(t, testError.Error(), err.Error())
 	assert.Nil(t, resp)
@@ -371,7 +371,7 @@ func TestSoftDeletePost(t *testing.T) {
 	dao.On("PostExistsByID", mock.AnythingOfType("int64")).Return(true, nil)
 	dao.On("SoftDeletePost", mock.AnythingOfType("*sioblog.BlogPost")).Return(nil)
 
-	resp, err := bs.SoftDeletePost(mockdata.PostEntity.ID.Int64)
+	resp, err := bs.SoftDeletePost(mockdata.PostEntity.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, true, resp.Success)
 	dao.AssertExpectations(t)
@@ -384,7 +384,7 @@ func TestSoftDeletePost_NotFound(t *testing.T) {
 
 	dao.On("PostExistsByID", mock.AnythingOfType("int64")).Return(false, sql.ErrNoRows)
 
-	resp, err := bs.SoftDeletePost(mockdata.PostEntity.ID.Int64)
+	resp, err := bs.SoftDeletePost(mockdata.PostEntity.ID)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 	assert.Equal(t, testError.Error(), err.Error())
@@ -401,7 +401,7 @@ func TestSoftDeletePost_DeleteErr(t *testing.T) {
 	dao.On("SoftDeletePost", mock.AnythingOfType("*sioblog.BlogPost")).
 		Return(sql.ErrConnDone)
 
-	resp, err := bs.SoftDeletePost(mockdata.PostEntity.ID.Int64)
+	resp, err := bs.SoftDeletePost(mockdata.PostEntity.ID)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 	assert.Equal(t, testError.Error(), err.Error())
@@ -414,7 +414,7 @@ func TestSoftDeleteComment(t *testing.T) {
 	dao.On("CommentExistsByID", mock.AnythingOfType("int64")).Return(true, nil)
 	dao.On("SoftDeleteComment", mock.AnythingOfType("*sioblog.BlogComment")).Return(nil)
 
-	resp, err := bs.SoftDeleteComment(mockdata.CommentEntity.ID.Int64)
+	resp, err := bs.SoftDeleteComment(mockdata.CommentEntity.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, true, resp.Success)
 	dao.AssertExpectations(t)
@@ -427,7 +427,7 @@ func TestSoftDeleteComment_NotFound(t *testing.T) {
 
 	dao.On("CommentExistsByID", mock.AnythingOfType("int64")).Return(false, sql.ErrNoRows)
 
-	resp, err := bs.SoftDeleteComment(mockdata.CommentEntity.ID.Int64)
+	resp, err := bs.SoftDeleteComment(mockdata.CommentEntity.ID)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 	assert.Equal(t, testError.Error(), err.Error())
@@ -444,7 +444,7 @@ func TestSoftDeleteComment_DeleteErr(t *testing.T) {
 	dao.On("SoftDeleteComment", mock.AnythingOfType("*sioblog.BlogComment")).
 		Return(sql.ErrConnDone)
 
-	resp, err := bs.SoftDeleteComment(mockdata.CommentEntity.ID.Int64)
+	resp, err := bs.SoftDeleteComment(mockdata.CommentEntity.ID)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 	assert.Equal(t, testError.Error(), err.Error())
