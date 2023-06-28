@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"fmt"
 	"time"
 
@@ -12,8 +13,8 @@ import (
 func buildCreatePostEntity(req *dto.CreatePostRequest) *sioblog.BlogPost {
 	fmt.Println(req)
 	return &sioblog.BlogPost{
-		Title:       req.Title,
-		Body:        req.Body,
+		Title:       handleStringForUpdates(req.Title),
+		Body:        handleStringForUpdates(req.Body),
 		CreatedByID: req.CreatedByID,
 		PostedDate:  time.Now(),
 	}
@@ -21,7 +22,7 @@ func buildCreatePostEntity(req *dto.CreatePostRequest) *sioblog.BlogPost {
 
 func buildAddCommentEntity(req *dto.AddCommentRequest) *sioblog.BlogComment {
 	return &sioblog.BlogComment{
-		Content:     req.Content,
+		Content:     handleStringForUpdates(req.Content),
 		CommentDate: time.Now(),
 		PostID:      req.PostID,
 		UserID:      req.UserID,
@@ -29,37 +30,32 @@ func buildAddCommentEntity(req *dto.AddCommentRequest) *sioblog.BlogComment {
 }
 
 func buildUpdatePostEntity(req *dto.UpdatePostRequest) *sioblog.BlogPost {
-	title := handleStringForUpdates(req.Title)
-	body := handleStringForUpdates(req.Body)
-
 	return &sioblog.BlogPost{
-		Title:       title,
-		Body:        body,
+		Title:       handleStringForUpdates(req.Title),
+		Body:        handleStringForUpdates(req.Body),
 		UpdatedByID: req.UpdatedByID,
 		UpdatedDate: time.Now(),
 	}
 }
 
 func buildUpdateCommentEntity(req *dto.UpdateCommentRequest) *sioblog.BlogComment {
-	content := handleStringForUpdates(req.Content)
-
 	return &sioblog.BlogComment{
-		Content:     content,
+		Content:     handleStringForUpdates(req.Content),
 		UpdatedDate: time.Now(),
 	}
 }
 
 func buildPostResponse(entity *sioblog.BlogPost) *dto.PostResponse {
 	return &dto.PostResponse{
-		ID:           entity.ID.Int64,
+		ID:           entity.ID,
 		Title:        entity.Title.String,
 		Body:         entity.Body.String,
-		PostedDate:   entity.PostedDate.Time,
-		UpdatedDate:  entity.UpdatedDate.Time,
-		DeletionDate: entity.DeletionDate.Time,
-		SoftDeleted:  entity.SoftDeleted.Bool,
-		CreatedByID:  entity.CreatedByID.Int64,
-		UpdatedByID:  entity.UpdatedByID.Int64,
+		PostedDate:   entity.PostedDate,
+		UpdatedDate:  entity.UpdatedDate,
+		DeletionDate: entity.DeletionDate,
+		SoftDeleted:  entity.SoftDeleted,
+		CreatedByID:  entity.CreatedByID,
+		UpdatedByID:  entity.UpdatedByID,
 		Comments:     buildCommentResponses(entity.Comments),
 	}
 }
@@ -74,14 +70,14 @@ func buildAllPostsResponse(entities *[]*sioblog.BlogPost) *[]*dto.PostResponse {
 
 func buildCommentResponse(entity *sioblog.BlogComment) *dto.CommentResponse {
 	return &dto.CommentResponse{
-		ID:           entity.ID.Int64,
+		ID:           entity.ID,
 		Content:      entity.Content.String,
-		CommentDate:  entity.CommentDate.Time,
-		UpdatedDate:  entity.UpdatedDate.Time,
-		SoftDeleted:  entity.SoftDeleted.Bool,
-		DeletionDate: entity.DeletionDate.Time,
-		PostID:       entity.PostID.Int64,
-		UserID:       entity.UserID.Int64,
+		CommentDate:  entity.CommentDate,
+		UpdatedDate:  entity.UpdatedDate,
+		SoftDeleted:  entity.SoftDeleted,
+		DeletionDate: entity.DeletionDate,
+		PostID:       entity.PostID,
+		UserID:       entity.UserID,
 	}
 }
 
@@ -97,9 +93,14 @@ func buildCommentResponses(entities *[]*sioblog.BlogComment) *[]*dto.CommentResp
 	return &commentReponses
 }
 
-func handleStringForUpdates(s string) siogeneric.SioNullString {
+func handleStringForUpdates(s string) sql.NullString {
 	if s == "" {
-		return siogeneric.NewSioInvalidNullString()
+		return sql.NullString{
+			Valid: false,
+		}
 	}
-	return s)
+	return sql.NullString{
+		Valid:  true,
+		String: s,
+	}
 }
