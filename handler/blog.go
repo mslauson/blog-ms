@@ -81,10 +81,10 @@ func (ph *BlogHdlr) GetAllPosts(c *gin.Context) {
 	// 	return
 	// }
 
-	if result, err := ph.svc.GetAllPosts(); result != nil {
-		c.JSON(http.StatusOK, result)
-	} else {
+	if result, err := ph.svc.GetAllPosts(); err != nil {
 		_ = c.Error(err)
+	} else {
+		c.JSON(http.StatusOK, result)
 	}
 }
 

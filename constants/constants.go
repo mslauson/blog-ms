@@ -6,6 +6,7 @@ const (
 	COMMENT          = "comment"
 	POST_EXISTS      = "post already exists"
 	NO_POST_FOUND    = "no post found"
+	NO_POSTS_FOUND    = "no posts found"
 	NO_COMMENT_FOUND = "no comment found"
 	INVALID_ID       = "id must be numerical"
 

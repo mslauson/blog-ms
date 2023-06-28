@@ -46,12 +46,16 @@ func (bs *BlogSvc) GetPost(id int64) (*dto.PostResponse, error) {
 }
 
 func (bs *BlogSvc) GetAllPosts() (*[]*dto.PostResponse, error) {
-	post, err := bs.dao.GetAllPosts()
+	posts, err := bs.dao.GetAllPosts()
 	if err != nil {
 		return nil, siodao.HandleDbErr(err, constants.POSTS)
 	}
 
-	return buildAllPostsResponse(post), nil
+	if posts == nil || len(*posts) == 0 {
+		return nil, sioerror.NewSioNotFoundError(constants.NO_POSTS_FOUND)
+	}
+
+	return buildAllPostsResponse(posts), nil
 }
 
 func (bs *BlogSvc) CreatePost(req *dto.CreatePostRequest) (*dto.PostResponse, error) {
