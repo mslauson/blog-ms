@@ -23,28 +23,28 @@ spec:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/role: "chore"
         vault.hashicorp.com/agent-pre-populate-only: "true"
-        vault.hashicorp.com/agent-inject-secret-encryption: "ndt/data/host"
+        vault.hashicorp.com/agent-inject-secret-encryption: "blog/data/host"
         vault.hashicorp.com/agent-inject-template-host: |
-          {{ with secret "ndt/data/host" -}}
+          {{ with secret "blog/data/host" -}}
             export LOKI_URL="{{ .Data.data.loki }}"
           {{- end }}
-        vault.hashicorp.com/agent-inject-secret-host: "ndt/data/encryption"
+        vault.hashicorp.com/agent-inject-secret-host: "blog/data/encryption"
         vault.hashicorp.com/agent-inject-template-encryption: |
-          {{ with secret "ndt/data/encryption" -}}
+          {{ with secret "blog/data/encryption" -}}
             export KEY="{{ .Data.data.key }}"
             export IV="{{ .Data.data.iv }}"
           {{- end }}
-        vault.hashicorp.com/agent-inject-secret-oauth: "ndt/data/oauth"
+        vault.hashicorp.com/agent-inject-secret-oauth: "blog/data/oauth"
         vault.hashicorp.com/agent-inject-template-oauth: |
-          {{ with secret "ndt/data/oauth" -}}
+          {{ with secret "blog/data/oauth" -}}
             export OAUTH_ADMIN_BASE="{{ .Data.data.authHost }}"
             export OAUTH_ISSUER_BASE="{{ .Data.data.oauthIssuerBase }}"
             export OAUTH_CLIENT_ID="{{ .Data.data.oauthClientId }}"
             export OAUTH_CLIENT_SECRET="{{ .Data.data.oauthClientSecret }}"
           {{- end }}
-        vault.hashicorp.com/agent-inject-secret-postgres: "ndt/data/postgres"
+        vault.hashicorp.com/agent-inject-secret-postgres: "blog/data/postgres"
         vault.hashicorp.com/agent-inject-template-postgres: |
-          {{ with secret "ndt/data/postgres" -}}
+          {{ with secret "blog/data/postgres" -}}
             export DB_HOST="{{ .Data.data.dbHost }}"
             export DB_USER="{{ .Data.data.dbUser }}"
             export DB_PASSWORD="{{ .Data.data.dbPassword }}"
