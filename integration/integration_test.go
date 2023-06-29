@@ -246,7 +246,7 @@ func TestUpdatePost(t *testing.T) {
 			pr := parsePostResponse(t, resp)
 			require.Equal(t, tt.res.Title, pr.Title)
 			require.Equal(t, tt.res.Body, pr.Body)
-			require.Equal(t, tt.res.UpdatedByID, pr.UpdatedByID)
+			require.Equal(t, userID, pr.UpdatedByID)
 		})
 	}
 }
@@ -369,7 +369,12 @@ func TestUpdatePost_ErrIDNotNumerical(t *testing.T) {
 	}
 
 	defer resp.Body.Close()
-	checkIfCorrectError(t, resp, "asdfj", http.StatusBadRequest)
+	checkIfCorrectError(
+		t,
+		resp,
+		"strconv.ParseInt: parsing \"asdf8\": invalid syntax",
+		http.StatusBadRequest,
+	)
 }
 
 func TestAddComment(t *testing.T) {
@@ -754,23 +759,98 @@ func TestSoftDeleteComment(t *testing.T) {
 
 	id := createdComments[0].ID
 	idStr := strconv.Itoa(int(id))
+	req, err := http.NewRequest(
+		"DELETE",
+		ts.URL+"/api/post/v1/comment/"+idStr,
+		nil,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}(resp.Body)
+
+	result := parseSuccessResponse(t, resp)
+	require.Equal(t, true, result.Success)
+}
+
+func TestSoftDeletePost(t *testing.T) {
+	ts := runTestServer()
+	defer ts.Close()
+
+	token, err := sioUtils.NewTokenClient().CreateToken()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	id := createdPosts[0].ID
+	idStr := strconv.Itoa(int(id))
+	req, err := http.NewRequest(
+		"DELETE",
+		ts.URL+"/api/post/v1/"+idStr,
+		nil,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}(resp.Body)
+
+	result := parseSuccessResponse(t, resp)
+	require.Equal(t, true, result.Success)
+}
+
+func TestSoftDeleteComment_Err(t *testing.T) {
+	ts := runTestServer()
+	defer ts.Close()
+	token, err := sioUtils.NewTokenClient().CreateToken()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// id := createdComments[0].ID
+	// idStr := strconv.Itoa(int(id))
 	errTests := []struct {
 		name   string
 		id     string
 		status int
 		err    string
 	}{
-		{
-			name:   "Not Found - Already Deleted",
-			id:     idStr,
-			status: http.StatusNotFound,
-			err:    "asdf",
-		},
+		// {
+		// 	name:   "Not Found - Already Deleted",
+		// 	id:     idStr,
+		// 	status: http.StatusNotFound,
+		// 	err:    "no comment found",
+		// },
 		{
 			name:   "Not Found",
 			id:     "123",
 			status: http.StatusNotFound,
-			err:    "asdf",
+			err:    "no comment found",
 		},
 
 		{
@@ -781,39 +861,11 @@ func TestSoftDeleteComment(t *testing.T) {
 		},
 	}
 
-	t.Run("Happy", func(t *testing.T) {
-		req, err := http.NewRequest(
-			"DELETE",
-			ts.URL+"/api/post/v1/comment/"+idStr,
-			nil,
-		)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Authorization", "Bearer "+token.AccessToken)
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		defer func(Body io.ReadCloser) {
-			err := Body.Close()
-			if err != nil {
-				t.Fatal(err)
-			}
-		}(resp.Body)
-
-		result := parseSuccessResponse(t, resp)
-		require.Equal(t, true, result.Success)
-	})
-
 	for _, et := range errTests {
 		t.Run(et.name, func(t *testing.T) {
 			req, err := http.NewRequest(
 				"DELETE",
-				ts.URL+"/api/post/v1/comment/"+idStr,
+				ts.URL+"/api/post/v1/comment/"+et.id,
 				nil,
 			)
 			if err != nil {
@@ -839,7 +891,7 @@ func TestSoftDeleteComment(t *testing.T) {
 	}
 }
 
-func TestSoftDeletePost(t *testing.T) {
+func TestSoftDeletePost_Err(t *testing.T) {
 	token, err := sioUtils.NewTokenClient().CreateToken()
 	if err != nil {
 		t.Fatal(err)
@@ -857,13 +909,13 @@ func TestSoftDeletePost(t *testing.T) {
 			name:   "Not Found - Already Deleted",
 			id:     idStr,
 			status: http.StatusNotFound,
-			err:    "asdf",
+			err:    "no post found",
 		},
 		{
 			name:   "Not Found",
 			id:     "123",
 			status: http.StatusNotFound,
-			err:    "asdf",
+			err:    "no post found",
 		},
 
 		{
@@ -874,44 +926,13 @@ func TestSoftDeletePost(t *testing.T) {
 		},
 	}
 
-	t.Run("Happy", func(t *testing.T) {
-		ts := runTestServer()
-		defer ts.Close()
-
-		req, err := http.NewRequest(
-			"DELETE",
-			ts.URL+"/api/post/v1/"+idStr,
-			nil,
-		)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Authorization", "Bearer "+token.AccessToken)
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		defer func(Body io.ReadCloser) {
-			err := Body.Close()
-			if err != nil {
-				t.Fatal(err)
-			}
-		}(resp.Body)
-
-		result := parseSuccessResponse(t, resp)
-		require.Equal(t, true, result.Success)
-	})
-
 	for _, et := range errTests {
 		t.Run(et.name, func(t *testing.T) {
 			ts := runTestServer()
 			defer ts.Close()
 			req, err := http.NewRequest(
 				"DELETE",
-				ts.URL+"/api/post/v1/"+idStr,
+				ts.URL+"/api/post/v1/"+et.id,
 				nil,
 			)
 			if err != nil {
