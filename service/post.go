@@ -10,6 +10,7 @@ import (
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/siodao"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
+	log "github.com/sirupsen/logrus"
 )
 
 type PostSvc struct {
@@ -87,19 +88,25 @@ func (ps *PostSvc) AddComment(req *dto.AddCommentRequest) (*dto.CommentResponse,
 }
 
 func (ps *PostSvc) UpdatePost(ID int64, req *dto.UpdatePostRequest) (*dto.PostResponse, error) {
-	if err := ps.postExistsByID(ID); err != nil {
-		return nil, err
-	}
-
+	start := time.Now()
 	post := buildUpdatePostEntity(ID, req)
 	if err := ps.dao.UpdatePost(post); err != nil {
 		return nil, siodao.HandleDbErr(err, constants.POST)
 	}
 
+	uDuration := time.Since(start)
+	log.Info("update post duration", uDuration)
+
+	gStart := time.Now()
 	post, err := ps.dao.GetPostByID(ID)
 	if err != nil {
 		return nil, siodao.HandleDbErr(err, constants.POST)
 	}
+	gDuration := time.Since(gStart)
+	log.Info("get post duration", gDuration)
+
+	fDuration := time.Since(start)
+	log.Info("get post duration", fDuration)
 
 	return buildPostResponse(post), nil
 }
@@ -107,10 +114,6 @@ func (ps *PostSvc) UpdatePost(ID int64, req *dto.UpdatePostRequest) (*dto.PostRe
 func (ps *PostSvc) UpdateComment(
 	ID int64, req *dto.UpdateCommentRequest,
 ) (*dto.CommentResponse, error) {
-	if err := ps.commentExistsByID(ID); err != nil {
-		return nil, err
-	}
-
 	comment := buildUpdateCommentEntity(ID, req)
 	if err := ps.dao.UpdateComment(comment); err != nil {
 		return nil, siodao.HandleDbErr(err, constants.COMMENT)
@@ -125,34 +128,38 @@ func (ps *PostSvc) UpdateComment(
 }
 
 func (ps *PostSvc) SoftDeletePost(ID int64) (*siogeneric.SuccessResponse, error) {
-	if err := ps.postExistsByID(ID); err != nil {
-		return nil, err
-	}
-
 	post := &sioblog.BlogPost{
 		ID:           ID,
 		DeletionDate: siodao.BuildNullTime(time.Now()),
 	}
 
-	if err := ps.dao.SoftDeletePost(post); err != nil {
+	result, err := ps.dao.SoftDeletePost(post)
+	if err != nil {
 		return nil, siodao.HandleDbErr(err, constants.POST)
+	}
+
+	n, err := result.RowsAffected()
+	if n == 0 {
+		return nil, sioerror.NewSioNotFoundError(constants.NO_POST_FOUND)
 	}
 
 	return &siogeneric.SuccessResponse{Success: true}, nil
 }
 
 func (ps *PostSvc) SoftDeleteComment(ID int64) (*siogeneric.SuccessResponse, error) {
-	if err := ps.commentExistsByID(ID); err != nil {
-		return nil, err
-	}
-
 	comment := &sioblog.BlogComment{
 		ID:           ID,
 		DeletionDate: siodao.BuildNullTime(time.Now()),
 	}
 
-	if err := ps.dao.SoftDeleteComment(comment); err != nil {
+	result, err := ps.dao.SoftDeleteComment(comment)
+	if err != nil {
 		return nil, siodao.HandleDbErr(err, constants.COMMENT)
+	}
+
+	n, err := result.RowsAffected()
+	if n == 0 {
+		return nil, sioerror.NewSioNotFoundError(constants.NO_COMMENT_FOUND)
 	}
 
 	return &siogeneric.SuccessResponse{Success: true}, nil

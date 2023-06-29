@@ -27,8 +27,8 @@ type PostDao interface {
 	UpdatePost(post *sioblog.BlogPost) error
 	AddComment(comment *sioblog.BlogComment) error
 	UpdateComment(comment *sioblog.BlogComment) error
-	SoftDeletePost(post *sioblog.BlogPost) error
-	SoftDeleteComment(comment *sioblog.BlogComment) error
+	SoftDeletePost(post *sioblog.BlogPost) (sql.Result, error)
+	SoftDeleteComment(comment *sioblog.BlogComment) (sql.Result, error)
 }
 
 func NewBlogDao() *PDao {
@@ -189,29 +189,23 @@ func (pd *PDao) UpdateComment(comment *sioblog.BlogComment) error {
 	return nil
 }
 
-func (pd *PDao) SoftDeletePost(post *sioblog.BlogPost) error {
+func (pd *PDao) SoftDeletePost(post *sioblog.BlogPost) (sql.Result, error) {
 	query := `UPDATE post 
 	SET
 	soft_deleted = $1,
 	deletion_date = $2
 	where id = $3`
 
-	if _, err := pd.db.ExecContext(ctx, query, true, post.DeletionDate, post.ID); err != nil {
-		return err
-	}
-	return nil
+	return pd.db.ExecContext(ctx, query, true, post.DeletionDate, post.ID)
 }
 
-func (pd *PDao) SoftDeleteComment(comment *sioblog.BlogComment) error {
+func (pd *PDao) SoftDeleteComment(comment *sioblog.BlogComment) (sql.Result, error) {
 	query := `UPDATE comment
 		SET 
 		soft_deleted = $1,
 		deletion_date = $2
 		WHERE id = $3`
-	if _, err := pd.db.ExecContext(ctx, query, true, comment.DeletionDate, comment.ID); err != nil {
-		return err
-	}
-	return nil
+	return pd.db.ExecContext(ctx, query, true, comment.DeletionDate, comment.ID)
 }
 
 func (pd *PDao) scanPost(rows *sql.Rows) (*sioblog.BlogPost, error) {
