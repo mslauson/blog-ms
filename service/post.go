@@ -10,7 +10,6 @@ import (
 	"gitea.slauson.io/slausonio/go-types/siogeneric"
 	"gitea.slauson.io/slausonio/go-utils/siodao"
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
-	log "github.com/sirupsen/logrus"
 )
 
 type PostSvc struct {
@@ -88,17 +87,22 @@ func (ps *PostSvc) AddComment(req *dto.AddCommentRequest) (*dto.CommentResponse,
 }
 
 func (ps *PostSvc) UpdatePost(ID int64, req *dto.UpdatePostRequest) (*dto.PostResponse, error) {
-	start := time.Now()
 	post := buildUpdatePostEntity(ID, req)
-	if err := ps.dao.UpdatePost(post); err != nil {
+
+	result, err := ps.dao.UpdatePost(post)
+	if err != nil {
 		return nil, siodao.HandleDbErr(err, constants.POST)
 	}
 
-	uDuration := time.Since(start)
-	log.Info("update post duration", uDuration)
+	n, err := result.RowsAffected()
+	if n == 0 {
+		return nil, sioerror.NewSioNotFoundError(constants.NO_POST_FOUND)
+	}
 
-	fDuration := time.Since(start)
-	log.Info("get post duration", fDuration)
+	post, err = ps.dao.GetPostByID(ID)
+	if err != nil {
+		return nil, siodao.HandleDbErr(err, constants.POST)
+	}
 
 	return buildPostResponse(post), nil
 }
@@ -107,7 +111,19 @@ func (ps *PostSvc) UpdateComment(
 	ID int64, req *dto.UpdateCommentRequest,
 ) (*dto.CommentResponse, error) {
 	comment := buildUpdateCommentEntity(ID, req)
-	if err := ps.dao.UpdateComment(comment); err != nil {
+
+	result, err := ps.dao.UpdateComment(comment)
+	if err != nil {
+		return nil, siodao.HandleDbErr(err, constants.COMMENT)
+	}
+
+	n, err := result.RowsAffected()
+	if n == 0 {
+		return nil, sioerror.NewSioNotFoundError(constants.NO_COMMENT_FOUND)
+	}
+
+	comment, err = ps.dao.GetCommentByID(ID)
+	if err != nil {
 		return nil, siodao.HandleDbErr(err, constants.COMMENT)
 	}
 

@@ -26,9 +26,9 @@ type PostDao interface {
 	GetCommentByID(ID int64) (*sioblog.BlogComment, error)
 	GetAllPosts() (*[]*sioblog.BlogPost, error)
 	GetAllCommentsByPostID(postID int64) (*[]*sioblog.BlogComment, error)
-	UpdatePost(post *sioblog.BlogPost) error
 	AddComment(comment *sioblog.BlogComment) error
-	UpdateComment(comment *sioblog.BlogComment) error
+	UpdatePost(post *sioblog.BlogPost) (sql.Result,error)
+	UpdateComment(comment *sioblog.BlogComment) (sql.Result,error)
 	SoftDeletePost(post *sioblog.BlogPost) (sql.Result, error)
 	SoftDeleteComment(comment *sioblog.BlogComment) (sql.Result, error)
 }
@@ -184,17 +184,16 @@ func (pd *PDao) GetAllCommentsByPostID(postID int64) (*[]*sioblog.BlogComment, e
 	return pd.scanComments(rows)
 }
 
-func (pd *PDao) UpdatePost(post *sioblog.BlogPost) error {
-	query := fmt.Sprintf(`UPDATE post
+func (pd *PDao) UpdatePost(post *sioblog.BlogPost) (sql.Result, error) {
+	query := `UPDATE post
 		SET 
 		title = COALESCE($1, title),
 		body = COALESCE($2,body),
 		updated_date = $3,
 		updated_by_id = $4
-		WHERE id = $5
-		returning %s`, constants.SELECT_ITEMS_POST)
+		WHERE id = $5`
 
-	rows, err := pd.db.QueryContext(
+	return pd.db.ExecContext(
 		ctx,
 		query,
 		post.Title,
@@ -203,24 +202,6 @@ func (pd *PDao) UpdatePost(post *sioblog.BlogPost) error {
 		post.UpdatedByID,
 		post.ID,
 	)
-	if err != nil {
-		return err
-	}
-
-	defer rows.Close()
-
-	for rows.Next() {
-		comment := &sioblog.BlogPost{}
-
-		err := pd.scanPost(rows, comment)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	return sql.ErrNoRows
 }
 
 func (pd *PDao) AddComment(comment *sioblog.BlogComment) error {
@@ -239,30 +220,14 @@ func (pd *PDao) AddComment(comment *sioblog.BlogComment) error {
 	return err
 }
 
-func (pd *PDao) UpdateComment(comment *sioblog.BlogComment) error {
-	query := fmt.Sprintf(`UPDATE comment
+func (pd *PDao) UpdateComment(comment *sioblog.BlogComment) (sql.Result, error) {
+	query := `UPDATE comment
 		SET 
 		content = COALESCE($1, content),
 		updated_date = COALESCE($2, updated_date)
-		WHERE id = $3 returning %s`, constants.SELECT_ITEMS_COMMENT)
+		WHERE id = $3`
 
-	rows, err := pd.db.QueryContext(ctx, query, comment.Content, comment.UpdatedDate, comment.ID)
-	if err != nil {
-		return err
-	}
-
-	for rows.Next() {
-		comment := &sioblog.BlogComment{}
-
-		err := pd.scanComment(rows, comment)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	return sql.ErrNoRows
+	return pd.db.ExecContext(ctx, query, comment.Content, comment.UpdatedDate, comment.ID)
 }
 
 func (pd *PDao) SoftDeletePost(post *sioblog.BlogPost) (sql.Result, error) {
