@@ -558,7 +558,28 @@ func TestSoftDeletePost(t *testing.T) {
 	mock.ExpectExec(`UPDATE post`).
 		WithArgs(true, mockdata.PostEntity.DeletionDate, mockdata.PostEntity.ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	err = pd.SoftDeletePost(mockdata.PostEntity)
+	result, err := pd.SoftDeletePost(mockdata.PostEntity)
+	n, err := result.RowsAffected()
+
+	require.Equal(t, int64(1), n)
+	require.NoError(t, err)
+}
+
+func TestSoftDeletePost_NoRows(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectExec(`UPDATE post`).
+		WithArgs(true, mockdata.PostEntity.DeletionDate, mockdata.PostEntity.ID).
+		WillReturnResult(sqlmock.NewResult(0, 0))
+	result, err := pd.SoftDeletePost(mockdata.PostEntity)
+	n, err := result.RowsAffected()
+
+	require.Equal(t, int64(0), n)
 	require.NoError(t, err)
 }
 
@@ -574,8 +595,10 @@ func TestSoftDeletePost_Err(t *testing.T) {
 		WithArgs(true, mockdata.PostEntity.DeletionDate, mockdata.PostEntity.ID).
 		WillReturnError(errors.New("test error"))
 
-	err = pd.SoftDeletePost(mockdata.PostEntity)
+	result, err := pd.SoftDeletePost(mockdata.PostEntity)
 	require.Error(t, err)
+
+	require.Nilf(t, result, "result should be nil")
 }
 
 func TestSoftDeleteComment(t *testing.T) {
@@ -589,7 +612,28 @@ func TestSoftDeleteComment(t *testing.T) {
 	mock.ExpectExec(`UPDATE comment`).
 		WithArgs(true, mockdata.CommentEntity.DeletionDate, mockdata.CommentEntity.ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	err = pd.SoftDeleteComment(mockdata.CommentEntity)
+	result, err := pd.SoftDeleteComment(mockdata.CommentEntity)
+	n, err := result.RowsAffected()
+
+	require.Equal(t, int64(1), n)
+	require.NoError(t, err)
+}
+
+func TestSoftDeleteComment_NoRows(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectExec(`UPDATE comment`).
+		WithArgs(true, mockdata.CommentEntity.DeletionDate, mockdata.CommentEntity.ID).
+		WillReturnResult(sqlmock.NewResult(0, 0))
+	result, err := pd.SoftDeleteComment(mockdata.CommentEntity)
+	n, err := result.RowsAffected()
+
+	require.Equal(t, int64(0), n)
 	require.NoError(t, err)
 }
 
@@ -604,8 +648,8 @@ func TestSoftDeleteComment_Err(t *testing.T) {
 		WithArgs(true, mockdata.CommentEntity.DeletionDate, mockdata.CommentEntity.ID).
 		WillReturnError(errors.New("test error"))
 
-	err = pd.SoftDeleteComment(mockdata.CommentEntity)
+	result, err := pd.SoftDeletePost(mockdata.PostEntity)
 	require.Error(t, err)
-}
 
-// require.NoError(t, mock.ExpectationsWereMet())
+	require.Nilf(t, result, "result should be nil")
+}
