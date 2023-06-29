@@ -212,6 +212,7 @@ func (pd *PDao) UpdatePost(post *sioblog.BlogPost) error {
 	}
 
 	defer rows.Close()
+
 	return pd.scanPost(rows, post)
 }
 
@@ -232,14 +233,16 @@ func (pd *PDao) AddComment(comment *sioblog.BlogComment) error {
 }
 
 func (pd *PDao) UpdateComment(comment *sioblog.BlogComment) error {
-	query := `UPDATE comment
+	query := fmt.Sprintf(`UPDATE comment
 		SET 
 		content = COALESCE($1, content),
 		updated_date = COALESCE($2, updated_date)
-		WHERE id = $3`
+		WHERE id = $3 returning %s`, selectItemsComment)
+
 	if _, err := pd.db.ExecContext(ctx, query, comment.Content, comment.UpdatedDate, comment.ID); err != nil {
 		return err
 	}
+
 	return nil
 }
 
