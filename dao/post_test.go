@@ -9,6 +9,46 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var postRows = sqlmock.NewRows([]string{
+	"id",
+	"title",
+	"body",
+	"created_by_id",
+	"updated_by_id",
+	"posted_date",
+	"updated_date",
+	"deletion_date",
+	"soft_deleted",
+}).
+	AddRow(mockdata.PostEntity.ID,
+		mockdata.PostEntity.Title.String,
+		mockdata.PostEntity.Body.String,
+		mockdata.PostEntity.CreatedByID,
+		mockdata.PostEntity.UpdatedByID,
+		mockdata.PostEntity.PostedDate,
+		mockdata.PostEntity.UpdatedDate,
+		mockdata.PostEntity.DeletionDate,
+		mockdata.PostEntity.SoftDeleted)
+
+var commentRows = sqlmock.NewRows([]string{
+	"id",
+	"content",
+	"comment_date",
+	"post_id",
+	"user_id",
+	"soft_deleted",
+	"deletion_date",
+}).
+	AddRow(
+		mockdata.CommentEntity.ID,
+		mockdata.CommentEntity.Content.String,
+		mockdata.CommentEntity.CommentDate,
+		mockdata.CommentEntity.PostID,
+		mockdata.CommentEntity.UserID,
+		mockdata.CommentEntity.SoftDeleted,
+		mockdata.CommentEntity.DeletionDate,
+	)
+
 func TestCreatePost(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
@@ -372,28 +412,8 @@ func TestGetAllPosts_ErrComments(t *testing.T) {
 
 	pd := &PDao{db: db}
 
-	rows := sqlmock.NewRows([]string{
-		"id",
-		"title",
-		"body",
-		"created_by_id",
-		"updated_by_id",
-		"posted_date",
-		"updated_date",
-		"deletion_date",
-		"soft_deleted",
-	}).
-		AddRow(mockdata.PostEntity.ID,
-			mockdata.PostEntity.Title.String,
-			mockdata.PostEntity.Body.String,
-			mockdata.PostEntity.CreatedByID,
-			mockdata.PostEntity.UpdatedByID,
-			mockdata.PostEntity.PostedDate,
-			mockdata.PostEntity.UpdatedDate,
-			mockdata.PostEntity.DeletionDate,
-			mockdata.PostEntity.SoftDeleted)
 	mock.ExpectQuery(`SELECT`).
-		WillReturnRows(rows)
+		WillReturnRows(postRows)
 
 	mock.ExpectQuery(`SELECT`).
 		WillReturnError(errors.New("test error"))
@@ -411,27 +431,8 @@ func TestGetAllCommentsByPostID(t *testing.T) {
 
 	pd := &PDao{db: db}
 
-	rows := sqlmock.NewRows([]string{
-		"id",
-		"content",
-		"comment_date",
-		"post_id",
-		"user_id",
-		"soft_deleted",
-		"deletion_date",
-	}).
-		AddRow(
-			mockdata.CommentEntity.ID,
-			mockdata.CommentEntity.Content.String,
-			mockdata.CommentEntity.CommentDate,
-			mockdata.CommentEntity.PostID,
-			mockdata.CommentEntity.UserID,
-			mockdata.CommentEntity.SoftDeleted,
-			mockdata.CommentEntity.DeletionDate,
-		)
-
 	mock.ExpectQuery(`SELECT`).
-		WillReturnRows(rows)
+		WillReturnRows(commentRows)
 	comments, err := pd.GetAllCommentsByPostID(mockdata.PostEntity.ID)
 	require.NoError(t, err)
 	require.NotNil(t, comments)
@@ -461,9 +462,10 @@ func TestUpdatePost(t *testing.T) {
 
 	pd := &PDao{db: db}
 
-	mock.ExpectExec(`UPDATE post`).
+	mock.ExpectQuery(`UPDATE post`).
 		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.UpdatedDate, mockdata.PostEntity.UpdatedByID, mockdata.PostEntity.ID).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+		WillReturnRows(postRows)
+
 	err = pd.UpdatePost(mockdata.PostEntity)
 	require.NoError(t, err)
 }
@@ -476,9 +478,10 @@ func TestUpdatePost_Err(t *testing.T) {
 
 	pd := &PDao{db: db}
 
-	mock.ExpectExec(`UPDATE post`).
+	mock.ExpectQuery(`UPDATE post`).
 		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.UpdatedDate, mockdata.PostEntity.UpdatedByID, mockdata.PostEntity.ID).
 		WillReturnError(errors.New("test error"))
+
 	err = pd.UpdatePost(mockdata.PostEntity)
 	require.Error(t, err)
 }
@@ -524,9 +527,10 @@ func TestUpdateComment(t *testing.T) {
 
 	pd := &PDao{db: db}
 
-	mock.ExpectExec(`UPDATE comment`).
+	mock.ExpectQuery(`UPDATE comment`).
 		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.UpdatedDate, mockdata.CommentEntity.ID).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+		WillReturnRows(commentRows)
+
 	err = pd.UpdateComment(mockdata.CommentEntity)
 	require.NoError(t, err)
 }
@@ -539,7 +543,7 @@ func TestUpdateComment_Err(t *testing.T) {
 
 	pd := &PDao{db: db}
 
-	mock.ExpectExec(`UPDATE comment`).
+	mock.ExpectQuery(`UPDATE comment`).
 		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.UpdatedDate, mockdata.CommentEntity.ID).
 		WillReturnError(errors.New("test error"))
 

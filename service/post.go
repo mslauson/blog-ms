@@ -97,14 +97,6 @@ func (ps *PostSvc) UpdatePost(ID int64, req *dto.UpdatePostRequest) (*dto.PostRe
 	uDuration := time.Since(start)
 	log.Info("update post duration", uDuration)
 
-	gStart := time.Now()
-	post, err := ps.dao.GetPostByID(ID)
-	if err != nil {
-		return nil, siodao.HandleDbErr(err, constants.POST)
-	}
-	gDuration := time.Since(gStart)
-	log.Info("get post duration", gDuration)
-
 	fDuration := time.Since(start)
 	log.Info("get post duration", fDuration)
 
@@ -116,11 +108,6 @@ func (ps *PostSvc) UpdateComment(
 ) (*dto.CommentResponse, error) {
 	comment := buildUpdateCommentEntity(ID, req)
 	if err := ps.dao.UpdateComment(comment); err != nil {
-		return nil, siodao.HandleDbErr(err, constants.COMMENT)
-	}
-
-	comment, err := ps.dao.GetCommentByID(ID)
-	if err != nil {
 		return nil, siodao.HandleDbErr(err, constants.COMMENT)
 	}
 

@@ -209,7 +209,18 @@ func (pd *PDao) UpdatePost(post *sioblog.BlogPost) error {
 
 	defer rows.Close()
 
-	return pd.scanPost(rows, post)
+	for rows.Next() {
+		comment := &sioblog.BlogPost{}
+
+		err := pd.scanPost(rows, comment)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	return sql.ErrNoRows
 }
 
 func (pd *PDao) AddComment(comment *sioblog.BlogComment) error {
@@ -235,11 +246,23 @@ func (pd *PDao) UpdateComment(comment *sioblog.BlogComment) error {
 		updated_date = COALESCE($2, updated_date)
 		WHERE id = $3 returning %s`, constants.SELECT_ITEMS_COMMENT)
 
-	if _, err := pd.db.ExecContext(ctx, query, comment.Content, comment.UpdatedDate, comment.ID); err != nil {
+	rows, err := pd.db.QueryContext(ctx, query, comment.Content, comment.UpdatedDate, comment.ID)
+	if err != nil {
 		return err
 	}
 
-	return nil
+	for rows.Next() {
+		comment := &sioblog.BlogComment{}
+
+		err := pd.scanComment(rows, comment)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	return sql.ErrNoRows
 }
 
 func (pd *PDao) SoftDeletePost(post *sioblog.BlogPost) (sql.Result, error) {
