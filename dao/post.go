@@ -5,13 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 
+	"gitea.slauson.io/blog/post-ms/constants"
 	"gitea.slauson.io/slausonio/go-types/sioblog"
 	"gitea.slauson.io/slausonio/go-utils/siodao"
-)
-
-var (
-	selectItemsPost    = `id, title, body, created_by_id, updated_by_id, posted_date, updated_date, deletion_date, soft_deleted`
-	selectItemsComment = `id, content, comment_date, user_id, post_id, soft_deleted, deletion_date`
 )
 
 var ctx = context.Background()
@@ -82,7 +78,7 @@ func (pd *PDao) CommentExistsByID(ID int64) (bool, error) {
 func (pd *PDao) GetPostByID(ID int64) (*sioblog.BlogPost, error) {
 	query := fmt.Sprintf(
 		`SELECT %s FROM post WHERE id = $1 AND soft_deleted = false`,
-		selectItemsPost,
+		constants.SELECT_ITEMS_POST,
 	)
 
 	rows, err := pd.db.QueryContext(ctx, query, ID)
@@ -115,7 +111,7 @@ func (pd *PDao) GetPostByID(ID int64) (*sioblog.BlogPost, error) {
 func (pd *PDao) GetCommentByID(ID int64) (*sioblog.BlogComment, error) {
 	query := fmt.Sprintf(
 		`SELECT %s FROM comment WHERE id = $1 AND soft_deleted = false`,
-		selectItemsComment,
+		constants.SELECT_ITEMS_COMMENT,
 	)
 
 	rows, err := pd.db.QueryContext(ctx, query, ID)
@@ -141,7 +137,7 @@ func (pd *PDao) GetCommentByID(ID int64) (*sioblog.BlogComment, error) {
 func (pd *PDao) GetAllPosts() (*[]*sioblog.BlogPost, error) {
 	query := fmt.Sprintf(
 		`SELECT %s FROM post WHERE soft_deleted = false`,
-		selectItemsPost,
+		constants.SELECT_ITEMS_POST,
 	)
 
 	rows, err := pd.db.QueryContext(ctx, query)
@@ -175,7 +171,7 @@ func (pd *PDao) GetAllPosts() (*[]*sioblog.BlogPost, error) {
 func (pd *PDao) GetAllCommentsByPostID(postID int64) (*[]*sioblog.BlogComment, error) {
 	query := fmt.Sprintf(
 		`SELECT %s FROM comment WHERE post_id = $1 AND soft_deleted = false`,
-		selectItemsComment,
+		constants.SELECT_ITEMS_COMMENT,
 	)
 
 	rows, err := pd.db.QueryContext(ctx, query, postID)
@@ -196,7 +192,7 @@ func (pd *PDao) UpdatePost(post *sioblog.BlogPost) error {
 		updated_date = $3,
 		updated_by_id = $4
 		WHERE id = $5
-		returning %s`, selectItemsPost)
+		returning %s`, constants.SELECT_ITEMS_POST)
 
 	rows, err := pd.db.QueryContext(
 		ctx,
@@ -237,7 +233,7 @@ func (pd *PDao) UpdateComment(comment *sioblog.BlogComment) error {
 		SET 
 		content = COALESCE($1, content),
 		updated_date = COALESCE($2, updated_date)
-		WHERE id = $3 returning %s`, selectItemsComment)
+		WHERE id = $3 returning %s`, constants.SELECT_ITEMS_COMMENT)
 
 	if _, err := pd.db.ExecContext(ctx, query, comment.Content, comment.UpdatedDate, comment.ID); err != nil {
 		return err
