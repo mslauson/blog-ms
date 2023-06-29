@@ -19,7 +19,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/blog/v1/post/": {
+        "/api/post/v1/": {
             "get": {
                 "description": "Get all posts",
                 "consumes": [
@@ -125,7 +125,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/blog/v1/post/:id": {
+        "/api/post/v1/:id": {
             "get": {
                 "description": "Get post by ID",
                 "consumes": [
@@ -298,7 +298,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/blog/v1/post/comment": {
+        "/api/post/v1/comment": {
             "post": {
                 "description": "Add Comment",
                 "consumes": [
@@ -356,7 +356,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/blog/v1/post/comment/:id": {
+        "/api/post/v1/comment/:id": {
             "delete": {
                 "description": "Delete Comment",
                 "consumes": [
@@ -633,8 +633,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "Blog Microservice",
-	Description:      "This MS handles blog posts and comments",
+	Title:            "Post Microservice",
+	Description:      "This MS handles posts and comments",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

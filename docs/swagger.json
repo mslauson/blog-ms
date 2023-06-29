@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This MS handles blog posts and comments",
-        "title": "Blog Microservice",
+        "description": "This MS handles posts and comments",
+        "title": "Post Microservice",
         "contact": {
             "name": "Matthew Slauson",
             "email": "matthew@slauson.io"
@@ -10,7 +10,7 @@
         "version": "1.0"
     },
     "paths": {
-        "/api/blog/v1/post/": {
+        "/api/post/v1/": {
             "get": {
                 "description": "Get all posts",
                 "consumes": [
@@ -116,7 +116,7 @@
                 }
             }
         },
-        "/api/blog/v1/post/:id": {
+        "/api/post/v1/:id": {
             "get": {
                 "description": "Get post by ID",
                 "consumes": [
@@ -289,7 +289,7 @@
                 }
             }
         },
-        "/api/blog/v1/post/comment": {
+        "/api/post/v1/comment": {
             "post": {
                 "description": "Add Comment",
                 "consumes": [
@@ -347,7 +347,7 @@
                 }
             }
         },
-        "/api/blog/v1/post/comment/:id": {
+        "/api/post/v1/comment/:id": {
             "delete": {
                 "description": "Delete Comment",
                 "consumes": [

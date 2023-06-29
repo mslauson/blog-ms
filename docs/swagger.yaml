@@ -100,11 +100,11 @@ info:
   contact:
     email: matthew@slauson.io
     name: Matthew Slauson
-  description: This MS handles blog posts and comments
-  title: Blog Microservice
+  description: This MS handles posts and comments
+  title: Post Microservice
   version: "1.0"
 paths:
-  /api/blog/v1/post/:
+  /api/post/v1/:
     get:
       consumes:
       - application/json
@@ -174,7 +174,7 @@ paths:
       summary: Create Post
       tags:
       - post
-  /api/blog/v1/post/:id:
+  /api/post/v1/:id:
     delete:
       consumes:
       - application/json
@@ -289,7 +289,7 @@ paths:
       summary: Update Post
       tags:
       - post
-  /api/blog/v1/post/comment:
+  /api/post/v1/comment:
     post:
       consumes:
       - application/json
@@ -327,7 +327,7 @@ paths:
       summary: Add Comment
       tags:
       - comment
-  /api/blog/v1/post/comment/:id:
+  /api/post/v1/comment/:id:
     delete:
       consumes:
       - application/json
