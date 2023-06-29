@@ -3,9 +3,15 @@ package dao
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"gitea.slauson.io/slausonio/go-types/sioblog"
 	"gitea.slauson.io/slausonio/go-utils/siodao"
+)
+
+var (
+	selectItemsPost    = `id, title, body, created_by_id, updated_by_id, posted_date, updated_date, deletion_date, soft_deleted`
+	selectItemsComment = `id, content, comment_date, user_id, post_id, soft_deleted, deletion_date`
 )
 
 var ctx = context.Background()
@@ -46,7 +52,7 @@ func (pd *PDao) CreatePost(post *sioblog.BlogPost) error {
 		post.Body,
 		post.PostedDate,
 		post.CreatedByID,
-		false,
+		post.SoftDeleted,
 	).Scan(&post.ID)
 	return err
 }
@@ -74,15 +80,22 @@ func (pd *PDao) CommentExistsByID(ID int64) (bool, error) {
 }
 
 func (pd *PDao) GetPostByID(ID int64) (*sioblog.BlogPost, error) {
-	query := `SELECT id, title, body, created_by_id, updated_by_id, posted_date, updated_date, deletion_date, soft_deleted FROM post WHERE id = $1 AND soft_deleted = false`
+	query := fmt.Sprintf(
+		`SELECT %s FROM post WHERE id = $1 AND soft_deleted = false`,
+		selectItemsPost,
+	)
+
 	rows, err := pd.db.QueryContext(ctx, query, ID)
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 
 	for rows.Next() {
-		post, err := pd.scanPost(rows)
+		post := &sioblog.BlogPost{}
+
+		err := pd.scanPost(rows, post)
 		if err != nil {
 			return nil, err
 		}
@@ -100,7 +113,11 @@ func (pd *PDao) GetPostByID(ID int64) (*sioblog.BlogPost, error) {
 }
 
 func (pd *PDao) GetCommentByID(ID int64) (*sioblog.BlogComment, error) {
-	query := `SELECT id, content, comment_date, user_id, post_id, soft_deleted, deletion_date FROM comment WHERE id = $1 AND soft_deleted = false`
+	query := fmt.Sprintf(
+		`SELECT %s FROM comment WHERE id = $1 AND soft_deleted = false`,
+		selectItemsComment,
+	)
+
 	rows, err := pd.db.QueryContext(ctx, query, ID)
 	if err != nil {
 		return nil, err
@@ -108,29 +125,46 @@ func (pd *PDao) GetCommentByID(ID int64) (*sioblog.BlogComment, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		return pd.scanComment(rows)
+		comment := &sioblog.BlogComment{}
+
+		err := pd.scanComment(rows, comment)
+		if err != nil {
+			return nil, err
+		}
+
+		return comment, nil
 	}
 
 	return nil, sql.ErrNoRows
 }
 
 func (pd *PDao) GetAllPosts() (*[]*sioblog.BlogPost, error) {
-	query := `SELECT id, title, body, created_by_id, updated_by_id, posted_date, updated_date, deletion_date, soft_deleted FROM post WHERE soft_deleted = false`
+	query := fmt.Sprintf(
+		`SELECT %s FROM post WHERE soft_deleted = false`,
+		selectItemsPost,
+	)
+
 	rows, err := pd.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 	posts := make([]*sioblog.BlogPost, 0)
+
 	for rows.Next() {
-		post, err := pd.scanPost(rows)
+		post := &sioblog.BlogPost{}
+
+		err := pd.scanPost(rows, post)
 		if err != nil {
 			return nil, err
 		}
+
 		comments, err := pd.GetAllCommentsByPostID(post.ID)
 		if err != nil {
 			return nil, err
 		}
+
 		post.Comments = comments
 		posts = append(posts, post)
 	}
@@ -139,32 +173,51 @@ func (pd *PDao) GetAllPosts() (*[]*sioblog.BlogPost, error) {
 }
 
 func (pd *PDao) GetAllCommentsByPostID(postID int64) (*[]*sioblog.BlogComment, error) {
-	query := `SELECT id, content, comment_date, user_id, post_id, soft_deleted, deletion_date FROM comment WHERE post_id = $1 AND soft_deleted = false`
+	query := fmt.Sprintf(
+		`SELECT %s FROM comment WHERE post_id = $1 AND soft_deleted = false`,
+		selectItemsComment,
+	)
+
 	rows, err := pd.db.QueryContext(ctx, query, postID)
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
+
 	return pd.scanComments(rows)
 }
 
 func (pd *PDao) UpdatePost(post *sioblog.BlogPost) error {
-	query := `UPDATE post
+	query := fmt.Sprintf(`UPDATE post
 		SET 
 		title = COALESCE($1, title),
 		body = COALESCE($2,body),
 		updated_date = $3,
 		updated_by_id = $4
 		WHERE id = $5
-	`
-	if _, err := pd.db.ExecContext(ctx, query, post.Title, post.Body, post.UpdatedDate, post.UpdatedByID, post.ID); err != nil {
+		returning %s`, selectItemsPost)
+
+	rows, err := pd.db.QueryContext(
+		ctx,
+		query,
+		post.Title,
+		post.Body,
+		post.UpdatedDate,
+		post.UpdatedByID,
+		post.ID,
+	)
+	if err != nil {
 		return err
 	}
-	return nil
+
+	defer rows.Close()
+	return pd.scanPost(rows, post)
 }
 
 func (pd *PDao) AddComment(comment *sioblog.BlogComment) error {
 	query := `INSERT INTO comment (content, comment_date, post_id, user_id, soft_deleted) VALUES ($1, $2, $3, $4, $5) RETURNING id`
+
 	err := pd.db.QueryRowContext(
 		ctx,
 		query,
@@ -174,6 +227,7 @@ func (pd *PDao) AddComment(comment *sioblog.BlogComment) error {
 		comment.UserID,
 		false,
 	).Scan(&comment.ID)
+
 	return err
 }
 
@@ -208,8 +262,7 @@ func (pd *PDao) SoftDeleteComment(comment *sioblog.BlogComment) (sql.Result, err
 	return pd.db.ExecContext(ctx, query, true, comment.DeletionDate, comment.ID)
 }
 
-func (pd *PDao) scanPost(rows *sql.Rows) (*sioblog.BlogPost, error) {
-	post := &sioblog.BlogPost{}
+func (pd *PDao) scanPost(rows *sql.Rows, post *sioblog.BlogPost) error {
 	err := rows.Scan(
 		&post.ID,
 		&post.Title,
@@ -222,14 +275,13 @@ func (pd *PDao) scanPost(rows *sql.Rows) (*sioblog.BlogPost, error) {
 		&post.SoftDeleted,
 	)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return post, nil
+	return nil
 }
 
-func (pd *PDao) scanComment(rows *sql.Rows) (*sioblog.BlogComment, error) {
-	comment := &sioblog.BlogComment{}
+func (pd *PDao) scanComment(rows *sql.Rows, comment *sioblog.BlogComment) error {
 	err := rows.Scan(
 		&comment.ID,
 		&comment.Content,
@@ -240,16 +292,18 @@ func (pd *PDao) scanComment(rows *sql.Rows) (*sioblog.BlogComment, error) {
 		&comment.DeletionDate,
 	)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return comment, nil
+	return nil
 }
 
 func (pd *PDao) scanComments(rows *sql.Rows) (*[]*sioblog.BlogComment, error) {
 	comments := &[]*sioblog.BlogComment{}
 	for rows.Next() {
-		comment, err := pd.scanComment(rows)
+		comment := &sioblog.BlogComment{}
+
+		err := pd.scanComment(rows, comment)
 		if err != nil {
 			return nil, err
 		}

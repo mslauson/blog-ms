@@ -16,6 +16,7 @@ func buildCreatePostEntity(req *dto.CreatePostRequest) *sioblog.BlogPost {
 		Body:        siodao.BuildNullString(req.Body),
 		CreatedByID: req.CreatedByID,
 		PostedDate:  time.Now(),
+		SoftDeleted: false,
 	}
 }
 
