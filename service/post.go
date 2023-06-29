@@ -177,13 +177,3 @@ func (ps *PostSvc) postExistsByID(id int64) error {
 
 	return nil
 }
-
-func (ps *PostSvc) commentExistsByID(id int64) error {
-	if exists, err := ps.dao.CommentExistsByID(id); err != nil {
-		return siodao.HandleDbErr(err, constants.COMMENT)
-	} else if !exists {
-		return sioerror.NewSioNotFoundError(constants.NO_COMMENT_FOUND)
-	}
-
-	return nil
-}

@@ -462,11 +462,33 @@ func TestUpdatePost(t *testing.T) {
 
 	pd := &PDao{db: db}
 
-	mock.ExpectQuery(`UPDATE post`).
+	mock.ExpectExec(`UPDATE post`).
 		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.UpdatedDate, mockdata.PostEntity.UpdatedByID, mockdata.PostEntity.ID).
-		WillReturnRows(postRows)
+		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = pd.UpdatePost(mockdata.PostEntity)
+	result, err := pd.UpdatePost(mockdata.PostEntity)
+	n, err := result.RowsAffected()
+
+	require.Equal(t, int64(1), n)
+	require.NoError(t, err)
+}
+
+func TestUpdatePost_NoRows(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectExec(`UPDATE post`).
+		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.UpdatedDate, mockdata.PostEntity.UpdatedByID, mockdata.PostEntity.ID).
+		WillReturnResult(sqlmock.NewResult(0, 0))
+
+	result, err := pd.UpdatePost(mockdata.PostEntity)
+	n, err := result.RowsAffected()
+
+	require.Equal(t, int64(0), n)
 	require.NoError(t, err)
 }
 
@@ -482,8 +504,10 @@ func TestUpdatePost_Err(t *testing.T) {
 		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.UpdatedDate, mockdata.PostEntity.UpdatedByID, mockdata.PostEntity.ID).
 		WillReturnError(errors.New("test error"))
 
-	err = pd.UpdatePost(mockdata.PostEntity)
+	result, err := pd.UpdateComment(mockdata.CommentEntity)
 	require.Error(t, err)
+
+	require.Nilf(t, result, "result should be nil")
 }
 
 func TestAddComment(t *testing.T) {
@@ -527,11 +551,34 @@ func TestUpdateComment(t *testing.T) {
 
 	pd := &PDao{db: db}
 
-	mock.ExpectQuery(`UPDATE comment`).
+	mock.ExpectExec(`UPDATE comment`).
 		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.UpdatedDate, mockdata.CommentEntity.ID).
-		WillReturnRows(commentRows)
+		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = pd.UpdateComment(mockdata.CommentEntity)
+	result, err := pd.UpdateComment(mockdata.CommentEntity)
+	n, err := result.RowsAffected()
+
+	require.Equal(t, int64(1), n)
+	require.NoError(t, err)
+}
+
+func TestUpdateComment_NoRows(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	pd := &PDao{db: db}
+
+	mock.ExpectExec(`UPDATE comment`).
+		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.UpdatedDate, mockdata.CommentEntity.ID).
+		WillReturnResult(sqlmock.NewResult(0, 0))
+
+	result, err := pd.UpdateComment(mockdata.CommentEntity)
+	n, err := result.RowsAffected()
+
+	require.Equal(t, int64(0), n)
+	require.NoError(t, err)
 	require.NoError(t, err)
 }
 
@@ -543,12 +590,14 @@ func TestUpdateComment_Err(t *testing.T) {
 
 	pd := &PDao{db: db}
 
-	mock.ExpectQuery(`UPDATE comment`).
+	mock.ExpectExec(`UPDATE comment`).
 		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.UpdatedDate, mockdata.CommentEntity.ID).
 		WillReturnError(errors.New("test error"))
 
-	err = pd.UpdateComment(mockdata.CommentEntity)
+	result, err := pd.UpdateComment(mockdata.CommentEntity)
 	require.Error(t, err)
+
+	require.Nilf(t, result, "result should be nil")
 }
 
 func TestSoftDeletePost(t *testing.T) {
