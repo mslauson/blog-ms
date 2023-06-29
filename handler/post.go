@@ -12,11 +12,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type BlogHdlr struct {
-	svc service.BlogService
+type PostHdlr struct {
+	svc service.PostService
 }
 
-type BlogHandler interface {
+type PostHandler interface {
 	GetPost(c *gin.Context)
 	GetAllPosts(c *gin.Context)
 	CreatePost(c *gin.Context)
@@ -27,9 +27,9 @@ type BlogHandler interface {
 	SoftDeleteComment(c *gin.Context)
 }
 
-func NewBlogHdlr() *BlogHdlr {
-	return &BlogHdlr{
-		svc: service.NewBlogSvc(),
+func NewPostHdlr() *PostHdlr {
+	return &PostHdlr{
+		svc: service.NewPostSvc(),
 	}
 }
 
@@ -46,7 +46,7 @@ func NewBlogHdlr() *BlogHdlr {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/blog/v1/post/:id [get]
-func (ph *BlogHdlr) GetPost(c *gin.Context) {
+func (ph *PostHdlr) GetPost(c *gin.Context) {
 	id := c.Param("id")
 
 	iId, err := sioUtils.ConvertToInt64(id)
@@ -73,7 +73,7 @@ func (ph *BlogHdlr) GetPost(c *gin.Context) {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/blog/v1/post/ [get]
-func (ph *BlogHdlr) GetAllPosts(c *gin.Context) {
+func (ph *PostHdlr) GetAllPosts(c *gin.Context) {
 	// includeDeleted := c.DefaultQuery("includeDeleted", "false")
 	// idBool, err := sioUtils.ToBool(includeDeleted)
 	// if err != nil {
@@ -101,7 +101,7 @@ func (ph *BlogHdlr) GetAllPosts(c *gin.Context) {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/blog/v1/post/ [post]
-func (ph *BlogHdlr) CreatePost(c *gin.Context) {
+func (ph *PostHdlr) CreatePost(c *gin.Context) {
 	validations := utils.NewValidator()
 	var request dto.CreatePostRequest
 	err := c.ShouldBindJSON(&request)
@@ -135,7 +135,7 @@ func (ph *BlogHdlr) CreatePost(c *gin.Context) {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/blog/v1/post/comment [post]
-func (ph *BlogHdlr) AddComment(c *gin.Context) {
+func (ph *PostHdlr) AddComment(c *gin.Context) {
 	validations := utils.NewValidator()
 	var request dto.AddCommentRequest
 	err := c.ShouldBindJSON(&request)
@@ -170,7 +170,7 @@ func (ph *BlogHdlr) AddComment(c *gin.Context) {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/blog/v1/post/:id [patch]
-func (ph *BlogHdlr) UpdatePost(c *gin.Context) {
+func (ph *PostHdlr) UpdatePost(c *gin.Context) {
 	validations := utils.NewValidator()
 
 	id := c.Param("id")
@@ -214,7 +214,7 @@ func (ph *BlogHdlr) UpdatePost(c *gin.Context) {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/blog/v1/post/comment/:id [patch]
-func (ph *BlogHdlr) UpdateComment(c *gin.Context) {
+func (ph *PostHdlr) UpdateComment(c *gin.Context) {
 	validations := utils.NewValidator()
 
 	id := c.Param("id")
@@ -257,7 +257,7 @@ func (ph *BlogHdlr) UpdateComment(c *gin.Context) {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/blog/v1/post/:id [delete]
-func (ph *BlogHdlr) SoftDeletePost(c *gin.Context) {
+func (ph *PostHdlr) SoftDeletePost(c *gin.Context) {
 	id := c.Param("id")
 
 	iId, err := sioUtils.ConvertToInt64(id)
@@ -285,7 +285,7 @@ func (ph *BlogHdlr) SoftDeletePost(c *gin.Context) {
 // @Failure 404 {object} siogeneric.ErrorResponse
 // @Failure 500 {object} siogeneric.ErrorResponse
 // @Router /api/blog/v1/post/comment/:id [delete]
-func (ph *BlogHdlr) SoftDeleteComment(c *gin.Context) {
+func (ph *PostHdlr) SoftDeleteComment(c *gin.Context) {
 	id := c.Param("id")
 
 	iId, err := sioUtils.ConvertToInt64(id)

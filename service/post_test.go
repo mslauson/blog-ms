@@ -12,9 +12,9 @@ import (
 	"gitea.slauson.io/slausonio/go-utils/sioerror"
 )
 
-func initEnv(t *testing.T) (*BlogSvc, *mocks.BlogDao) {
+func initEnv(t *testing.T) (*PostSvc, *mocks.BlogDao) {
 	mDao := mocks.NewBlogDao(t)
-	svc := &BlogSvc{dao: mDao}
+	svc := &PostSvc{dao: mDao}
 	return svc, mDao
 }
 

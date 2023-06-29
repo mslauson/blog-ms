@@ -15,7 +15,7 @@ func TestCreatePost(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	rows := sqlmock.NewRows([]string{"id"}).AddRow(1)
 	mock.ExpectQuery(`INSERT INTO post`).
@@ -32,7 +32,7 @@ func TestCreatePost_Error(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectQuery(`INSERT INTO post`).
 		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.PostedDate, mockdata.PostEntity.CreatedByID, false).
@@ -47,7 +47,7 @@ func TestPostExists(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
 	mock.ExpectQuery(`SELECT EXISTS`).
@@ -67,7 +67,7 @@ func TestPostExists_Error(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectQuery(`SELECT EXISTS`).
 		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.CreatedByID).
@@ -86,7 +86,7 @@ func TestPostExistsByID(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
 	mock.ExpectQuery(`SELECT EXISTS`).
@@ -102,7 +102,7 @@ func TestPostExistsByID_Error(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectQuery(`SELECT EXISTS`).
 		WillReturnError(errors.New("test error"))
@@ -117,7 +117,7 @@ func TestCommentExistsByID(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
 	mock.ExpectQuery(`SELECT EXISTS`).
@@ -133,7 +133,7 @@ func TestCommentExistsByID_Error(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectQuery(`SELECT EXISTS`).
 		WillReturnError(errors.New("test error"))
@@ -148,7 +148,7 @@ func TestGetPostByID(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	rows := sqlmock.NewRows([]string{
 		"id",
@@ -198,7 +198,7 @@ func TestGetPostByID_ErrorPost(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectQuery(`SELECT`).
 		WillReturnError(errors.New("test error"))
@@ -217,7 +217,7 @@ func TestGetPostByID_ErrorComment(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	rows := sqlmock.NewRows([]string{
 		"id",
@@ -248,7 +248,7 @@ func TestGetCommentByID(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	rows := sqlmock.NewRows([]string{
 		"id",
@@ -281,7 +281,7 @@ func TestGetCommentByID_Err(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectQuery(`SELECT`).
 		WillReturnError(errors.New("test error"))
@@ -296,7 +296,7 @@ func TestGetAllPosts(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	rows := sqlmock.NewRows([]string{
 		"id",
@@ -354,7 +354,7 @@ func TestGetAllPosts_ErrPost(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectQuery(`SELECT`).
 		WillReturnError(errors.New("test error"))
@@ -370,7 +370,7 @@ func TestGetAllPosts_ErrComments(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	rows := sqlmock.NewRows([]string{
 		"id",
@@ -409,7 +409,7 @@ func TestGetAllCommentsByPostID(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	rows := sqlmock.NewRows([]string{
 		"id",
@@ -443,7 +443,7 @@ func TestGetAllCommentsByPostID_Err(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectQuery(`SELECT`).
 		WillReturnError(errors.New("test error"))
@@ -459,7 +459,7 @@ func TestUpdatePost(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectExec(`UPDATE post`).
 		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.UpdatedDate, mockdata.PostEntity.UpdatedByID, mockdata.PostEntity.ID).
@@ -474,7 +474,7 @@ func TestUpdatePost_Err(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectExec(`UPDATE post`).
 		WithArgs(mockdata.PostEntity.Title.String, mockdata.PostEntity.Body.String, mockdata.PostEntity.UpdatedDate, mockdata.PostEntity.UpdatedByID, mockdata.PostEntity.ID).
@@ -489,7 +489,7 @@ func TestAddComment(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	rows := sqlmock.NewRows([]string{"id"}).AddRow(1)
 	mock.ExpectQuery(`INSERT INTO comment`).
@@ -506,7 +506,7 @@ func TestAddComment_Err(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectQuery(`INSERT INTO comment`).
 		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.CommentDate, mockdata.CommentEntity.PostID, mockdata.CommentEntity.UserID, false).
@@ -522,7 +522,7 @@ func TestUpdateComment(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectExec(`UPDATE comment`).
 		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.UpdatedDate, mockdata.CommentEntity.ID).
@@ -537,7 +537,7 @@ func TestUpdateComment_Err(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectExec(`UPDATE comment`).
 		WithArgs(mockdata.CommentEntity.Content.String, mockdata.CommentEntity.UpdatedDate, mockdata.CommentEntity.ID).
@@ -553,7 +553,7 @@ func TestSoftDeletePost(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectExec(`UPDATE post`).
 		WithArgs(true, mockdata.PostEntity.DeletionDate, mockdata.PostEntity.ID).
@@ -568,7 +568,7 @@ func TestSoftDeletePost_Err(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectExec(`UPDATE post`).
 		WithArgs(true, mockdata.PostEntity.DeletionDate, mockdata.PostEntity.ID).
@@ -584,7 +584,7 @@ func TestSoftDeleteComment(t *testing.T) {
 
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectExec(`UPDATE comment`).
 		WithArgs(true, mockdata.CommentEntity.DeletionDate, mockdata.CommentEntity.ID).
@@ -598,7 +598,7 @@ func TestSoftDeleteComment_Err(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	pd := &BDao{db: db}
+	pd := &PDao{db: db}
 
 	mock.ExpectExec(`UPDATE comment`).
 		WithArgs(true, mockdata.CommentEntity.DeletionDate, mockdata.CommentEntity.ID).

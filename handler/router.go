@@ -15,7 +15,7 @@ func CreateRouter() *gin.Engine {
 	r.Use(siomw.PrometheusMiddleware())
 	r.Use(siomw.ErrorHandler)
 
-	h := NewBlogHdlr()
+	h := NewPostHdlr()
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
