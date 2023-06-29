@@ -17,8 +17,8 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func initEnv() (*PostHdlr, *mocks.BlogService) {
-	mSvc := &mocks.BlogService{}
+func initEnv() (*PostHdlr, *mocks.PostService) {
+	mSvc := &mocks.PostService{}
 	hdlr := &PostHdlr{
 		svc: mSvc,
 	}
