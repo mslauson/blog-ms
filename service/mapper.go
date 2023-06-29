@@ -41,6 +41,7 @@ func buildUpdatePostEntity(ID int64, req *dto.UpdatePostRequest) *sioblog.BlogPo
 
 func buildUpdateCommentEntity(ID int64, req *dto.UpdateCommentRequest) *sioblog.BlogComment {
 	return &sioblog.BlogComment{
+		ID:          ID,
 		Content:     siodao.BuildNullString(req.Content),
 		UpdatedDate: siodao.BuildNullTime(time.Now()),
 	}

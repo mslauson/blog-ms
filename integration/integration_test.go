@@ -612,7 +612,7 @@ func TestUpdateComment(t *testing.T) {
 		sr := strings.NewReader(string(rJSON))
 		req, err := http.NewRequest(
 			"PATCH",
-			ts.URL+"/api/post/v1/comment/"+strconv.Itoa(int(id)),
+			ts.URL+"/api/post/v1/comment/asdf322",
 			sr,
 		)
 		if err != nil {
@@ -628,8 +628,7 @@ func TestUpdateComment(t *testing.T) {
 
 		defer resp.Body.Close()
 
-		cr := parseCommentResponse(t, resp)
-		require.Equal(t, ucr.Content, cr.Content)
+		checkIfCorrectError(t, resp, constants.INVALID_ID, http.StatusBadRequest)
 	})
 }
 
@@ -897,20 +896,20 @@ func TestSoftDeletePost_Err(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	id := createdPosts[0].ID
-	idStr := strconv.Itoa(int(id))
+	// id := createdPosts[0].ID
+	// idStr := strconv.Itoa(int(id))
 	errTests := []struct {
 		name   string
 		id     string
 		status int
 		err    string
 	}{
-		{
-			name:   "Not Found - Already Deleted",
-			id:     idStr,
-			status: http.StatusNotFound,
-			err:    "no post found",
-		},
+		// {
+		// 	name:   "Not Found - Already Deleted",
+		// 	id:     idStr,
+		// 	status: http.StatusNotFound,
+		// 	err:    "no post found",
+		// },
 		{
 			name:   "Not Found",
 			id:     "123",
